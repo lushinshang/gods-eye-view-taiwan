@@ -3,19 +3,25 @@
 > **現代化 3D 地球態勢感知中樞 × 臺灣交通部航港局（MOTC MPB）9,000+ 艘官方即時雷達數據對接**  
 > 融合幾十年分散式 GIS / C4ISR 防禦雷達工程底蘊與 2026+ AI 時代（Agentic / MCP / 多模態 Vision）架構演進規劃。
 
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Docs-38bdf8?style=flat&logo=github)](https://lushinshang.github.io/gods-eye-view-taiwan/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
+🌐 **GitHub Pages 線上直接瀏覽**：[https://lushinshang.github.io/gods-eye-view-taiwan/](https://lushinshang.github.io/gods-eye-view-taiwan/)
+
 ---
 
 ## 📑 核心成果與系統文件導覽（HTML 圖文並茂）
 
-本專案所有核心交付物均已完成 **Playwright 雙端自動化檢驗（桌機 1280px / 手機直屏 390px 零橫向滾動、零錯誤）**：
+本專案所有核心交付物均已完成 **Playwright 雙端自動化檢驗（桌機 1280px / 手機直屏 390px 零橫向滾動、零錯誤）**，支援線上 GitHub Pages 直開瀏覽與離線本機開啟：
 
-| 文件名稱 | 檔案路徑 | 顧問規格與核心內容 |
-| :--- | :--- | :--- |
-| **📖 系統發布與使用指南** | [`readme.html`](file:///Users/lanss/projects/2_Practice/tools/1151104_gods-eye-view/readme.html) | 一鍵 Docker + uv 啟動指引、8 大船型辨識圖譜、即時更新矩陣、人機工效快捷鍵與 FAQ。 |
-| **🏛️ 現代 C4ISR 系統架構白皮書** | [`system-architecture.html`](file:///Users/lanss/projects/2_Practice/tools/1151104_gods-eye-view/system-architecture.html) | 幾十年資深系統分析顧問 × AI 時代全景白皮書：雙軌 API 契約、40s 快取安全、Texture Atlas 1 Draw Call 合批、Screen-Space 13.4px 尺度治理、Agentic/MCP 演進藍圖。 |
-| **📊 技術演進與實錄全歷程** | [`gods-eye-view-summary.html`](file:///Users/lanss/projects/2_Practice/tools/1151104_gods-eye-view/gods-eye-view-summary.html) | 深入記錄本機 Docker 實測、Claude Code 逆向挖掘免金鑰官方雷達源、數據解耦、尺度災難復盤與修復實錄。 |
-| **🔬 深度研究與實測規劃報告** | [`gods-eye-view-analysis.html`](file:///Users/lanss/projects/2_Practice/tools/1151104_gods-eye-view/gods-eye-view-analysis.html) | 基於 GitHub v0.3.0 與 DeepWiki 42 篇文件交叉實證、19/21 免金鑰圖層驗證、臺灣高公局 CCTV 與本土化實測存證。 |
-| **🎨 微光學圖標設計展示書** | [`spec.html`](repo/public/icons/taiwan-vessels/spec.html)（本機離線；容器網址：http://localhost:4173/icons/taiwan-vessels/spec.html） | Awwwards / FWA 規格 16 款（8 normal + 8 白金選取態）48×48 Texture Atlas 微光學船舶點陣圖標設計展示。 |
+| 文件名稱 | 線上 GitHub Pages 瀏覽 | 檔案路徑 | 顧問規格與核心內容 |
+| :--- | :--- | :--- | :--- |
+| **📖 系統發布與使用指南** | [點此線上開啟](https://lushinshang.github.io/gods-eye-view-taiwan/readme.html) | `readme.html` | 一鍵 Docker + uv 啟動指引、8 大船型辨識圖譜、即時更新矩陣、人機工效快捷鍵與 FAQ。 |
+| **🏛️ 現代 C4ISR 系統架構白皮書** | [點此線上開啟](https://lushinshang.github.io/gods-eye-view-taiwan/system-architecture.html) | `system-architecture.html` | 幾十年資深系統分析顧問 × AI 時代全景白皮書：雙軌 API 契約、Texture Atlas 1 Draw Call 合批、Agentic/MCP 演進藍圖。 |
+| **💻 資源實測與移植硬體規格評估** | [點此線上開啟](https://lushinshang.github.io/gods-eye-view-taiwan/system-resource-evaluation.html) | `system-resource-evaluation.html` | 實機壓測數據、三級硬體矩陣速查卡（最低/建議/極致戰情旗艦）、Ubuntu Docker / Win11 WSL2 部署手冊。 |
+| **📊 技術演進與實錄全歷程** | [點此線上開啟](https://lushinshang.github.io/gods-eye-view-taiwan/gods-eye-view-summary.html) | `gods-eye-view-summary.html` | 深入記錄本機 Docker 實測、Claude Code 逆向挖掘免金鑰官方雷達源、數據解耦、尺度災難復盤與修復實錄。 |
+| **🔬 深度研究與實測規劃報告** | [點此線上開啟](https://lushinshang.github.io/gods-eye-view-taiwan/gods-eye-view-analysis.html) | `gods-eye-view-analysis.html` | 基於 GitHub v0.3.0 與 DeepWiki 42 篇文件交叉實證、19/21 免金鑰圖層驗證、臺灣高公局 CCTV 與本土化實測存證。 |
+| **🎨 微光學圖標設計展示書** | [點此線上開啟](https://lushinshang.github.io/gods-eye-view-taiwan/repo/public/icons/taiwan-vessels/spec.html) | `repo/public/icons/taiwan-vessels/spec.html` | Awwwards / FWA 規格 16 款（8 normal + 8 白金選取態）48×48 Texture Atlas 微光學船舶點陣圖標設計展示。 |
 
 ---
 

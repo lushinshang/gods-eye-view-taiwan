@@ -394,6 +394,26 @@ curl -s http://localhost:11434/api/ps
 
 這條路的分工是：**專案和 Docker 在 WSL2 裡，Ollama 裝在 Windows 本機**，這樣可以直接吃 Windows 的 NVIDIA 驅動，不用在 WSL2 裡另外折騰 GPU。
 
+#### 📦 Windows 必備與選配軟體包下載一覽表
+
+動手前先把安裝檔一次備齊，後面就不用邊裝邊找連結。全部請從官方網站下載：
+
+| 軟體 | 安裝檔 | 必要性 | 用途 | 官方下載 |
+|------|--------|--------|------|----------|
+| Docker Desktop for Windows | `Docker Desktop Installer.exe` | **必裝** | 跑專案容器 | <https://www.docker.com/products/docker-desktop/> |
+| Git for Windows | `Git-64-bit.exe` | **必裝** | 抓專案原始碼、管理版本 | <https://git-scm.com/download/win> |
+| Ollama for Windows | `OllamaSetup.exe` | 選配 | 本機 AI 參謀，直通 Windows 的 GPU | <https://ollama.com/download/windows> |
+| Node.js v20／v22 LTS | `node-v22-x64.msi` | 備用路線 | 不用 Docker 時直接跑專案才需要 | <https://nodejs.org/> |
+
+怎麼挑，看你要玩到哪一層：
+
+- **只要基本 3D 態勢台**：裝 2 個就夠，Docker Desktop ＋ Git。
+- **想加 AI 參謀**：再多裝 Ollama，其他不用動。
+- **WSL2 不用找安裝檔**：Windows 11 內建，管理員 PowerShell 一行 `wsl --install` 就搞定（下面 Step 1 會帶你做）。
+- **Node.js 只有「免 Docker」才用得到**：走上面的 Docker 路線就可以直接跳過。
+
+> 小提醒：本章 Step 4 是在 WSL2 的 Ubuntu 裡 `git clone`，那邊用的是 Ubuntu 自己的 git；Git for Windows 主要是讓你在 Windows 端也能抓專案、管版本。以上安裝檔名與連結為官方頁面現況，版本號可能更新，**未逐一實際下載驗證**。
+
 #### Step 1｜開虛擬化並安裝 WSL2
 
 先到 BIOS／UEFI 確認虛擬化（Intel VT-x／AMD-V）已開啟。接著用「系統管理員」身分開 PowerShell：

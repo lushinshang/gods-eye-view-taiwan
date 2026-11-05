@@ -1,0 +1,838 @@
+{
+  "end_time": "2026-11-04T23:46:10.617627+00:00",
+  "scenarios": [
+    {
+      "label": "live_static",
+      "vessels": 9976,
+      "heap_mib": 165.45154476165771,
+      "cdp_heap_mib": 97.93660736083984,
+      "backing_mib": 67.43190097808838,
+      "dom_nodes": 6847,
+      "dom_elements": 2605,
+      "fps": 0.9999333377774815,
+      "frame_p95_ms": 273.5999999642372,
+      "draws_per_frame": 29,
+      "resources": {
+        "container_cpu_percent": {
+          "n": 7,
+          "min": 16.81,
+          "mean": 20.908571428571427,
+          "max": 24.08
+        },
+        "container_memory_mib": {
+          "n": 7,
+          "min": 862.5,
+          "mean": 888.5857142857143,
+          "max": 893.7
+        },
+        "cgroup_anon_mib": {
+          "n": 7,
+          "min": 443.8046875,
+          "mean": 470.1517857142857,
+          "max": 476.25
+        },
+        "process_rss_mib": null,
+        "host_gpu_percent": {
+          "n": 7,
+          "min": 56,
+          "mean": 63.142857142857146,
+          "max": 79
+        },
+        "ollama_process_cpu_percent": {
+          "n": 7,
+          "min": 0.0,
+          "mean": 0.0,
+          "max": 0.0
+        },
+        "first": {
+          "BlockIO": "110MB / 49.4MB",
+          "CPUPerc": "24.08%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "10.87%",
+          "MemUsage": "862.5MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "150MB / 487MB",
+          "PIDs": "25"
+        },
+        "last": {
+          "BlockIO": "110MB / 49.4MB",
+          "CPUPerc": "22.45%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "11.26%",
+          "MemUsage": "893.3MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "151MB / 492MB",
+          "PIDs": "25"
+        }
+      }
+    },
+    {
+      "label": "live_moving",
+      "vessels": 9976,
+      "heap_mib": 171.53906631469727,
+      "cdp_heap_mib": 102.4331169128418,
+      "backing_mib": 69.09815311431885,
+      "dom_nodes": 7413,
+      "dom_elements": 2605,
+      "fps": 41.39834406617155,
+      "frame_p95_ms": 28.100000023841858,
+      "draws_per_frame": 43.22222222222222,
+      "resources": {
+        "container_cpu_percent": {
+          "n": 7,
+          "min": 20.8,
+          "mean": 24.104285714285716,
+          "max": 31.06
+        },
+        "container_memory_mib": {
+          "n": 7,
+          "min": 894.6,
+          "mean": 894.9,
+          "max": 895.4
+        },
+        "cgroup_anon_mib": {
+          "n": 7,
+          "min": 475.61328125,
+          "mean": 477.265625,
+          "max": 477.73828125
+        },
+        "process_rss_mib": null,
+        "host_gpu_percent": {
+          "n": 7,
+          "min": 67,
+          "mean": 95.14285714285714,
+          "max": 100
+        },
+        "ollama_process_cpu_percent": {
+          "n": 7,
+          "min": 0.0,
+          "mean": 0.0,
+          "max": 0.0
+        },
+        "first": {
+          "BlockIO": "110MB / 49.4MB",
+          "CPUPerc": "25.61%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "11.28%",
+          "MemUsage": "894.8MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "152MB / 493MB",
+          "PIDs": "25"
+        },
+        "last": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "24.47%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "11.28%",
+          "MemUsage": "895MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "153MB / 494MB",
+          "PIDs": "25"
+        }
+      }
+    },
+    {
+      "label": "zero_ships_warm_static",
+      "vessels": 0,
+      "heap_mib": 160.17500400543213,
+      "cdp_heap_mib": 94.28592300415039,
+      "backing_mib": 67.1286792755127,
+      "dom_nodes": 7112,
+      "dom_elements": 2605,
+      "fps": 0.9999333377774815,
+      "frame_p95_ms": 264.30000001192093,
+      "draws_per_frame": 44,
+      "resources": {
+        "container_cpu_percent": {
+          "n": 7,
+          "min": 20.19,
+          "mean": 31.61285714285714,
+          "max": 82.02
+        },
+        "container_memory_mib": {
+          "n": 7,
+          "min": 889.1,
+          "mean": 890.3571428571429,
+          "max": 895.1
+        },
+        "cgroup_anon_mib": {
+          "n": 7,
+          "min": 469.48828125,
+          "mean": 471.67689732142856,
+          "max": 477.71484375
+        },
+        "process_rss_mib": null,
+        "host_gpu_percent": {
+          "n": 7,
+          "min": 44,
+          "mean": 58.42857142857143,
+          "max": 68
+        },
+        "ollama_process_cpu_percent": {
+          "n": 7,
+          "min": 0.0,
+          "mean": 0.04285714285714286,
+          "max": 0.3
+        },
+        "first": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "23.05%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "11.28%",
+          "MemUsage": "895.1MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "154MB / 494MB",
+          "PIDs": "25"
+        },
+        "last": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "20.19%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "11.21%",
+          "MemUsage": "889.1MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "159MB / 499MB",
+          "PIDs": "25"
+        }
+      }
+    },
+    {
+      "label": "zero_ships_warm_moving",
+      "vessels": 0,
+      "heap_mib": 159.55982112884521,
+      "cdp_heap_mib": 94.17804336547852,
+      "backing_mib": 66.23051834106445,
+      "dom_nodes": 6939,
+      "dom_elements": 2605,
+      "fps": 41.995800419958,
+      "frame_p95_ms": 30.599999964237213,
+      "draws_per_frame": 42.285714285714285,
+      "resources": {
+        "container_cpu_percent": {
+          "n": 7,
+          "min": 21.98,
+          "mean": 24.16,
+          "max": 30.6
+        },
+        "container_memory_mib": {
+          "n": 7,
+          "min": 889.0,
+          "mean": 889.4571428571429,
+          "max": 889.8
+        },
+        "cgroup_anon_mib": {
+          "n": 7,
+          "min": 465.5625,
+          "mean": 470.53683035714283,
+          "max": 471.84375
+        },
+        "process_rss_mib": null,
+        "host_gpu_percent": {
+          "n": 7,
+          "min": 65,
+          "mean": 94.85714285714286,
+          "max": 100
+        },
+        "ollama_process_cpu_percent": {
+          "n": 7,
+          "min": 0.0,
+          "mean": 0.6285714285714287,
+          "max": 4.4
+        },
+        "first": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "22.33%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "11.21%",
+          "MemUsage": "889.5MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "160MB / 500MB",
+          "PIDs": "25"
+        },
+        "last": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "22.56%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "11.21%",
+          "MemUsage": "889.2MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "161MB / 501MB",
+          "PIDs": "25"
+        }
+      }
+    },
+    {
+      "label": "9000_static",
+      "vessels": 9000,
+      "heap_mib": 168.1262092590332,
+      "cdp_heap_mib": 99.93416595458984,
+      "backing_mib": 68.35985565185547,
+      "dom_nodes": 6897,
+      "dom_elements": 2605,
+      "fps": 0,
+      "frame_p95_ms": null,
+      "draws_per_frame": null,
+      "resources": {
+        "container_cpu_percent": {
+          "n": 7,
+          "min": 20.29,
+          "mean": 25.077142857142857,
+          "max": 32.66
+        },
+        "container_memory_mib": {
+          "n": 7,
+          "min": 956.7,
+          "mean": 956.9571428571429,
+          "max": 957.3
+        },
+        "cgroup_anon_mib": {
+          "n": 7,
+          "min": 536.0859375,
+          "mean": 537.3175223214286,
+          "max": 538.32421875
+        },
+        "process_rss_mib": {
+          "n": 7,
+          "min": 602.2578125,
+          "mean": 602.3303571428571,
+          "max": 602.34375
+        },
+        "host_gpu_percent": {
+          "n": 7,
+          "min": 51,
+          "mean": 58.142857142857146,
+          "max": 68
+        },
+        "ollama_process_cpu_percent": {
+          "n": 7,
+          "min": 0.0,
+          "mean": 0.0,
+          "max": 0.0
+        },
+        "first": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "25.69%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "12.06%",
+          "MemUsage": "957MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "181MB / 586MB",
+          "PIDs": "25"
+        },
+        "last": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "22.33%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "12.07%",
+          "MemUsage": "957.3MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "185MB / 590MB",
+          "PIDs": "25"
+        }
+      }
+    },
+    {
+      "label": "9000_moving",
+      "vessels": 9000,
+      "heap_mib": 172.7777223587036,
+      "cdp_heap_mib": 104.05191802978516,
+      "backing_mib": 68.76021099090576,
+      "dom_nodes": 7347,
+      "dom_elements": 2605,
+      "fps": 39.32861389963412,
+      "frame_p95_ms": 31.400000035762787,
+      "draws_per_frame": 43.28983050847457,
+      "resources": {
+        "container_cpu_percent": {
+          "n": 7,
+          "min": 22.63,
+          "mean": 41.97142857142857,
+          "max": 118.41
+        },
+        "container_memory_mib": {
+          "n": 7,
+          "min": 954.6,
+          "mean": 957.6714285714286,
+          "max": 961.2
+        },
+        "cgroup_anon_mib": {
+          "n": 7,
+          "min": 534.25390625,
+          "mean": 540.8376116071429,
+          "max": 546.34765625
+        },
+        "process_rss_mib": {
+          "n": 7,
+          "min": 602.34765625,
+          "mean": 606.7767857142857,
+          "max": 610.4453125
+        },
+        "host_gpu_percent": {
+          "n": 7,
+          "min": 59,
+          "mean": 93.71428571428571,
+          "max": 100
+        },
+        "ollama_process_cpu_percent": {
+          "n": 7,
+          "min": 0.0,
+          "mean": 4.685714285714285,
+          "max": 32.8
+        },
+        "first": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "25.12%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "12.06%",
+          "MemUsage": "956.9MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "185MB / 590MB",
+          "PIDs": "25"
+        },
+        "last": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "37.47%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "12.12%",
+          "MemUsage": "961.2MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "191MB / 596MB",
+          "PIDs": "25"
+        }
+      }
+    },
+    {
+      "label": "9000_traffic_static",
+      "vessels": 9000,
+      "heap_mib": 170.53199291229248,
+      "cdp_heap_mib": 102.41169357299805,
+      "backing_mib": 68.54258441925049,
+      "dom_nodes": 6935,
+      "dom_elements": 2617,
+      "fps": 0.9999733340460149,
+      "frame_p95_ms": 246,
+      "draws_per_frame": 47,
+      "resources": {
+        "container_cpu_percent": {
+          "n": 7,
+          "min": 19.85,
+          "mean": 22.502857142857142,
+          "max": 24.77
+        },
+        "container_memory_mib": {
+          "n": 7,
+          "min": 961.0,
+          "mean": 961.6571428571428,
+          "max": 962.1
+        },
+        "cgroup_anon_mib": {
+          "n": 7,
+          "min": 545.140625,
+          "mean": 546.7907366071429,
+          "max": 549.09765625
+        },
+        "process_rss_mib": {
+          "n": 7,
+          "min": 611.24609375,
+          "mean": 611.24609375,
+          "max": 611.24609375
+        },
+        "host_gpu_percent": {
+          "n": 7,
+          "min": 45,
+          "mean": 51.57142857142857,
+          "max": 64
+        },
+        "ollama_process_cpu_percent": {
+          "n": 7,
+          "min": 0.0,
+          "mean": 0.0,
+          "max": 0.0
+        },
+        "first": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "19.85%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "12.12%",
+          "MemUsage": "961.4MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "193MB / 597MB",
+          "PIDs": "25"
+        },
+        "last": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "23.83%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "12.13%",
+          "MemUsage": "962.1MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "194MB / 598MB",
+          "PIDs": "25"
+        }
+      }
+    },
+    {
+      "label": "9000_after_ai_static",
+      "vessels": 9000,
+      "heap_mib": 171.4643898010254,
+      "cdp_heap_mib": 104.51386642456055,
+      "backing_mib": 68.68680763244629,
+      "dom_nodes": 6980,
+      "dom_elements": 2617,
+      "fps": 0.06665733463971116,
+      "frame_p95_ms": null,
+      "draws_per_frame": 47,
+      "resources": {
+        "container_cpu_percent": {
+          "n": 5,
+          "min": 28.83,
+          "mean": 57.062,
+          "max": 124.48
+        },
+        "container_memory_mib": {
+          "n": 5,
+          "min": 962.3,
+          "mean": 962.78,
+          "max": 963.6
+        },
+        "cgroup_anon_mib": {
+          "n": 5,
+          "min": 542.29296875,
+          "mean": 545.1921875,
+          "max": 548.234375
+        },
+        "process_rss_mib": {
+          "n": 5,
+          "min": 612.32421875,
+          "mean": 612.59765625,
+          "max": 612.99609375
+        },
+        "host_gpu_percent": {
+          "n": 5,
+          "min": 46,
+          "mean": 52.6,
+          "max": 58
+        },
+        "ollama_process_cpu_percent": {
+          "n": 5,
+          "min": 0.0,
+          "mean": 0.12,
+          "max": 0.3
+        },
+        "first": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "28.83%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "12.13%",
+          "MemUsage": "962.4MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "205MB / 611MB",
+          "PIDs": "25"
+        },
+        "last": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "124.48%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "12.15%",
+          "MemUsage": "963.6MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "207MB / 617MB",
+          "PIDs": "25"
+        }
+      }
+    }
+  ],
+  "ollama": [
+    {
+      "label": "cold",
+      "options": {
+        "temperature": 0,
+        "num_predict": 256
+      },
+      "think": false,
+      "metrics": {
+        "model": "gemma4:e4b",
+        "created_at": "2026-11-04T23:06:20.72347Z",
+        "done": true,
+        "done_reason": "length",
+        "total_duration": 54515076792,
+        "load_duration": 12949031250,
+        "prompt_eval_count": 61,
+        "prompt_eval_cached_count": 0,
+        "prompt_eval_duration": 33091693709,
+        "eval_count": 256,
+        "eval_duration": 8468894167
+      },
+      "response_chars": 391,
+      "tokens_per_second": 30.228267699640508,
+      "wall_seconds": 54.545910417000016,
+      "ollama_ps": {
+        "command": "ollama ps",
+        "exit": 0,
+        "output": "NAME          ID              SIZE      PROCESSOR    CONTEXT    RUNNER    UNTIL              \ngemma4:e4b    5a08735df03c    9.4 GB    100% GPU     4096       mlx       4 minutes from now    \n"
+      },
+      "resources": {
+        "container_cpu_percent": {
+          "n": 16,
+          "min": 15.18,
+          "mean": 35.005,
+          "max": 109.97
+        },
+        "container_memory_mib": {
+          "n": 16,
+          "min": 961.1,
+          "mean": 962.09375,
+          "max": 963.1
+        },
+        "cgroup_anon_mib": {
+          "n": 16,
+          "min": 540.87109375,
+          "mean": 549.463623046875,
+          "max": 591.85546875
+        },
+        "process_rss_mib": {
+          "n": 16,
+          "min": 611.24609375,
+          "mean": 611.840576171875,
+          "max": 612.32421875
+        },
+        "host_gpu_percent": {
+          "n": 16,
+          "min": 42,
+          "mean": 53,
+          "max": 96
+        },
+        "ollama_process_cpu_percent": {
+          "n": 16,
+          "min": 0.0,
+          "mean": 20.83125,
+          "max": 49.7
+        },
+        "first": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "15.18%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "12.12%",
+          "MemUsage": "961.8MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "194MB / 602MB",
+          "PIDs": "25"
+        },
+        "last": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "58.29%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "12.14%",
+          "MemUsage": "962.8MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "203MB / 610MB",
+          "PIDs": "26"
+        }
+      },
+      "loaded_models": [
+        {
+          "name": "gemma4:e4b",
+          "model": "gemma4:e4b",
+          "size": 9403998728,
+          "digest": "5a08735df03c348ab10d56e8ad758098ff1960ab6030605c95fde7d90fc9de18",
+          "details": {
+            "parent_model": "",
+            "format": "safetensors",
+            "family": "",
+            "families": null,
+            "parameter_size": "",
+            "quantization_level": ""
+          },
+          "expires_at": "2026-11-05T07:11:20.743587+08:00",
+          "size_vram": 9403998728,
+          "context_length": 4096,
+          "runner": "mlx"
+        }
+      ]
+    },
+    {
+      "label": "warm",
+      "options": {
+        "temperature": 0,
+        "num_predict": 256
+      },
+      "think": false,
+      "metrics": {
+        "model": "gemma4:e4b",
+        "created_at": "2026-11-04T23:06:30.878213Z",
+        "done": true,
+        "done_reason": "length",
+        "total_duration": 7428669750,
+        "load_duration": 26330208,
+        "prompt_eval_count": 61,
+        "prompt_eval_cached_count": 60,
+        "prompt_eval_duration": 2534584,
+        "eval_count": 256,
+        "eval_duration": 7381728875
+      },
+      "response_chars": 402,
+      "tokens_per_second": 34.6802225244286,
+      "wall_seconds": 7.449403082999993,
+      "ollama_ps": {
+        "command": "ollama ps",
+        "exit": 0,
+        "output": "NAME          ID              SIZE      PROCESSOR    CONTEXT    RUNNER    UNTIL              \ngemma4:e4b    5a08735df03c    9.4 GB    100% GPU     4096       mlx       4 minutes from now    \n"
+      },
+      "resources": {
+        "container_cpu_percent": {
+          "n": 3,
+          "min": 15.8,
+          "mean": 29.393333333333334,
+          "max": 39.59
+        },
+        "container_memory_mib": {
+          "n": 3,
+          "min": 962.3,
+          "mean": 962.4666666666667,
+          "max": 962.7
+        },
+        "cgroup_anon_mib": {
+          "n": 3,
+          "min": 543.0859375,
+          "mean": 546.5247395833334,
+          "max": 548.25
+        },
+        "process_rss_mib": {
+          "n": 3,
+          "min": 612.32421875,
+          "mean": 612.32421875,
+          "max": 612.32421875
+        },
+        "host_gpu_percent": {
+          "n": 3,
+          "min": 48,
+          "mean": 80,
+          "max": 96
+        },
+        "ollama_process_cpu_percent": {
+          "n": 3,
+          "min": 1.9,
+          "mean": 28.96666666666667,
+          "max": 54.800000000000004
+        },
+        "first": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "32.79%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "12.13%",
+          "MemUsage": "962.4MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "204MB / 610MB",
+          "PIDs": "25"
+        },
+        "last": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "39.59%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "12.13%",
+          "MemUsage": "962.3MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "205MB / 611MB",
+          "PIDs": "25"
+        }
+      },
+      "loaded_models": [
+        {
+          "name": "gemma4:e4b",
+          "model": "gemma4:e4b",
+          "size": 9421431304,
+          "digest": "5a08735df03c348ab10d56e8ad758098ff1960ab6030605c95fde7d90fc9de18",
+          "details": {
+            "parent_model": "",
+            "format": "safetensors",
+            "family": "",
+            "families": null,
+            "parameter_size": "",
+            "quantization_level": ""
+          },
+          "expires_at": "2026-11-05T07:11:30.890635+08:00",
+          "size_vram": 9421431304,
+          "context_length": 4096,
+          "runner": "mlx"
+        }
+      ]
+    }
+  ],
+  "final": {
+    "time": "2026-11-04T23:46:10.621190+00:00",
+    "processes": {
+      "command": "ps -axo pid,ppid,%cpu,rss,comm | rg -i 'ollama|VirtualMachine|Chrome|chromium'",
+      "exit": 0,
+      "output": "17507 30426   0.0  18480 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/156.0.8078.79/Helpers/Google Chrome Helper (Aperitif Renderer).app/Contents/MacOS/Google Chrome Helper (Aperitif Renderer)\n17805 30426   0.0  50624 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/156.0.8078.79/Helpers/Google Chrome Helper (Aperitif Renderer).app/Contents/MacOS/Google Chrome Helper (Aperitif Renderer)\n30068 30426   0.0   7520 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/156.0.8078.79/Helpers/Google Chrome Helper (Aperitif Renderer).app/Contents/MacOS/Google Chrome Helper (Aperitif Renderer)\n30426     1   0.0 272912 /Applications/Google Chrome.app/Contents/MacOS/Google Chrome\n30432 30426   0.0  56592 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/156.0.8078.79/Helpers/Google Chrome Helper (Aperitif).app/Contents/MacOS/Google Chrome Helper (Aperitif)\n30433 30426   0.0  68016 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/156.0.8078.79/Helpers/Google Chrome Helper (Aperitif).app/Contents/MacOS/Google Chrome Helper (Aperitif)\n30434 30426   0.0  11056 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/156.0.8078.79/Helpers/Google Chrome Helper (Aperitif).app/Contents/MacOS/Google Chrome Helper (Aperitif)\n30452 30426   0.0   8304 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/156.0.8078.79/Helpers/Google Chrome Helper (Aperitif Renderer).app/Contents/MacOS/Google Chrome Helper (Aperitif Renderer)\n30456 30426   0.0 205456 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/156.0.8078.79/Helpers/Google Chrome Helper (Aperitif Renderer).app/Contents/MacOS/Google Chrome Helper (Aperitif Renderer)\n30472 30426   0.0  10608 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/156.0.8078.79/Helpers/Google Chrome Helper (Aperitif).app/Contents/MacOS/Google Chrome Helper (Aperitif)\n30473 30426   0.0  14736 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/156.0.8078.79/Helpers/Google Chrome Helper (Aperitif).app/Contents/MacOS/Google Chrome Helper (Aperitif)\n40550 30426   2.1 212336 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/156.0.8078.79/Helpers/Google Chrome Helper (Aperitif Renderer).app/Contents/MacOS/Google Chrome Helper (Aperitif Renderer)\n44589 30426   0.0  10208 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/156.0.8078.79/Helpers/Google Chrome Helper (Aperitif Renderer).app/Contents/MacOS/Google Chrome Helper (Aperitif Renderer)\n58390     1   0.0     32 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/156.0.8078.79/Helpers/chrome_crashpad_handler\n70831     1   1.0 1467472 /System/Library/Frameworks/Virtualization.framework/Versions/A/XPCServices/com.apple.Virtualization.VirtualMachine.xpc/Contents/MacOS/com.apple.Virtualization.VirtualMachine\n71778 30426   0.0   8064 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/156.0.8078.79/Helpers/Google Chrome Helper (Aperitif Renderer).app/Contents/MacOS/Google Chrome Helper (Aperitif Renderer)\n73700 30426   0.0   8224 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/156.0.8078.79/Helpers/Google Chrome Helper (Aperitif Renderer).app/Contents/MacOS/Google Chrome Helper (Aperitif Renderer)\n74059 74058   1.0 275632 /Applications/Google Chrome.app/Contents/MacOS/Google Chrome\n74064     1   0.0   8576 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/156.0.8078.81/Helpers/chrome_crashpad_handler\n74070 74059   4.7 237856 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/156.0.8078.81/Helpers/Google Chrome Helper (GPU).app/Contents/MacOS/Google Chrome Helper (GPU)\n74071 74059   1.4 206352 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/156.0.8078.81/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper\n74073 74059   0.0  86128 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/156.0.8078.81/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper\n74076 74059   0.0 188880 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/156.0.8078.81/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)\n74078 74059   0.0 104880 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/156.0.8078.81/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)\n74079 74059  15.4 824832 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/156.0.8078.81/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)\n74097 30426   0.0 115744 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/156.0.8078.79/Helpers/Google Chrome Helper (Aperitif Renderer).app/Contents/MacOS/Google Chrome Helper (Aperitif Renderer)\n81351 30426   0.0  39552 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/156.0.8078.79/Helpers/Google Chrome Helper (Aperitif Renderer).app/Contents/MacOS/Google Chrome Helper (Aperitif Renderer)\n82980 30426   0.0   8752 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/156.0.8078.79/Helpers/Google Chrome Helper (Aperitif Renderer).app/Contents/MacOS/Google Chrome Helper (Aperitif Renderer)\n85049     1   0.0  17664 /Applications/Ollama.app/Contents/MacOS/Ollama\n85052 85049   0.0  29888 /Applications/Ollama.app/Contents/Resources/ollama\n94517 30426   0.0 143344 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/156.0.8078.79/Helpers/Google Chrome Helper (Aperitif Renderer).app/Contents/MacOS/Google Chrome Helper (Aperitif Renderer)\n"
+    },
+    "gpu": {
+      "command": "ioreg -r -c AGXAccelerator -l | rg 'PerformanceStatistics'",
+      "exit": 0,
+      "output": "  |   \"PerformanceStatistics\" = {\"In use system memory (driver)\"=0,\"Alloc system memory\"=4534976512,\"Tiler Utilization %\"=73,\"recoveryCount\"=0,\"lastRecoveryTime\"=0,\"Renderer Utilization %\"=73,\"TiledSceneBytes\"=4980736,\"Device Utilization %\"=73,\"SplitSceneCount\"=0,\"Allocated PB Size\"=117702656,\"In use system memory\"=1406681088}\n"
+    },
+    "swap": {
+      "command": "sysctl vm.swapusage",
+      "exit": 0,
+      "output": "vm.swapusage: total = 8192.00M  used = 7462.81M  free = 729.19M  (encrypted)\n"
+    },
+    "vm": {
+      "command": "vm_stat",
+      "exit": 0,
+      "output": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     5852.\nPages active:                                 340488.\nPages inactive:                               330423.\nPages speculative:                              9079.\nPages throttled:                                   0.\nPages wired down:                             219341.\nPages purgeable:                               24160.\n\"Translation faults\":                     3924561423.\nPages copy-on-write:                       105069342.\nPages zero filled:                        2040293295.\nPages reactivated:                         610496677.\nPages purged:                               49295617.\nFile-backed pages:                            132314.\nAnonymous pages:                              547676.\nPages stored in compressor:                   227834.\nPages occupied by compressor:                  90116.\nDecompressions:                            759600944.\nCompressions:                              890482279.\nPageins:                                   135880346.\nPageouts:                                     261970.\nSwapins:                                    45225131.\nSwapouts:                                   50599880.\n"
+    },
+    "docker": {
+      "command": "docker stats --no-stream --format '{{json .}}'",
+      "exit": 0,
+      "output": "{\"BlockIO\":\"111MB / 49.4MB\",\"CPUPerc\":\"0.25%\",\"Container\":\"227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92\",\"ID\":\"227297fadd62\",\"MemPerc\":\"12.41%\",\"MemUsage\":\"984.3MiB / 7.748GiB\",\"Name\":\"repo-gods-eye-view-1\",\"NetIO\":\"260MB / 796MB\",\"PIDs\":\"25\"}\n"
+    },
+    "cgroup": {
+      "command": "docker exec repo-gods-eye-view-1 sh -c 'cat /sys/fs/cgroup/memory.current /sys/fs/cgroup/memory.stat'",
+      "exit": 0,
+      "output": "1120595968\nanon 899403776\nfile 190607360\nkernel 19398656\nkernel_stack 442368\npagetables 7774208\nsec_pagetables 0\npercpu 27360\nsock 0\nvmalloc 16384\nshmem 0\nzswap 0\nzswapped 0\nfile_mapped 64888832\nfile_dirty 0\nfile_writeback 0\nswapcached 0\nanon_thp 532676608\nfile_thp 39845888\nshmem_thp 0\ninactive_anon 0\nactive_anon 909299712\ninactive_file 81522688\nactive_file 109084672\nunevictable 0\nslab_reclaimable 9522616\nslab_unreclaimable 1567784\nslab 11090400\nworkingset_refault_anon 0\nworkingset_refault_file 0\nworkingset_activate_anon 0\nworkingset_activate_file 0\nworkingset_restore_anon 0\nworkingset_restore_file 0\nworkingset_nodereclaim 0\npgdemote_kswapd 0\npgdemote_direct 0\npgdemote_khugepaged 0\npgdemote_proactive 0\npgscan 0\npgsteal 0\npswpin 0\npswpout 0\npgscan_kswapd 0\npgscan_direct 0\npgscan_khugepaged 0\npgscan_proactive 0\npgsteal_kswapd 0\npgsteal_direct 0\npgsteal_khugepaged 0\npgsteal_proactive 0\npgfault 1384681\npgmajfault 58\npgrefill 0\npgactivate 0\npgdeactivate 0\npglazyfree 0\npglazyfreed 0\nswpin_zero 0\nswpout_zero 0\nzswpin 0\nzswpout 0\nzswpwb 0\nthp_fault_alloc 1558\nthp_collapse_alloc 198\nthp_swpout 0\nthp_swpout_fallback 0\n"
+    },
+    "container_rss": {
+      "command": "docker top repo-gods-eye-view-1 -eo pid,rss,comm",
+      "exit": 0,
+      "output": "PID                 RSS                 COMMAND\n578                 603940              MainThread\n629                 340364              esbuild\n"
+    },
+    "ollama": {
+      "models": []
+    }
+  },
+  "track_end": {
+    "vessels": 15411,
+    "points": 97668,
+    "retentionDays": 7,
+    "oldestT": 1793799885000,
+    "newestT": 1793835783000,
+    "diskKB": 11634,
+    "files": 2,
+    "skippedInvalidMmsi": 16828,
+    "corruptLines": 0
+  },
+  "disk_end": {
+    "command": "du -sk .gev-cache .gev-cache/taiwan-tracks; du -ak .gev-cache | sort -n",
+    "exit": 0,
+    "output": "22544\t.gev-cache\n11652\t.gev-cache/taiwan-tracks\n0\t.gev-cache/ai-advisor\n0\t.gev-cache/overpass\n4\t.gev-cache/celestrak-stations.json\n4\t.gev-cache/mcp-panel-key\n8\t.gev-cache/celestrak-galileo.json\n8\t.gev-cache/celestrak-glo-ops.json\n8\t.gev-cache/celestrak-gps-ops.json\n28\t.gev-cache/celestrak-visual.json\n100\t.gev-cache/celestrak-geo.json\n184\t.gev-cache/adsbdb.json\n788\t.gev-cache/launch-library-2-v2.3.json\n1808\t.gev-cache/celestrak-starlink.json\n2704\t.gev-cache/celestrak-active.json\n3368\t.gev-cache/taiwan-tracks/2026-11-04.ndjson\n5248\t.gev-cache/terrain-heights.json\n8284\t.gev-cache/taiwan-tracks/2026-11-05.ndjson\n11652\t.gev-cache/taiwan-tracks\n22544\t.gev-cache\n"
+  }
+}

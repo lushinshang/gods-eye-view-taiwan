@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>God's Eye View 深度研究與本機實測規劃報告｜GitHub v0.3.0 × DeepWiki 雙重實證</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-page: #f9f7f4;
+      --bg-card: #ffffff;
+      --bg-subtle: #f1ede6;
+      --bg-code: #1e222a;
+      --text-main: #1a1a1a;
+      --text-muted: #525866;
+      --border-soft: #e2dcd3;
+      --accent-teal: #0f766e;
+      --accent-amber: #b45309;
+      --accent-indigo: #3730a3;
+      --accent-red: #b91c1c;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg-page);
+      color: var(--text-main);
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      font-size: 16.5px;
+      line-height: 1.68;
+      letter-spacing: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Summary Infographic */
+    figure.summary-figure {
+      margin: 28px 0 20px;
+      padding: 0 24px;
+    }
+    figure.summary-figure img {
+      width: 100%;
+      max-width: 640px;
+      display: block;
+      margin: 0 auto;
+      border-radius: 12px;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+      border: 1px solid var(--border-soft);
+      cursor: zoom-in;
+    }
+    figure.summary-figure figcaption {
+      max-width: 640px;
+      margin: 10px auto 0;
+      text-align: center;
+      font-size: 13.5px;
+      line-height: 1.54;
+      color: var(--text-muted);
+    }
+
+    /* Sticky Navigation */
+    nav.top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: 58px;
+      background: rgba(249, 247, 244, 0.92);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--border-soft);
+      border-bottom: 1px solid var(--border-soft);
+      display: flex;
+      align-items: center;
+    }
+    .nav-inner {
+      max-width: 1120px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      overflow-x: auto;
+      white-space: nowrap;
+      scrollbar-width: none;
+    }
+    .nav-inner::-webkit-scrollbar {
+      display: none;
+    }
+    .nav-brand {
+      font-weight: 800;
+      font-size: 15px;
+      color: var(--accent-teal);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .nav-links {
+      display: flex;
+      gap: 6px;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-size: 14px;
+      font-weight: 500;
+      padding: 6px 11px;
+      border-radius: 6px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .nav-links a:hover {
+      background: var(--bg-subtle);
+      color: var(--text-main);
+    }
+
+    /* Page Container */
+    .page-wrap {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* Hero Header */
+    header.article-hero {
+      max-width: 720px;
+      margin: 40px auto 36px;
+      text-align: center;
+    }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #e6f4f1;
+      color: var(--accent-teal);
+      font-size: 13px;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 999px;
+      margin-bottom: 16px;
+    }
+    header.article-hero h1 {
+      font-size: clamp(2.0rem, 4vw, 3.1rem);
+      line-height: 1.22;
+      font-weight: 900;
+      margin: 0 0 18px;
+      color: var(--text-main);
+      text-wrap: balance;
+    }
+    header.article-hero .hero-lead {
+      font-size: 17.5px;
+      line-height: 1.65;
+      color: var(--text-muted);
+      margin: 0 0 22px;
+    }
+    .meta-strip {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      font-size: 13.5px;
+      color: var(--text-muted);
+    }
+    .meta-pill {
+      background: var(--bg-subtle);
+      padding: 5px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border-soft);
+    }
+
+    /* Main Article Body */
+    article.prose {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    article.prose section {
+      margin-bottom: 52px;
+      scroll-margin-top: 76px;
+    }
+    article.prose h2 {
+      font-size: clamp(1.45rem, 2.5vw, 1.85rem);
+      line-height: 1.32;
+      font-weight: 800;
+      margin: 44px 0 16px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--border-soft);
+      color: var(--text-main);
+      text-wrap: balance;
+    }
+    article.prose h3 {
+      font-size: 1.22rem;
+      line-height: 1.4;
+      font-weight: 700;
+      margin: 28px 0 12px;
+      color: var(--accent-teal);
+    }
+    article.prose p {
+      margin: 0 0 16px;
+    }
+    article.prose ul, article.prose ol {
+      margin: 0 0 18px;
+      padding-left: 22px;
+    }
+    article.prose li {
+      margin-bottom: 8px;
+    }
+    article.prose code {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.88em;
+      background: var(--bg-subtle);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #0f172a;
+      word-break: break-all;
+    }
+    article.prose pre {
+      background: var(--bg-code);
+      color: #f8fafc;
+      padding: 18px 20px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      margin: 18px 0 24px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+    article.prose pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+      font-size: inherit;
+      word-break: normal;
+      white-space: pre;
+    }
+
+    /* Callouts & Cards */
+    .callout {
+      background: var(--bg-card);
+      border-left: 4px solid var(--accent-teal);
+      border-top: 1px solid var(--border-soft);
+      border-right: 1px solid var(--border-soft);
+      border-bottom: 1px solid var(--border-soft);
+      border-radius: 0 10px 10px 0;
+      padding: 16px 20px;
+      margin: 20px 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    }
+    .callout.warn {
+      border-left-color: var(--accent-amber);
+      background: #fffdf9;
+    }
+    .callout-title {
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-main);
+    }
+
+    /* Dictionary Grid */
+    .dict-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin: 20px 0;
+    }
+    .dict-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-soft);
+      border-radius: 10px;
+      padding: 16px 18px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+    }
+    .dict-term {
+      font-weight: 800;
+      font-size: 16px;
+      color: var(--accent-indigo);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .dict-tag {
+      font-size: 12px;
+      font-weight: 600;
+      background: #eef2ff;
+      color: var(--accent-indigo);
+      padding: 2px 8px;
+      border-radius: 99px;
+    }
+    .dict-desc {
+      margin: 0;
+      font-size: 15.5px;
+      color: var(--text-main);
+    }
+
+    /* Visual SVG Figures (Breakout up to 860px) */
+    figure.svg-figure, figure.section-figure {
+      max-width: 860px;
+      margin: 28px calc(50% - min(430px, 50vw)) 32px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-soft);
+      border-radius: 12px;
+      padding: 18px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+    }
+    figure.svg-figure svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 8px;
+    }
+    figure.section-figure img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 8px;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      cursor: zoom-in;
+    }
+    figure.svg-figure figcaption, figure.section-figure figcaption {
+      margin-top: 12px;
+      font-size: 13.5px;
+      line-height: 1.54;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* Comparison Cards / Tables */
+    .table-wrap {
+      overflow-x: auto;
+      margin: 20px 0 26px;
+      border: 1px solid var(--border-soft);
+      border-radius: 10px;
+      background: var(--bg-card);
+    }
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 15px;
+    }
+    table.data-table th, table.data-table td {
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-soft);
+      vertical-align: top;
+    }
+    table.data-table th {
+      background: var(--bg-subtle);
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    table.data-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Step Cards for Local Plan */
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin: 20px 0;
+    }
+    .step-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-soft);
+      border-radius: 10px;
+      padding: 18px 20px;
+      position: relative;
+    }
+    .step-badge {
+      display: inline-block;
+      background: var(--accent-teal);
+      color: #fff;
+      font-size: 12.5px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+    .step-card h4 {
+      margin: 0 0 8px;
+      font-size: 17px;
+      color: var(--text-main);
+    }
+
+    /* Lightbox */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(26, 26, 26, 0.88);
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      cursor: zoom-out;
+    }
+    .lightbox.is-open {
+      display: flex;
+    }
+    .lightbox img {
+      max-width: 96vw;
+      max-height: 92vh;
+      width: auto;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4);
+    }
+    .lightbox .lightbox-hint {
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      color: rgba(255, 255, 255, 0.75);
+      font-size: 14px;
+    }
+
+    footer.article-footer {
+      max-width: 720px;
+      margin: 60px auto 0;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-soft);
+      font-size: 14px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    @media (max-width: 880px) {
+      figure.svg-figure, figure.section-figure {
+        margin-left: 0;
+        margin-right: 0;
+      }
+    }
+
+      @media (max-width: 640px) {
+      figure.summary-figure img {
+        aspect-ratio: 9 / 16;
+        max-width: 360px;
+      }
+      figure.section-figure img {
+        aspect-ratio: 9 / 16;
+      }
+      header.article-hero {
+        text-align: left;
+        margin-top: 28px;
+      }
+      .meta-strip {
+        justify-content: flex-start;
+      }
+      article.prose pre {
+        font-size: 13px;
+        padding: 14px;
+      }
+      /* Stacked responsive cards for tables on mobile (zero horizontal scroll) */
+      .table-wrap {
+        border: none;
+        background: transparent;
+        overflow-x: visible;
+      }
+      table.data-table,
+      table.data-table thead,
+      table.data-table tbody,
+      table.data-table th,
+      table.data-table td,
+      table.data-table tr {
+        display: block;
+      }
+      table.data-table thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+      }
+      table.data-table tr {
+        background: var(--bg-card);
+        border: 1px solid var(--border-soft);
+        border-radius: 10px;
+        margin-bottom: 14px;
+        padding: 12px 14px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+      }
+      table.data-table td {
+        border: none;
+        border-bottom: 1px dashed var(--border-soft);
+        padding: 8px 0;
+        font-size: 14.5px;
+      }
+      table.data-table td:last-child {
+        border-bottom: none;
+        padding-bottom: 2px;
+      }
+      table.data-table td::before {
+        content: attr(data-label);
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--accent-teal);
+        margin-bottom: 2px;
+      }
+    }
+
+    /* Step 10：SVG 技術圖 */
+    .svg-fig { margin: 24px auto; max-width: 560px; }
+    .svg-fig svg { display: block; width: 100%; height: auto; border: 1px solid var(--border-soft); border-radius: 14px; }
+    .svg-fig figcaption { margin-top: 10px; font-size: 14px; line-height: 1.65; color: var(--text-muted); }
+    .svg-fig .figure-tag { font-size: 12px; font-weight: 700; color: var(--accent-teal); margin-right: 4px; }
+    article.prose td code { overflow-wrap: anywhere; }
+  </style>
+</head>
+<body>
+
+  <!-- Top Summary Banner (16:9 Desktop / 9:16 Mobile) -->
+  <figure class="summary-figure">
+    <picture>
+      <source media="(max-width: 640px)" srcset="images/summary_banner-mobile.png">
+      <img src="images/summary_banner.png" alt="God's Eye View 一圖看懂總覽：19/21 免金鑰圖層、三層安全代理架構、五大底層渲染引擎、AI 語音與 MCP 控制">
+    </picture>
+    <figcaption>▲ 一圖看懂 <code>bilawalsidhu/gods-eye-view</code> 核心架構與實測重點（點擊圖片可放大檢視）</figcaption>
+  </figure>
+
+  <!-- Sticky Navigation -->
+  <nav class="top-nav" aria-label="章節導覽">
+    <div class="nav-inner">
+      <a class="nav-brand" href="readme.html">◉ GOD'S EYE VIEW</a>
+      <div class="nav-links">
+        <a href="readme.html" style="color: #0f766e; font-weight: 700;">📖 發布手冊</a>
+        <a href="system-architecture.html" style="color: #7c3aed; font-weight: 700;">🏛️ 系統架構</a>
+        <a href="system-resource-evaluation.html" style="color: #0369a1; font-weight: 700;">💻 資源評估</a>
+        <a href="gods-eye-view-summary.html" style="color: #b45309; font-weight: 700;">📊 演進實錄</a>
+        <a href="gods-eye-view-analysis.html" class="active" aria-current="page" style="background: #e6f4f1; color: #0f766e; font-weight: 700; outline: 2px solid #0f766e;">🔬 技術分析</a>
+        <a href="repo/public/icons/taiwan-vessels/spec.html" target="_blank" rel="noopener" style="color: #be185d; font-weight: 700;" title="容器網址：http://localhost:4173/icons/taiwan-vessels/spec.html">🎨 圖標設計書 ↗</a>
+        <a href="#sec-tw-extension" style="background: #e6f4f1; color: #0f766e; font-weight: 700;">🇹🇼 臺灣航港局對接實證</a>
+        <a href="#sec-ais-contract" style="background: #e6f4f1; color: #0f766e; font-weight: 700;">🔬 Step 8–9 技術補遺</a>
+        <a href="#sec-dict">0. 專有名詞</a>
+        <a href="#sec-overview">1. 專案定位</a>
+        <a href="#sec-arch">2. 三層架構</a>
+        <a href="#sec-deepwiki">3. DeepWiki 查核</a>
+        <a href="#sec-taiwan">4. 台灣 CCTV</a>
+        <a href="#sec-security">5. 資安模型</a>
+        <a href="#sec-plan">6. 驗收存證</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page-wrap" id="top">
+    <header class="article-hero">
+      <div class="hero-eyebrow">🛡️ 公開情報戰情室（OSINT / GEOINT）深度工程拆解</div>
+      <h1>God's Eye View 深度研究與本機實測規劃報告</h1>
+      <p class="hero-lead">
+        結合 GitHub 最新 <code>main</code> 分支原始碼（v0.3.0，共 3,029 個檔案）與 DeepWiki 官方 MCP 知識庫（12 大章節、42 篇架構頁、7,984 行文檔）進行交叉實證，拆解它如何把 21 種即時全球公開訊號放進瀏覽器 3D 地球，並規劃 macOS 本機零金鑰實測藍圖。
+      </p>
+      <div class="meta-strip">
+        <span class="meta-pill">📦 儲存庫：<code>bilawalsidhu/gods-eye-view</code></span>
+        <span class="meta-pill">🟢 免金鑰比例：19 / 21 圖層</span>
+        <span class="meta-pill">💻 本機環境：Node v26.13.0 / Docker v29.9.2 就緒</span>
+        <span class="meta-pill">🔬 第 8–11 節：五大精進技術補遺（2026-11-05）</span>
+      </div>
+    </header>
+
+    <article class="prose">
+
+      <!-- Section 0: Dictionary -->
+      <section id="sec-dict">
+        <h2>0. 專有名詞速查字典（給跨領域讀者的前置降落傘）</h2>
+        <p>在進入底層渲染引擎與代理伺服器架構之前，我們先把幾個專案核心的地理空間情報（GEOINT）與公開來源情報（OSINT）術語，用一句生活比喻加上底層機制講清楚：</p>
+
+        <div class="dict-grid">
+          <div class="dict-card">
+            <div class="dict-term">
+              <span>CesiumJS &amp; 3D Tiles</span>
+              <span class="dict-tag">3D 地球引擎與城市積木</span>
+            </div>
+            <p class="dict-desc">
+              <strong>白話</strong>：網頁版的地球渲染引擎與「分塊載入的 3D 城市積木」。<br>
+              <strong>機制</strong>：鏡頭拉遠時只載入粗糙地球，拉近到街區時才動態串流高解析度 3D 建築網格，避免瀏覽器記憶體一次載入全球模型而崩潰。
+            </p>
+          </div>
+
+          <div class="dict-card">
+            <div class="dict-term">
+              <span>ADS-B &amp; AIS</span>
+              <span class="dict-tag">飛機與船隻的公開廣播</span>
+            </div>
+            <p class="dict-desc">
+              <strong>白話</strong>：飛機與船隻自動對外廣播的「公開身分證與定位訊號」。<br>
+              <strong>機制</strong>：飛機透過無線電（1090 MHz）廣播經緯度、氣壓高度、航向（由 OpenSky、adsb.lol 地面站接收）；船隻則透過 AIS 系統廣播海上航跡。
+            </p>
+          </div>
+
+          <div class="dict-card">
+            <div class="dict-term">
+              <span>TLE &amp; SGP4</span>
+              <span class="dict-tag">衛星軌道行事曆與推算公式</span>
+            </div>
+            <p class="dict-desc">
+              <strong>白話</strong>：不用每秒問太空總署衛星在哪，拿到兩行數字就能自己算。<br>
+              <strong>機制</strong>：從 CelesTrak 下載兩行軌道根數（TLE），瀏覽器在本地透過 <code>satellite.js</code> 執行 SGP4 物理模型與 GMST 恆星時對齊，即時算出 838+ 顆衛星的當前位置。
+            </p>
+          </div>
+
+          <div class="dict-card">
+            <div class="dict-term">
+              <span>EGM96 大地水準面起伏（Geoid Undulation）</span>
+              <span class="dict-tag">防飛機陷地高程轉換</span>
+            </div>
+            <p class="dict-desc">
+              <strong>白話</strong>：真實海平面（MSL）跟電腦裡的完美數學橢球（WGS84）之間有 30～100 公尺的高低差。<br>
+              <strong>機制</strong>：透過 <code>geoid.js</code> 查表補償（<code>H_ellipsoid = H_msl + N_geoid</code>），才不會讓降落中的飛機「鑽進跑道地底下」或「浮在半空中」。
+            </p>
+          </div>
+
+          <div class="dict-card">
+            <div class="dict-term">
+              <span>Ephemeral Token（短效臨時憑證）</span>
+              <span class="dict-tag">金鑰隔離安全機制</span>
+            </div>
+            <p class="dict-desc">
+              <strong>白話</strong>：後端發給瀏覽器的「一次性入場券」。<br>
+              <strong>機制</strong>：為了讓瀏覽器跟 OpenAI / Gemini 進行超低延遲的 WebRTC 即時語音通話，又不想把永久 <code>API_KEY</code> 暴露在前端 F12 裡，由本地 Node 伺服器代為向原廠換取短效臨時 Token。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 1: Overview -->
+      <section id="sec-overview">
+        <h2>1. 專案定位與核心價值：這座系統到底在幹嘛？</h2>
+        <p>
+          <strong>一句話總結</strong>：把好萊塢諜報片裡的「戰情室衛星監控台（God's Eye View）」搬進瀏覽器，但<strong>裡面跑的飛機、軍機、船隻、衛星、地震與街口監視器全都是真實的公開資料（OSINT）</strong>。
+        </p>
+        <p>
+          作者 Bilawal Sidhu（前 Google Creative Lab 3D 空間運算專家）原本在 YouTube 發布了一系列超過 500 萬觀看的空間情報視覺化影片，在社群強烈敲碗下將整套系統以 MIT 授權開源，並於 2026 年 8 月衝上 GitHub Trending 日榜與週榜雙料冠軍。
+        </p>
+
+        <div class="callout">
+          <div class="callout-title">💡 為什麼這套專案在工程圈引發轟動？</div>
+          <ul>
+            <li><strong>零金鑰即可啟動（Keyless-First）</strong>：全系統 <strong>21 個資料圖層中，有 19 個圖層不需要任何 API Key</strong> 就能直接跑（使用 Esri 衛星底圖、Re:Earth 免費地形、OpenSky 匿名航班、adsb.lol 軍機、CelesTrak 衛星、USGS 地震、NOAA 氣象、各國政府公開 CCTV 等）。</li>
+            <li><strong>明確的倫理紅線（Responsible OSINT）</strong>：專案在 <code>README.md</code> 明文規定只追蹤「事件、載具、基礎設施與系統」，<strong>嚴格禁止且拒收任何「搜尋特定自然人、人臉辨識、追蹤個人」的 PR</strong>。</li>
+            <li><strong>從全局到第一人稱機艙（Cockpit Mode）</strong>：你可以從 40,000 公里的太空俯瞰全球海底電纜與衛星，下一秒點擊一架進場中的民航機，按下 <code>C</code> 鍵直接坐進駕駛艙，開著 FLIR 熱成像或 NVG 夜視鏡跟著它降落。</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Section 2: Architecture & Causal Chain -->
+      <section id="sec-arch">
+        <h2>2. 系統三層架構與資料流因果鏈</h2>
+        <p>
+          許多開源 3D 地球專案做成純前端 SPA，結果不是撞上 CORS 跨域阻擋，就是把私密 API Key 洩漏在前端，或是每 15 秒更新一次座標時飛機在畫面上「瞬移跳格」。<code>gods-eye-view</code> 採用了極為嚴謹的 <strong>「本地安全代理層（Vite + Node Middleware）＋ 瀏覽器 3D 狀態機 ＋ AI 語音與 MCP 工具鏈」</strong> 三層架構。
+        </p>
+
+        <!-- Custom Responsive SVG Diagram 1: System Architecture -->
+        <figure class="svg-figure">
+          <svg viewBox="0 0 860 660" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="God's Eye View 三層系統架構與資料流向圖">
+            <defs>
+              <marker id="arrow-teal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#0f766e"/>
+              </marker>
+              <marker id="arrow-indigo" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#3730a3"/>
+              </marker>
+              <marker id="arrow-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#b45309"/>
+              </marker>
+            </defs>
+
+            <!-- Background -->
+            <rect width="860" height="660" rx="12" fill="#fbf9f5"/>
+
+            <!-- Layer 1: Upstream Sources -->
+            <rect x="24" y="20" width="812" height="125" rx="10" fill="#eef6f4" stroke="#99cfc7" stroke-width="1.5"/>
+            <text x="42" y="46" font-family="Noto Sans TC, sans-serif" font-size="15" font-weight="800" fill="#0f766e">🌐 第一層：外部公開情報與雲端資料源（21+ 資料圖層）</text>
+
+            <rect x="42" y="60" width="245" height="68" rx="8" fill="#ffffff" stroke="#b8dcd6"/>
+            <text x="56" y="84" font-family="Noto Sans TC, sans-serif" font-size="13.5" font-weight="700" fill="#1a1a1a">🟢 19 個免金鑰公開資料源</text>
+            <text x="56" y="104" font-family="Noto Sans TC, sans-serif" font-size="12" fill="#525866">OpenSky / adsb.lol / CelesTrak</text>
+            <text x="56" y="120" font-family="Noto Sans TC, sans-serif" font-size="12" fill="#525866">USGS / NOAA / 台灣高公局 CCTV</text>
+
+            <rect x="307" y="60" width="245" height="68" rx="8" fill="#ffffff" stroke="#b8dcd6"/>
+            <text x="321" y="84" font-family="Noto Sans TC, sans-serif" font-size="13.5" font-weight="700" fill="#1a1a1a">🟡/🔴 選用金鑰加值服務</text>
+            <text x="321" y="104" font-family="Noto Sans TC, sans-serif" font-size="12" fill="#525866">Cesium ion / Google 3D Tiles</text>
+            <text x="321" y="120" font-family="Noto Sans TC, sans-serif" font-size="12" fill="#525866">AISStream 船舶 / NASA FIRMS 火點</text>
+
+            <rect x="572" y="60" width="245" height="68" rx="8" fill="#ffffff" stroke="#b8dcd6"/>
+            <text x="586" y="84" font-family="Noto Sans TC, sans-serif" font-size="13.5" font-weight="700" fill="#1a1a1a">🎙️ 即時多模態語音與推論模型</text>
+            <text x="586" y="104" font-family="Noto Sans TC, sans-serif" font-size="12" fill="#525866">OpenAI Realtime API (WebRTC)</text>
+            <text x="586" y="120" font-family="Noto Sans TC, sans-serif" font-size="12" fill="#525866">Gemini Live (gemini-3.8-live)</text>
+
+            <!-- Arrows Layer 1 to Layer 2 -->
+            <line x1="164" y1="128" x2="164" y2="178" stroke="#0f766e" stroke-width="2" marker-end="url(#arrow-teal)"/>
+            <line x1="430" y1="128" x2="430" y2="178" stroke="#0f766e" stroke-width="2" marker-end="url(#arrow-teal)"/>
+            <line x1="694" y1="128" x2="694" y2="178" stroke="#b45309" stroke-width="2" marker-end="url(#arrow-amber)"/>
+
+            <!-- Layer 2: Server Proxy Layer -->
+            <rect x="24" y="182" width="812" height="140" rx="10" fill="#fff8eb" stroke="#e6c891" stroke-width="1.5"/>
+            <text x="42" y="208" font-family="Noto Sans TC, sans-serif" font-size="15" font-weight="800" fill="#b45309">🛡️ 第二層：本地安全代理與配額守門員（Node.js / server/providers/*，預設僅綁定 127.0.0.1）</text>
+
+            <rect x="42" y="222" width="245" height="82" rx="8" fill="#ffffff" stroke="#ebd3a7"/>
+            <text x="56" y="246" font-family="Noto Sans TC, sans-serif" font-size="13.5" font-weight="700" fill="#1a1a1a">SSRF 防護與流量清洗</text>
+            <text x="56" y="266" font-family="Noto Sans TC, sans-serif" font-size="12" fill="#525866">• 拒絕重導向與跨站請求</text>
+            <text x="56" y="284" font-family="Noto Sans TC, sans-serif" font-size="12" fill="#525866">• 單一回應大小上限 (Cap)</text>
+
+            <rect x="307" y="222" width="245" height="82" rx="8" fill="#ffffff" stroke="#ebd3a7"/>
+            <text x="321" y="246" font-family="Noto Sans TC, sans-serif" font-size="13.5" font-weight="700" fill="#1a1a1a">配額調節與本地磁碟快取</text>
+            <text x="321" y="266" font-family="Noto Sans TC, sans-serif" font-size="12" fill="#525866">• OpenSky / TomTom 額度控管</text>
+            <text x="321" y="284" font-family="Noto Sans TC, sans-serif" font-size="12" fill="#525866">• .gev-cache/ 地形與 TLE 快取</text>
+
+            <rect x="572" y="222" width="245" height="82" rx="8" fill="#ffffff" stroke="#ebd3a7"/>
+            <text x="586" y="246" font-family="Noto Sans TC, sans-serif" font-size="13.5" font-weight="700" fill="#1a1a1a">短效憑證簽發器 (Token Broker)</text>
+            <text x="586" y="266" font-family="Noto Sans TC, sans-serif" font-size="12" fill="#525866">• /api/realtime/token 換發臨時票</text>
+            <text x="586" y="284" font-family="Noto Sans TC, sans-serif" font-size="12" fill="#525866">• 永久 API Key 絕不進入瀏覽器</text>
+
+            <!-- Arrows Layer 2 to Layer 3 -->
+            <line x1="290" y1="304" x2="290" y2="358" stroke="#3730a3" stroke-width="2" marker-end="url(#arrow-indigo)"/>
+            <text x="155" y="338" font-family="Noto Sans TC, sans-serif" font-size="12" font-weight="600" fill="#3730a3">同源 JSON / HLS 影格串流</text>
+            <line x1="694" y1="304" x2="694" y2="358" stroke="#b45309" stroke-width="2" marker-end="url(#arrow-amber)"/>
+            <text x="575" y="338" font-family="Noto Sans TC, sans-serif" font-size="12" font-weight="600" fill="#b45309">Ephemeral Token</text>
+
+            <!-- Layer 3: Browser Client & MCP -->
+            <rect x="24" y="362" width="528" height="274" rx="10" fill="#eef0ff" stroke="#b4bcf5" stroke-width="1.5"/>
+            <text x="42" y="388" font-family="Noto Sans TC, sans-serif" font-size="15" font-weight="800" fill="#3730a3">🖥️ 第三層（左）：瀏覽器 3D 戰情室引擎（Vue 3.5 + Pinia + CesiumJS 1.124）</text>
+
+            <rect x="42" y="404" width="236" height="96" rx="8" fill="#ffffff" stroke="#c7cdf7"/>
+            <text x="56" y="426" font-family="Noto Sans TC, sans-serif" font-size="13.5" font-weight="700" fill="#1a1a1a">時間延遲內插 &amp; 高程對齊</text>
+            <text x="56" y="446" font-family="Noto Sans TC, sans-serif" font-size="12" fill="#525866">• 落後 1 週期平滑內插 + 航位推算</text>
+            <text x="56" y="464" font-family="Noto Sans TC, sans-serif" font-size="12" fill="#525866">• EGM96 大地水準面 + Floor-Hold</text>
+            <text x="56" y="482" font-family="Noto Sans TC, sans-serif" font-size="12" fill="#525866">• SGP4 衛星推進 + GMST 對齊</text>
+
+            <rect x="296" y="404" width="236" height="96" rx="8" fill="#ffffff" stroke="#c7cdf7"/>
+            <text x="310" y="426" font-family="Noto Sans TC, sans-serif" font-size="13.5" font-weight="700" fill="#1a1a1a">Render Governor &amp; 視覺系統</text>
+            <text x="310" y="446" font-family="Noto Sans TC, sans-serif" font-size="12" fill="#525866">• 靜止時自動切換按需單幀渲染</text>
+            <text x="310" y="464" font-family="Noto Sans TC, sans-serif" font-size="12" fill="#525866">• Label Arbiter 標籤防碰撞與加分</text>
+            <text x="310" y="482" font-family="Noto Sans TC, sans-serif" font-size="12" fill="#525866">• 6 種 GLSL 濾鏡 (NVG/FLIR/CRT)</text>
+
+            <rect x="42" y="516" width="490" height="100" rx="8" fill="#ffffff" stroke="#3730a3" stroke-width="1.5"/>
+            <text x="58" y="540" font-family="Noto Sans TC, sans-serif" font-size="14" font-weight="800" fill="#3730a3">🧠 World Packet 零網路開銷快照組裝器（src/agent/worldPacket.js）</text>
+            <text x="58" y="562" font-family="Noto Sans TC, sans-serif" font-size="12.5" fill="#1a1a1a">在瀏覽器端瞬間聚合：當前鏡頭座標/高度、開啟圖層、鎖定追蹤中的飛機/船舶/衛星、</text>
+            <text x="58" y="582" font-family="Noto Sans TC, sans-serif" font-size="12.5" fill="#1a1a1a">250km 內 Contacts 清單，以及街景高度下的 WebGL 畫面截圖（上限 1200×900 / 200KB）。</text>
+
+            <!-- Layer 3 Right: Agent & MCP -->
+            <rect x="572" y="362" width="264" height="274" rx="10" fill="#f5eefc" stroke="#cfb8ec" stroke-width="1.5"/>
+            <text x="588" y="388" font-family="Noto Sans TC, sans-serif" font-size="15" font-weight="800" fill="#5b21b6">🤖 第三層（右）：AI 與 MCP 雙向控制</text>
+
+            <rect x="588" y="404" width="232" height="102" rx="8" fill="#ffffff" stroke="#dac7f2"/>
+            <text x="602" y="426" font-family="Noto Sans TC, sans-serif" font-size="13.5" font-weight="700" fill="#1a1a1a">30 個語音/文字 Action Runner</text>
+            <text x="602" y="446" font-family="Noto Sans TC, sans-serif" font-size="12" fill="#525866">• 鏡頭導播 (flyTo / orbit / 路線飛行)</text>
+            <text x="602" y="464" font-family="Noto Sans TC, sans-serif" font-size="12" fill="#525866">• 語音白板 (OSM 邊界多邊形標註)</text>
+            <text x="602" y="482" font-family="Noto Sans TC, sans-serif" font-size="12" fill="#525866">• 情報分析查詢 + $5 美元花費硬上限</text>
+
+            <rect x="588" y="520" width="232" height="96" rx="8" fill="#ffffff" stroke="#dac7f2"/>
+            <text x="602" y="542" font-family="Noto Sans TC, sans-serif" font-size="13.5" font-weight="700" fill="#1a1a1a">本地 MCP Server (stdio.js)</text>
+            <text x="602" y="562" font-family="Noto Sans TC, sans-serif" font-size="12" fill="#525866">• 供 Claude Desktop / Codex 呼叫</text>
+            <text x="602" y="580" font-family="Noto Sans TC, sans-serif" font-size="12" fill="#525866">• 將互動式 3D 地球直接嵌入對話框</text>
+
+            <!-- Bidirectional Arrows between World Packet and Agent -->
+            <line x1="532" y1="555" x2="584" y2="465" stroke="#3730a3" stroke-width="2" marker-end="url(#arrow-indigo)"/>
+            <line x1="584" y1="445" x2="532" y2="455" stroke="#0f766e" stroke-width="2" marker-end="url(#arrow-teal)"/>
+          </svg>
+          <figcaption>▲ 圖 1：God's Eye View 三層安全代理、渲染調節與 World Packet 雙向控制架構圖</figcaption>
+        </figure>
+
+        <h3>🔍 架構連線背後的工程因果：</h3>
+        <ol>
+          <li>
+            <strong>為什麼瀏覽器不直接打公開 API，非要過一層 <code>server/providers/</code>？</strong><br>
+            一方面是為了<strong>金鑰隔離</strong>（如 <code>AISSTREAM_API_KEY</code> 使用 WebSocket 且無法在瀏覽器端限制網域，必須由 Node 伺服器維持單一長連線並快取，前端只輪詢本地 <code>/api/vessels</code>）；另一方面是為了<strong>防禦與配額調節</strong>，代理層內建嚴格的 SSRF 防護、回應大小上限與 OpenSky / TomTom 額度控管。
+          </li>
+          <li>
+            <strong>為什麼飛機與船隻每 15～30 秒才更新一次，畫面看起來卻像 60 FPS 連續飛行？</strong><br>
+            系統刻意讓渲染時鐘<strong>落後真實時間一個更新週期</strong>，在兩個已知座標點之間進行平滑內插（Interpolation），搭配<strong>航位推算（Dead Reckoning）</strong>與每幀螢幕空間航向投影（<code>iconOrientation.js</code>），確保無論從正上方俯視或斜角觀察，機頭與船頭永遠指向真實世界航向。
+          </li>
+          <li>
+            <strong>為什麼語音 Agent 知道「我現在螢幕上看著哪條街、哪架飛機」？</strong><br>
+            透過 <code>src/agent/worldPacket.js</code>，每當你開口詢問，前端會在零網路請求的情況下瞬間組裝一份 <strong>World Packet</strong>（含座標、開啟圖層、追蹤目標、250km 接觸清單與街景截圖），讓 AI 具備完整的空間感知。
+          </li>
+        </ol>
+      </section>
+
+      <!-- Section 3: DeepWiki Analysis & Drift Verification -->
+      <section id="sec-deepwiki">
+        <h2>3. DeepWiki 深度剖析：五大底層引擎與「版本落差」事實查核</h2>
+        <p>
+          當我們直接用 <code>curl</code> 抓取 <code>https://deepwiki.com/bilawalsidhu/gods-eye-view</code> 時，發現其網頁前端部署了 <strong>Vercel Security Checkpoint (WAF)</strong> 會阻擋自動化讀取。我們改用工程手段，直接對接 DeepWiki 官方後端的 MCP 端點（<code>https://mcp.deepwiki.com/mcp</code>），成功拉出完整的 <strong>12 大章節、42 篇子頁面（共 7,984 行）</strong> 的架構文檔，並與 GitHub 最新原始碼進行逐行核對。
+        </p>
+
+        <!-- Custom Responsive SVG Diagram 2: Five Core Engines from DeepWiki -->
+        <figure class="svg-figure">
+          <svg viewBox="0 0 860 450" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="DeepWiki 揭示的五大底層渲染與空間計算引擎">
+            <rect width="860" height="450" rx="12" fill="#fbf9f5"/>
+            <text x="32" y="40" font-family="Noto Sans TC, sans-serif" font-size="16" font-weight="800" fill="#1a1a1a">⚙️ DeepWiki 揭露的五大底層引擎機制（維持 60 FPS 與視覺精準度的關鍵）</text>
+
+            <!-- Card 1 -->
+            <rect x="28" y="62" width="254" height="172" rx="10" fill="#ffffff" stroke="#d5cfc4" stroke-width="1.5"/>
+            <rect x="28" y="62" width="254" height="36" rx="10" fill="#0f766e"/>
+            <text x="44" y="85" font-family="Noto Sans TC, sans-serif" font-size="13.5" font-weight="700" fill="#ffffff">1. Render Governor 幀率調節器</text>
+            <text x="44" y="116" font-family="JetBrains Mono, monospace" font-size="11.5" fill="#0f766e">src/renderGovernor.js</text>
+            <text x="44" y="140" font-family="Noto Sans TC, sans-serif" font-size="12.5" fill="#1a1a1a">• 解決 Cesium 預設每秒 60 次空轉耗電</text>
+            <text x="44" y="162" font-family="Noto Sans TC, sans-serif" font-size="12.5" fill="#1a1a1a">• 以 _holds 集合動態切換連續/按需渲染</text>
+            <text x="44" y="184" font-family="Noto Sans TC, sans-serif" font-size="12.5" fill="#1a1a1a">• M5 實測：1.86s 啟動 / 105MB 待機</text>
+            <text x="44" y="206" font-family="Noto Sans TC, sans-serif" font-size="12" fill="#525866">→ 靜止時 GPU 負載趨近於零</text>
+
+            <!-- Card 2 -->
+            <rect x="303" y="62" width="254" height="172" rx="10" fill="#ffffff" stroke="#d5cfc4" stroke-width="1.5"/>
+            <rect x="303" y="62" width="254" height="36" rx="10" fill="#3730a3"/>
+            <text x="319" y="85" font-family="Noto Sans TC, sans-serif" font-size="13.5" font-weight="700" fill="#ffffff">2. Label Arbiter 標籤防碰撞仲裁</text>
+            <text x="319" y="116" font-family="JetBrains Mono, monospace" font-size="11.5" fill="#3730a3">worldOverlay.js / localGeojsonLod.js</text>
+            <text x="319" y="140" font-family="Noto Sans TC, sans-serif" font-size="12.5" fill="#1a1a1a">• 控管上萬載具與 4,351 座資料中心標籤</text>
+            <text x="319" y="162" font-family="Noto Sans TC, sans-serif" font-size="12.5" fill="#1a1a1a">• 卡片碰撞上限 96 + 14,000km 地平線剔除</text>
+            <text x="319" y="184" font-family="Noto Sans TC, sans-serif" font-size="12.5" fill="#1a1a1a">• 現任者加分 (Incumbent Bonus = 250)</text>
+            <text x="319" y="206" font-family="Noto Sans TC, sans-serif" font-size="12" fill="#525866">→ 防止鏡頭微動時標籤瘋狂跳動閃爍</text>
+
+            <!-- Card 3 -->
+            <rect x="578" y="62" width="254" height="172" rx="10" fill="#ffffff" stroke="#d5cfc4" stroke-width="1.5"/>
+            <rect x="578" y="62" width="254" height="36" rx="10" fill="#b45309"/>
+            <text x="594" y="85" font-family="Noto Sans TC, sans-serif" font-size="13.5" font-weight="700" fill="#ffffff">3. EGM96 高程與 Floor-Hold</text>
+            <text x="594" y="116" font-family="JetBrains Mono, monospace" font-size="11.5" fill="#b45309">geoid.js / meshFloorSampler.js</text>
+            <text x="594" y="140" font-family="Noto Sans TC, sans-serif" font-size="12.5" fill="#1a1a1a">• 修正氣壓海平面 (MSL) 與橢球 30~100m 差</text>
+            <text x="594" y="162" font-family="Noto Sans TC, sans-serif" font-size="12.5" fill="#1a1a1a">• 三級取樣：3D Mesh → 地形 → 鄰居借高</text>
+            <text x="594" y="184" font-family="Noto Sans TC, sans-serif" font-size="12.5" fill="#1a1a1a">• Display Floor Hold 指數平滑過渡</text>
+            <text x="594" y="206" font-family="Noto Sans TC, sans-serif" font-size="12" fill="#525866">→ 滑行飛機與監視器緊貼真實地面</text>
+
+            <!-- Card 4 -->
+            <rect x="28" y="254" width="392" height="168" rx="10" fill="#ffffff" stroke="#d5cfc4" stroke-width="1.5"/>
+            <rect x="28" y="254" width="392" height="36" rx="10" fill="#5b21b6"/>
+            <text x="44" y="277" font-family="Noto Sans TC, sans-serif" font-size="13.5" font-weight="700" fill="#ffffff">4. 語音白板漸進式多邊形引擎 (Annotation Engine)</text>
+            <text x="44" y="308" font-family="JetBrains Mono, monospace" font-size="11.5" fill="#5b21b6">annotationEngine.js / annotationResolver.js</text>
+            <text x="44" y="332" font-family="Noto Sans TC, sans-serif" font-size="12.5" fill="#1a1a1a">• 先秒畫點錨點，背景併發 (上限 2) + 退避重試 (8s, 25s) 拉取邊界</text>
+            <text x="44" y="354" font-family="Noto Sans TC, sans-serif" font-size="12.5" fill="#1a1a1a">• 優先匹配內建離線 Natural Earth 山脈/海域與城市街區 GeoJSON</text>
+            <text x="44" y="376" font-family="Noto Sans TC, sans-serif" font-size="12.5" fill="#1a1a1a">• Ramer-Douglas-Peucker 頂點簡化 + 最多 120 個活躍標記上限</text>
+            <text x="44" y="398" font-family="Noto Sans TC, sans-serif" font-size="12" fill="#525866">→ 語音畫圈不卡死 UI 執行緒，自動貼合 3D 地形起伏</text>
+
+            <!-- Card 5 -->
+            <rect x="440" y="254" width="392" height="168" rx="10" fill="#ffffff" stroke="#d5cfc4" stroke-width="1.5"/>
+            <rect x="440" y="254" width="392" height="36" rx="10" fill="#be123c"/>
+            <text x="456" y="277" font-family="Noto Sans TC, sans-serif" font-size="13.5" font-weight="700" fill="#ffffff">5. 對稱生命週期契約 &amp; 底圖防競態 (_switchGen)</text>
+            <text x="456" y="308" font-family="JetBrains Mono, monospace" font-size="11.5" fill="#be123c">src/app/application.js / mapStackController.js</text>
+            <text x="456" y="332" font-family="Noto Sans TC, sans-serif" font-size="12.5" fill="#1a1a1a">• 正序啟動：['scene', 'controls', 'data', 'tools']</text>
+            <text x="456" y="354" font-family="Noto Sans TC, sans-serif" font-size="12.5" fill="#1a1a1a">• 反序清理：['tools', 'controls', 'data', 'scene'] + defer(cleanup)</text>
+            <text x="456" y="376" font-family="Noto Sans TC, sans-serif" font-size="12.5" fill="#1a1a1a">• 單調計數器 _switchGen 丟棄過期的非同步底圖切換請求</text>
+            <text x="456" y="398" font-family="Noto Sans TC, sans-serif" font-size="12" fill="#525866">→ 徹底杜絕快速連點切換底圖或熱重載時的資源洩漏</text>
+          </svg>
+          <figcaption>▲ 圖 2：從 DeepWiki 42 篇技術頁面提煉出的五大核心引擎設計</figcaption>
+        </figure>
+
+        <h3>⚠️ DeepWiki 與 GitHub 最新版（v0.3.0）的「架構演進差」查核表</h3>
+        <p>
+          工程驗證不能只看單一文檔。我們把 DeepWiki 內容與 GitHub 最新 Commit 交叉比對後，發現 DeepWiki 索引到的版本較舊，存在以下三個必須校準的事實差異：
+        </p>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>查核維度</th>
+                <th>DeepWiki 記載的舊狀態</th>
+                <th>GitHub <code>main</code> (v0.3.0) 真實最新狀態</th>
+                <th>原始碼查核依據</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td data-label="查核維度"><strong>前端 UI 框架</strong></td>
+                <td data-label="DeepWiki 記載的舊狀態">描述為「Vanilla JavaScript platform」，UI 邏輯集中在單一 <code>src/ui.js</code></td>
+                <td data-label="GitHub main (v0.3.0) 真實最新狀態">已全面遷移至 <strong>Vue 3 (<code>^3.5.44</code>) + Pinia (<code>^2.3.1</code>) + <code>vue-i18n</code></strong>，拆分為 407 個 <code>src/ui/</code> 模組</td>
+                <td data-label="原始碼查核依據"><code>package.json</code>,<br><code>docs/VUE-MIGRATION.md</code></td>
+              </tr>
+              <tr>
+                <td data-label="查核維度"><strong>AI 語音與聊天</strong></td>
+                <td data-label="DeepWiki 記載的舊狀態">僅記載 OpenAI Realtime API (<code>gevRealtime.js</code>)</td>
+                <td data-label="GitHub main (v0.3.0) 真實最新狀態">支援 <strong>OpenAI 與 Google Gemini (<code>gemini-3.8-live</code>) 雙引擎切換</strong>，新增免麥克風靜音 <strong>CHAT 面板</strong>與本機 <strong>Codex OAuth 免金鑰模式</strong></td>
+                <td data-label="原始碼查核依據"><code>README.md</code>,<br><code>server/providers/openai.js</code></td>
+              </tr>
+              <tr>
+                <td data-label="查核維度"><strong>資料圖層與 MCP</strong></td>
+                <td data-label="DeepWiki 記載的舊狀態">早期約 15 個圖層，無台灣 CCTV、無街景整合、無 MCP</td>
+                <td data-label="GitHub main (v0.3.0) 真實最新狀態">擴充至 <strong>21+ 圖層</strong>，新增<strong>台灣高公局 CCTV (<code>taiwan.js</code>)</strong>、<strong>4 大街景面板 (Mapillary / Google / KartaView / Panoramax)</strong>、<strong>ALPR 車牌鏡頭</strong>、<strong>風場/雷達/颱風</strong>與<strong>本地 MCP Server</strong></td>
+                <td data-label="原始碼查核依據"><code>server/providers/cctv/taiwan.js</code>,<br><code>docs/MCP_SETUP.md</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Section 4: Taiwan CCTV -->
+      <section id="sec-taiwan">
+        <h2>4. 台灣在地亮點：高公局國道 CCTV 整合模組拆解 🇹🇼</h2>
+        <p>
+          在檢視後端原始碼時，我們發現 <code>server/providers/cctv/taiwan.js</code> 專門為台灣寫了完整的高速公路監視器整合模組，而且完全免金鑰即可在 3D 地球上觀看：
+        </p>
+        <ul>
+          <li><strong>官方公開資料源</strong>：直接抓取交通部高公局（MOTC）公開的 <code>https://tisvcloud.freeway.gov.tw/history/motc20/CCTV.xml</code>（MOTC 2.0 XML 標準，每日更新約 1,800 支國道監視器，檔案約 1.2 MB，代理層上限設為 6 MB）。</li>
+          <li><strong>全島南北 7 大錨點均勻抽樣</strong>：為了避免預設 600 支鏡頭上限（<code>DEFAULT_TAIWAN_MAX_SOURCES = 600</code>）全部塞在大台北地區，程式碼明確定義了由北到南 7 個地理座標錨點：<strong>台北（25.033, 121.5654）、桃園、新竹、宜蘭、台中、台南、高雄（22.6273, 120.3014）</strong>，確保全島國道都有監視器分佈。</li>
+          <li><strong>串流轉單張影格代理（Stream-to-Frame）</strong>：將高公局北中南區伺服器（<code>cctvn</code> / <code>cctvn5</code> / <code>cctvc</code> / <code>cctvs.freeway.gov.tw</code>）的 MJPEG 串流路徑自動轉換為單張 JPEG 路徑（如 <code>/abs2mjpg/bmjpg</code> 轉 <code>/abs2mjpg/jpg</code>），直接投影進 3D 街道並支援拖曳 Gizmo 校準視錐（Viewshed）。</li>
+          <li><strong>海外網路容錯退避</strong>：考量高公局主機偶爾對台灣境外網路不回應，內建 24 小時快取（<code>TAIWAN_LAST_GOOD_MAX_AGE_MS</code>）與失敗後 1 小時退避（<code>TAIWAN_RETRY_AFTER_FAILURE_MS</code>），避免卡死整體的 CCTV 更新。</li>
+        </ul>
+      </section>
+
+      <!-- Section 5: Security -->
+      <section id="sec-security">
+        <h2>5. 資安模型與本地優先防禦（Threat Model）</h2>
+        <p>
+          檢視 <code>SECURITY.md</code> 與 <code>server/standalone/key-setup.js</code>，這套系統在「如何保護使用者的 API Key 與荷包」上展現了極高的工程水準：
+        </p>
+        <ul>
+          <li><strong>預設僅綁定 <code>127.0.0.1</code></strong>：無論執行 <code>npm run dev</code> 或 <code>docker compose up</code>，預設只監聽本機 Loopback，外網與同區網他人皆無法連入。</li>
+          <li><strong>嚴格的瀏覽器端金鑰白名單</strong>：透過 <code>build/vite.js</code> 的 <code>define</code> 區塊，只有 3 把設計給前端公開使用的 Token（<strong>Google Maps API Key</strong>、<strong>Cesium ion Token</strong>、<strong>Mapillary Client Token</strong>）會進入瀏覽器；其餘所有私密金鑰（<code>OPENAI_API_KEY</code>、<code>GEMINI_API_KEY</code>、<code>AISSTREAM_API_KEY</code>、<code>OPENSKY_CLIENT_SECRET</code>、以及負責 Places/Geocoding 的 <code>GOOGLE_MAPS_SERVER_API_KEY</code>）全部鎖在 Node 伺服器端。</li>
+          <li><strong>Docker Gateway 特權陷阱防護</strong>：在 Docker Bridge 網路中，宿主機瀏覽器連入容器的來源 IP 是容器 Gateway IP。若使用者將容器埠號開放給區網（LAN），區網內所有人的請求也會從同一個 Gateway IP 進來。因此文件強制要求在開放區網時設定 <code>GEV_KEY_SETUP_TRUSTED_PEERS=none</code>，關閉網頁端的金鑰設定面板（Provider Settings）。</li>
+          <li><strong>OpenAI 語音花費硬上限（Spend Cap）</strong>：即時語音 API 計費昂貴，系統內建即時費用計算器、<strong>$2 美元警告與 $5 美元強制斷線硬上限</strong>；同時支援直接讀取本機 <code>~/.codex/auth.json</code> 的 ChatGPT OAuth 登入態，免 API Key 測試語音功能。</li>
+        </ul>
+      </section>
+
+      <!-- Section 6: Local Plan & Results -->
+      <section id="sec-plan">
+        <h2>6. 本機 Docker ＋ uv 實測成果與驗收報告（已驗證通過）</h2>
+        <p>
+          我們已於 macOS 本機透過 <strong>Docker 容器（node:24.22.2-slim）＋ uv 0.13.6 隔離測試腳本</strong> 完成完整實機驗證。以下為實測環境狀態與自動化測試驗收結果：
+        </p>
+
+        <div class="callout">
+          <div class="callout-title">🚢 關於「AIS 船舶數據源」狀態實測說明</div>
+          <p>
+            針對實測時發現的 <code>/api/vessels</code> 回應狀態：<br>
+            • <strong>HTTP 回應代碼</strong>：<code>503 Service Unavailable</code><br>
+            • <strong>錯誤原因</strong>：<code>{"status":"missing-key","error":"AISSTREAM_API_KEY is not set"}</code><br>
+            • <strong>機制因果</strong>：AISStream 官方不支援瀏覽器 CORS，且需要獨立長連線 WebSocket。在未設定金鑰時，系統會以 503 誠實回報 <code>missing-key</code>。此 Key 是<strong>完全免費申請</strong>的，只要至 <a href="https://aisstream.io" target="_blank" rel="noopener">aisstream.io</a> 免費註冊取回 API Key，貼入右下角 <code>POWER UP</code> 面板，後端就會自動建立長連線並在地球上繪製全球即時船舶！
+          </p>
+        </div>
+
+        <h3>A. 自動化驗收報告數據（uv run verify_gev.py）</h3>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>測試項目</th>
+                <th>請求路徑 / 動作</th>
+                <th>實測結果與指標</th>
+                <th>狀態判定</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td data-label="測試項目"><strong>Docker 容器健康狀態</strong></td>
+                <td data-label="請求路徑 / 動作"><code>docker compose ps</code></td>
+                <td data-label="實測結果與指標"><code>Up (healthy)</code>，嚴格綁定 <code>127.0.0.1:4173</code></td>
+                <td data-label="狀態判定">✅ 通過</td>
+              </tr>
+              <tr>
+                <td data-label="測試項目"><strong>Gateway 信任機制</strong></td>
+                <td data-label="請求路徑 / 動作"><code>/api/setup/status</code></td>
+                <td data-label="實測結果與指標">成功信任 <code>172.18.0.1</code>，支援本機瀏覽器 Power Up 設定</td>
+                <td data-label="狀態判定">✅ 通過</td>
+              </tr>
+              <tr>
+                <td data-label="測試項目"><strong>即時軍機資料流</strong></td>
+                <td data-label="請求路徑 / 動作"><code>/api/military</code> (adsb.lol)</td>
+                <td data-label="實測結果與指標">即時截獲 <strong>192 架</strong> 軍機訊號（ER35、CTM2081 等）</td>
+                <td data-label="狀態判定">✅ 通過</td>
+              </tr>
+              <tr>
+                <td data-label="測試項目"><strong>🇹🇼 台灣高公局 CCTV</strong></td>
+                <td data-label="請求路徑 / 動作"><code>/api/cctv/sources</code></td>
+                <td data-label="實測結果與指標">台灣 Pack 命中：提供 <strong>1,781 支</strong> 國道鏡頭，目前分派 243 支</td>
+                <td data-label="狀態判定">✅ 通過</td>
+              </tr>
+              <tr>
+                <td data-label="測試項目"><strong>太空衛星軌道 TLE</strong></td>
+                <td data-label="請求路徑 / 動作"><code>/api/celestrak/stations</code></td>
+                <td data-label="實測結果與指標">成功拉取太空站 TLE（含 ISS 國際太空站、中國天和號）</td>
+                <td data-label="狀態判定">✅ 通過</td>
+              </tr>
+              <tr>
+                <td data-label="測試項目"><strong>3D WebGL 渲染與 GLSL 濾鏡</strong></td>
+                <td data-label="請求路徑 / 動作">Playwright 實機截圖</td>
+                <td data-label="實測結果與指標">Cesium Canvas 正常渲染、NVG/CRT 濾鏡與 HUD 快捷鍵響應順暢</td>
+                <td data-label="狀態判定">✅ 通過</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>B. 實機渲染截圖存證（由 uv Playwright 自動捕捉）</h3>
+        <figure class="svg-figure">
+          <img src="test-results/02_shader_nvg.png" alt="God's Eye View CRT 復古螢幕濾鏡實測截圖" style="width:100%; border-radius:8px; display:block;">
+          <figcaption>▲ 實機截圖 1：奧斯汀德州州議會上空 CRT 復古掃描線濾鏡與情報 HUD 渲染</figcaption>
+        </figure>
+
+        <figure class="svg-figure">
+          <img src="test-results/03_shader_flir.png" alt="God's Eye View NVG 夜視濾鏡實測截圖" style="width:100%; border-radius:8px; display:block;">
+          <figcaption>▲ 實機截圖 2：Surveillance / NVG PVS-14 綠磷光夜視鏡濾鏡與動態暗角光圈（Scope Mask）</figcaption>
+        </figure>
+
+        <h3>C. 容器日常操作指引</h3>
+        <pre><code># 1. 隨時用本機瀏覽器進入戰情室（已在背景健康運行）
+open http://localhost:4173
+
+# 2. 查看容器即時日誌（例如查看 CCTV 或航班拉取情形）
+cd /Users/lanss/projects/2_Practice/tools/1151104_gods-eye-view/repo
+docker compose logs -f
+
+# 3. 停止與關閉容器（不遺失快取與設定）
+docker compose down
+
+# 4. 重新啟動容器
+docker compose up -d</code></pre>
+      </section>
+
+      <!-- Section 7: 臺灣海域航港局 (MOTC MPB) 實務對接與微光學圖形學擴充實證 -->
+      <section id="sec-tw-extension">
+        <h2>7. 🇹🇼 臺灣海域航港局（MOTC MPB）實務對接與微光學圖形學擴充實證</h2>
+        <p>
+          在完成開源系統的基礎容器化驗證後，我們展開了進階本土化實戰：<strong>對接臺灣交通部航港局（MOTC MPB）免金鑰開放資料雷達源</strong>，將 9,000+ 艘臺灣周邊船舶即時動態整合進這套 3D 全球戰情中樞。
+        </p>
+
+        <div class="callout">
+          <strong>⚡ 本土化實戰三大核心突破：</strong>
+          <ol style="margin-top: 8px; padding-left: 20px;">
+            <li><strong>雙軌數據架構解耦</strong>：保留原版 <code>/api/vessels</code>（全球 AISStream）不受干擾，獨立增設 <code>/api/taiwan-vessels</code> 代理端點。內建 40s In-Memory 快取與並行請求合併，避免外部政府 API 遭擊穿。</li>
+            <li><strong>Awwwards / FWA 獲獎級 16 款微光學圖標</strong>：針對航港局 8 大船舶分類（貨船、油輪、客船、漁船、拖船、執法船、特殊船與其他），預先光柵化 48×48 小點陣圖與白金選取態，利用 WebGL <strong>Texture Atlas</strong> 合批技術達成 <strong>1 Draw Call 繪製 9,000 艘船</strong>。</li>
+            <li><strong>尺度危機根本修復（Screen-Space 13.4px）</strong>：徹底修復早期 92px 巨型圖標遮蔽海峽的空間尺度事故，改採黃金比例固定 13.4px 螢幕像素，搭配 GPU 著色器視距階梯（航行船 8,000km 全域可見，靜止小船 280km 近景展開）。</li>
+          </ol>
+        </div>
+
+        <h3>A. 尺度事故與修復前後對照</h3>
+        <figure class="svg-figure">
+          <img src="images/scale_incident_history.png" alt="尺度事故：92px 圖標遮蔽臺灣海峽" style="width:100%; border-radius:8px; display:block;">
+          <figcaption>▲ 歷史事故存證：128px SVG 搭配 0.72 縮放比例導致 92px 圖標霸屏，海面視野完全被遮蔽</figcaption>
+        </figure>
+
+        <figure class="svg-figure">
+          <img src="test-results/16_screen_space_13px_overview.png" alt="Screen-Space 13.4px 修正後鳥瞰臺灣海峽" style="width:100%; border-radius:8px; display:block;">
+          <figcaption>▲ 成功修正存證：Screen-Space 13.4px 螢幕固定縮放，海峽開闊清爽，商船航向羅盤針分明</figcaption>
+        </figure>
+
+        <h3>B. 雙面板人機工效戰情台實測</h3>
+        <figure class="svg-figure">
+          <img src="test-results/08_tw_vessels_panel_all.png" alt="臺灣海峽專精戰情台面板展開與 8 大分類勾選" style="width:100%; border-radius:8px; display:block;">
+          <figcaption>▲ 右側臺灣專精台展開：8 大船型即時艘數徽章、多重勾選過濾與單船情報卡片聯動</figcaption>
+        </figure>
+
+        <div class="callout warning">
+          <strong>📑 深度白皮書與技術歷程導航：</strong>
+          <p style="margin: 8px 0 0;">
+            若欲了解完整的 C4ISR 系統架構、GPU 圖形學合批原理、AI 時代 Agentic / MCP 協同規劃或全流程演進復盤，請參閱：
+          </p>
+          <ul style="margin-top: 8px; padding-left: 20px;">
+            <li><a href="readme.html" style="font-weight: 700; color: var(--accent-teal);">📖 God's Eye View 系統使用指南與發布手冊</a>：端到端 Docker + uv 啟動與操作指南。</li>
+            <li><a href="system-architecture.html" style="font-weight: 700; color: var(--accent-indigo);">🏛️ 現代 C4ISR 態勢感知系統架構白皮書</a>：30 年資深系統分析顧問 × AI 時代全景白皮書。</li>
+            <li><a href="gods-eye-view-summary.html" style="font-weight: 700; color: var(--accent-amber);">📊 臺灣海域即時船舶系統：工程實測與全流程演進實戰報告</a>：人機協作全歷程總結。</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="sec-ais-contract">
+        <h2>8. AIS 航速與時間戳契約修復</h2>
+        <p>快照系統對欄位語意很寬容：畫面上船還是在動。一旦要保存歷史，每個欄位的真實意義都會被放大。審查 2026-11-04 實抓的 8,951 筆上游資料後，確認 <code>mpb-taiwan.js</code> 有下列契約問題。</p>
+        <figure class="svg-fig"><svg viewBox="0 0 420 610" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AIS 資料契約因果鏈：Record_Time 被忽略導致舊定位冒充新資料；SOG 哨兵與 COG 無效值外洩；寫入航跡庫前必須修正" font-family="-apple-system,BlinkMacSystemFont,&quot;PingFang TC&quot;,&quot;Noto Sans TC&quot;,&quot;Microsoft JhengHei&quot;,sans-serif"><title>AIS 資料契約因果鏈：Record_Time 被忽略導致舊定位冒充新資料；SOG 哨兵與 COG 無效值外洩；寫入航跡庫前必須修正</title><defs><marker id="cha-a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#8b8478"/></marker></defs><rect width="420" height="610" rx="14" fill="#fbf9f6"/><rect x="20" y="12" width="380" height="86" rx="10" fill="#ffffff" stroke="#b91c1c" stroke-width="1.4"/><text x="32" y="36" font-size="15" fill="#1a1a1a" font-weight="700">根因：上游欄位未對應語意</text><text x="32" y="55" font-size="13.5" fill="#525866">Record_Time 無時區・SOG 102.3 不可用</text><text x="32" y="74" font-size="13.5" fill="#525866">COG ≥ 360 不可用・型號 33 未歸類</text><line x1="210" y1="98" x2="210" y2="124" stroke="#8b8478" stroke-width="1.8" marker-end="url(#cha-a)"/><rect x="20" y="126" width="380" height="86" rx="10" fill="#ffffff" stroke="#b45309" stroke-width="1.4"/><text x="32" y="150" font-size="15" fill="#1a1a1a" font-weight="700">症狀：快照看起來都正常</text><text x="32" y="169" font-size="13.5" fill="#525866">epoch 固定用抓取時間 now</text><text x="32" y="188" font-size="13.5" fill="#525866">位置舊了，時間卻永遠是新的</text><line x1="210" y1="212" x2="210" y2="238" stroke="#8b8478" stroke-width="1.8" marker-end="url(#cha-a)"/><rect x="20" y="240" width="380" height="86" rx="10" fill="#ffffff" stroke="#b45309" stroke-width="1.4"/><text x="32" y="264" font-size="15" fill="#1a1a1a" font-weight="700">放大器：7 天航跡庫</text><text x="32" y="283" font-size="13.5" fill="#525866">快照的小誤差變成永久歷史污染</text><text x="32" y="302" font-size="13.5" fill="#525866">無法判斷定位時間是否真的更新</text><line x1="210" y1="326" x2="210" y2="352" stroke="#8b8478" stroke-width="1.8" marker-end="url(#cha-a)"/><rect x="20" y="354" width="380" height="108" rx="10" fill="#ffffff" stroke="#3730a3" stroke-width="1.4"/><text x="32" y="378" font-size="15" fill="#1a1a1a" font-weight="700">修復：convertTaiwanVesselRows 純轉換</text><text x="32" y="397" font-size="13.5" fill="#525866">parseRecordTime 固定 UTC+8</text><text x="32" y="416" font-size="13.5" fill="#525866">aisSpeed ≥ 102.3 → null</text><text x="32" y="435" font-size="13.5" fill="#525866">normalizeCourse ≥ 360 → null</text><line x1="210" y1="462" x2="210" y2="488" stroke="#8b8478" stroke-width="1.8" marker-end="url(#cha-a)"/><rect x="20" y="490" width="380" height="106" rx="10" fill="#ffffff" stroke="#15803d" stroke-width="1.4"/><text x="32" y="514" font-size="15" fill="#1a1a1a" font-weight="700">驗證：真實快照 8,933 筆</text><text x="32" y="533" font-size="13.5" fill="#525866">每筆 epoch 都與抓取時間不同</text><text x="32" y="552" font-size="13.5" fill="#525866">無效航向 0・無效時間 0</text><text x="32" y="571" font-size="13.5" fill="#525866">型號 33 全數進 special_ops（62 艘）</text></svg><figcaption><span class="figure-tag">圖 8-1</span> AIS 資料契約因果鏈。</figcaption></figure>
+        <div class="table-wrap"><table class="data-table"><thead><tr><th>欄位</th><th>上游實況</th><th>修復前</th><th>修復後</th></tr></thead><tbody><tr><td data-label="欄位"><code>Record_Time</code></td><td data-label="上游實況">100% 為無時區字串 <code>YYYY/MM/DD HH:mm:ss</code></td><td data-label="修復前">epoch 用抓取時間；<code>last_position_UTC</code> 實為本地時間</td><td data-label="修復後">依 UTC+8 解析，並驗證月份與日期</td></tr><tr><td data-label="欄位"><code>SOG</code></td><td data-label="上游實況">AIS 以 102.3 表示不可用</td><td data-label="修復前">數字型別即原樣輸出</td><td data-label="修復後"><code>aisSpeed</code> 把 ≥ 102.3 轉為 <code>null</code></td></tr><tr><td data-label="欄位"><code>COG</code></td><td data-label="上游實況">224 筆 ≥ 360（AIS 不可用）</td><td data-label="修復前">原樣當航向</td><td data-label="修復後"><code>normalizeCourse</code> 轉為 <code>null</code></td></tr><tr><td data-label="欄位">型號 33</td><td data-label="上游實況">65 艘挖泥／水下作業船</td><td data-label="修復前">落入 <code>unspecified</code></td><td data-label="修復後">歸 <code>special_ops</code>，型號 34 不變</td></tr></tbody></table></div>
+        <figure class="svg-fig"><svg viewBox="0 0 420 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="時間戳時序：船舶定位時間、上游發布、後端抓取三個時間點；修復前用抓取時間，修復後用 Record_Time 解析為 UTC+8" font-family="-apple-system,BlinkMacSystemFont,&quot;PingFang TC&quot;,&quot;Noto Sans TC&quot;,&quot;Microsoft JhengHei&quot;,sans-serif"><title>時間戳時序：船舶定位時間、上游發布、後端抓取三個時間點；修復前用抓取時間，修復後用 Record_Time 解析為 UTC+8</title><defs><marker id="tim-a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#8b8478"/></marker></defs><rect width="420" height="360" rx="14" fill="#fbf9f6"/><text x="20" y="30" font-size="16" fill="#1a1a1a" font-weight="700">同一筆定位的三個時刻（時間為示意）</text><line x1="30" y1="86" x2="396" y2="86" stroke="#8b8478" stroke-width="1.8" marker-end="url(#tim-a)"/><circle cx="70" cy="86" r="7" fill="#3730a3"/><text x="70" y="70" font-size="13" fill="#1a1a1a" font-weight="700" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">21:19:00</text><text x="70" y="112" font-size="13" fill="#525866" text-anchor="middle">Record_Time</text><circle cx="210" cy="86" r="7" fill="#8b8478"/><text x="210" y="70" font-size="13" fill="#1a1a1a" font-weight="700" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">21:19:xx</text><text x="210" y="112" font-size="13" fill="#525866" text-anchor="middle">上游可取得</text><circle cx="340" cy="86" r="7" fill="#b45309"/><text x="340" y="70" font-size="13" fill="#1a1a1a" font-weight="700" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">21:26:30</text><text x="340" y="112" font-size="13" fill="#525866" text-anchor="middle">後端抓取</text><rect x="20" y="136" width="380" height="92" rx="10" fill="#ffffff" stroke="#b91c1c" stroke-width="1.4"/><text x="32" y="160" font-size="14.5" fill="#1a1a1a" font-weight="700">修復前</text><text x="32" y="179" font-size="13.5" fill="#525866">last_position_epoch = now（21:26:30）</text><text x="32" y="198" font-size="13.5" fill="#525866">舊定位被冒充為新資料</text><rect x="20" y="244" width="380" height="100" rx="10" fill="#ffffff" stroke="#15803d" stroke-width="1.4"/><text x="32" y="268" font-size="14.5" fill="#1a1a1a" font-weight="700">修復後</text><text x="32" y="288" font-size="13" fill="#525866">"2026/11/04 21:19:00" 視為 +08:00</text><text x="32" y="308" font-size="13" fill="#525866">= 2026-11-04T13:19:00Z，與主機時區無關</text><text x="32" y="328" font-size="13" fill="#525866">last_position_UTC 才名實相符</text></svg><figcaption><span class="figure-tag">圖 8-2</span> 為什麼 <code>Record_Time</code> 必須取代抓取時間。時刻為示意，日期解析範例取自驗收條件。</figcaption></figure>
+        <div class="callout">
+          <strong>驗證：</strong>真實快照 8,933 筆，無效航向 0、無效時間 0，每筆 epoch 都與抓取時間不同；型號 33 共 62 艘重新歸類，<code>unspecified</code> 由 4,593 降為 4,531。解析測試在預設時區、<code>TZ=UTC</code> 與 <code>TZ=America/Los_Angeles</code> 下皆通過。
+        </div>
+        <p>航速單位還有第二道防線。提示詞規定船速一律為「節」，Validator 再以 a2 規則拒絕「航速＋km/h」的輸出，因為 km/h 是國道車速的單位，模型在同一份 Context 裡確實可能混用。</p>
+      </section>
+
+      <section id="sec-gps-drift">
+        <h2>9. GPS 漂移分級過濾演算法</h2>
+        <p>上游快照裡，<code>SOG &lt; 0.5</code> 的船約佔一半（4,441 艘）。它們的 GPS 位置會在原地抖動，若直接套用航行船的 30 公尺門檻，停泊船會不斷產生沒有意義的「移動」。</p>
+        <figure class="svg-fig"><svg viewBox="0 0 420 392" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="GPS 漂移分級閘門示意：航行船 30 公尺半徑、停泊船 150 公尺半徑，圈內點在時間門檻內不寫入" font-family="-apple-system,BlinkMacSystemFont,&quot;PingFang TC&quot;,&quot;Noto Sans TC&quot;,&quot;Microsoft JhengHei&quot;,sans-serif"><title>GPS 漂移分級閘門示意：航行船 30 公尺半徑、停泊船 150 公尺半徑，圈內點在時間門檻內不寫入</title><defs><marker id="dri-a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#8b8478"/></marker></defs><rect width="420" height="392" rx="14" fill="#fbf9f6"/><text x="20" y="30" font-size="15" fill="#1a1a1a" font-weight="700">位移閘門半徑比較（示意，非實際座標）</text><circle cx="112" cy="160" r="18" fill="#15803d" fill-opacity=".12" stroke="#15803d" stroke-width="2"/><circle cx="112" cy="160" r="4" fill="#15803d"/><text x="112" y="286" font-size="15" fill="#1a1a1a" font-weight="700" text-anchor="middle">航行級 30 m</text><text x="112" y="310" font-size="13.5" fill="#525866" text-anchor="middle">s ≥ 0.5 或航速 null</text><text x="112" y="332" font-size="13.5" fill="#525866" text-anchor="middle">時間閘 10 分</text><circle cx="308" cy="160" r="90" fill="#b45309" fill-opacity=".12" stroke="#b45309" stroke-width="2"/><circle cx="308" cy="160" r="4" fill="#b45309"/><text x="308" y="286" font-size="15" fill="#1a1a1a" font-weight="700" text-anchor="middle">停泊級 150 m</text><text x="308" y="310" font-size="13.5" fill="#525866" text-anchor="middle">s &lt; 0.5 節</text><text x="308" y="332" font-size="13.5" fill="#525866" text-anchor="middle">時間閘 30 分</text><circle cx="303.2" cy="169.7" r="2.6" fill="#525866"/><circle cx="305.0" cy="155.8" r="2.6" fill="#525866"/><circle cx="282.3" cy="154.2" r="2.6" fill="#525866"/><circle cx="342.1" cy="173.0" r="2.6" fill="#525866"/><circle cx="338.4" cy="167.3" r="2.6" fill="#525866"/><circle cx="313.9" cy="162.8" r="2.6" fill="#525866"/><circle cx="255.1" cy="187.3" r="2.6" fill="#525866"/><circle cx="319.5" cy="171.3" r="2.6" fill="#525866"/><circle cx="260.4" cy="111.1" r="2.6" fill="#525866"/><circle cx="282.7" cy="146.7" r="2.6" fill="#525866"/><circle cx="311.3" cy="159.5" r="2.6" fill="#525866"/><circle cx="321.1" cy="143.8" r="2.6" fill="#525866"/><circle cx="313.2" cy="166.7" r="2.6" fill="#525866"/><circle cx="286.9" cy="214.9" r="2.6" fill="#525866"/><text x="210" y="370" font-size="13" fill="#525866" text-anchor="middle">灰點：停泊船漂移的回報位置，圈內且未滿時間閘就不入庫</text></svg><figcaption><span class="figure-tag">圖 9-1</span> 停泊級的位移半徑是航行級的 5 倍，時間閘是 3 倍。</figcaption></figure>
+        <pre><code>slow   = p.s !== null && p.s &lt; 0.5        // 未知航速不算停泊
+minKm  = slow ? 0.15 : 0.03
+minMs  = slow ? 1_800_000 : 600_000
+skip   = p.t &lt;= prev.t ||
+         (p.t - prev.t &lt; minMs &&
+          distanceKm(prev, p) &lt; minKm)</code></pre>
+        <p>第一個條件防止定位時間未更新時重複寫入；40 秒快取之間，多數船都不會有新回報。第二個條件才是分級閘門，只有時間與位移<strong>同時</strong>未達標才略過。</p>
+        <div class="table-wrap"><table class="data-table"><thead><tr><th>指標</th><th>數值</th><th>含意</th></tr></thead><tbody><tr><td data-label="指標">庫內 <code>s &lt; 0.5</code> 點數</td><td data-label="數值">11,182／43,292 點（25.8%）</td><td data-label="含意">此為點數佔比，與快照的船數佔比（約 5 成）口徑不同</td></tr><tr><td data-label="指標">停泊相鄰段位移中位數</td><td data-label="數值">52 m</td><td data-label="含意">多數停泊段並未真正移動</td></tr><tr><td data-label="指標">位移 &lt; 150 m 的停泊段</td><td data-label="數值">65.5%（共 5,868 段）</td><td data-label="含意">這些點不是靠位移通過閘門</td></tr><tr><td data-label="指標">間隔 ≥ 30 分的停泊段</td><td data-label="數值">76.8%</td><td data-label="含意">時間閘讓停泊船維持低頻心跳點</td></tr></tbody></table></div>
+        <p>以上取自 2026-11-05 當下的航跡庫，定位跨度約 3.3 小時，腳本存於 <code>backup/step10/evidence/track-drift-stats.py</code>。</p>
+        <div class="callout">
+          <strong>限制：</strong>30 m、150 m 是工程門檻，未以逐船真值校準。停泊段位移的 p90 約 3.6 km，可能混有長間隔後的真實移動或定位跳點，尚未細分；統計里程另以「隱含速度 &gt; 100 節」排除跳點。早期 100 秒短樣本線性外推得 4.20 GB／7 天，含首次入庫的新船，不是可驗證的磁碟佔用；7 天實際用量仍待累積。
+        </div>
+      </section>
+
+      <section id="sec-pat-gate">
+        <h2>10. PAT SHA-256 閘門防護</h2>
+        <p>AI 端點會觸發本機推論，所以它的風險不是資料外洩，而是被任意網頁或外部程式當成算力使用。防護分成兩層：本機同源瀏覽器不需權杖，其他客戶端必須帶 Bearer PAT。</p>
+        <figure class="svg-fig"><svg viewBox="0 0 420 590" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="外部客戶端 PAT 請求時序：客戶端送 Bearer，閘門計算 SHA-256 並以 timingSafeEqual 比對，通過後才進入檢索與 Ollama" font-family="-apple-system,BlinkMacSystemFont,&quot;PingFang TC&quot;,&quot;Noto Sans TC&quot;,&quot;Microsoft JhengHei&quot;,sans-serif"><title>外部客戶端 PAT 請求時序：客戶端送 Bearer，閘門計算 SHA-256 並以 timingSafeEqual 比對，通過後才進入檢索與 Ollama</title><defs><marker id="pse-a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#8b8478"/></marker></defs><rect width="420" height="590" rx="14" fill="#fbf9f6"/><rect x="4" y="12" width="112" height="40" rx="10" fill="#ffffff" stroke="#3730a3" stroke-width="1.4"/><text x="60.0" y="36.5" font-size="12.5" fill="#1a1a1a" font-weight="700" text-anchor="middle">外部客戶端</text><line x1="60" y1="52" x2="60" y2="574" stroke="#8b8478" stroke-dasharray="4 5"/><rect x="154" y="12" width="112" height="40" rx="10" fill="#ffffff" stroke="#3730a3" stroke-width="1.4"/><text x="210.0" y="36.5" font-size="12.5" fill="#1a1a1a" font-weight="700" text-anchor="middle">Advisor 閘門</text><line x1="210" y1="52" x2="210" y2="574" stroke="#8b8478" stroke-dasharray="4 5"/><rect x="304" y="12" width="112" height="40" rx="10" fill="#ffffff" stroke="#3730a3" stroke-width="1.4"/><text x="360.0" y="36.5" font-size="12.5" fill="#1a1a1a" font-weight="700" text-anchor="middle">Token／AI</text><line x1="360" y1="52" x2="360" y2="574" stroke="#8b8478" stroke-dasharray="4 5"/><line x1="60" y1="92" x2="210" y2="92" stroke="#8b8478" stroke-width="1.8" marker-end="url(#pse-a)"/><text x="135.0" y="83" font-size="12.5" fill="#1a1a1a" text-anchor="middle">POST＋Bearer</text><rect x="120" y="104" width="180" height="46" rx="8" fill="#f1ede6"/><text x="210" y="124" font-size="12.5" fill="#1a1a1a" text-anchor="middle">無 Origin → 跳過同源檢查</text><text x="210" y="142" font-size="12" fill="#525866" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">isLocalBrowser = false</text><line x1="210" y1="186" x2="360" y2="186" stroke="#8b8478" stroke-width="1.8" marker-end="url(#pse-a)"/><text x="285.0" y="177" font-size="12.5" fill="#1a1a1a" text-anchor="middle">verify(token)</text><rect x="240" y="198" width="172" height="64" rx="8" fill="#f1ede6"/><text x="326" y="220" font-size="12.5" fill="#1a1a1a" text-anchor="middle">讀 0600 雜湊檔</text><text x="326" y="240" font-size="12.5" fill="#1a1a1a" text-anchor="middle">SHA-256 → 定長比對</text><line x1="360" y1="292" x2="210" y2="292" stroke="#8b8478" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#pse-a)"/><text x="285.0" y="283" font-size="12.5" fill="#1a1a1a" text-anchor="middle">true／false</text><line x1="210" y1="328" x2="60" y2="328" stroke="#b91c1c" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#pse-a)"/><text x="135.0" y="319" font-size="12.5" fill="#1a1a1a" text-anchor="middle">false → 401</text><line x1="210" y1="368" x2="360" y2="368" stroke="#8b8478" stroke-width="1.8" marker-end="url(#pse-a)"/><text x="285.0" y="359" font-size="12.5" fill="#1a1a1a" text-anchor="middle">retrieve → Ollama</text><rect x="240" y="380" width="172" height="44" rx="8" fill="#f1ede6"/><text x="326" y="407" font-size="12.5" fill="#1a1a1a" text-anchor="middle">緩衝＋Grounding</text><line x1="360" y1="452" x2="210" y2="452" stroke="#8b8478" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#pse-a)"/><text x="285.0" y="443" font-size="12.5" fill="#1a1a1a" text-anchor="middle">核驗後回答</text><line x1="210" y1="490" x2="60" y2="490" stroke="#15803d" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#pse-a)"/><text x="135.0" y="481" font-size="12.5" fill="#1a1a1a" text-anchor="middle">200 JSON</text><rect x="14" y="512" width="392" height="50" rx="8" fill="#f1ede6"/><text x="24" y="533" font-size="12.5" fill="#1a1a1a">同一 PAT 呼叫 /api/taiwan-ai-token → 403</text><text x="24" y="552" font-size="12.5" fill="#525866">權杖管理只限本機瀏覽器，PAT 無法自我輪替</text></svg><figcaption><span class="figure-tag">圖 10-1</span> 外部客戶端呼叫 AI 參謀的時序。</figcaption></figure>
+        <div class="table-wrap"><table class="data-table"><thead><tr><th>威脅</th><th>防護</th><th>位置</th></tr></thead><tbody><tr><td data-label="威脅">惡意網頁跨站呼叫</td><td data-label="防護">帶 Origin 必須與 Host 完全一致，否則 403</td><td data-label="位置"><code>createAdvisorMiddleware</code></td></tr><tr><td data-label="威脅">代理或隧道偽裝本機</td><td data-label="防護"><code>admitKeySetupRequest</code> 檢查迴路位址、Host 與代理標頭；另須同源 Fetch Metadata，或為帶 Origin 的 POST</td><td data-label="位置"><code>isLocalBrowser</code></td></tr><tr><td data-label="威脅">權杖檔外洩</td><td data-label="防護">只存 SHA-256；檔案 <code>0600</code>，並以 <code>O_NOFOLLOW</code> 開啟、驗證權限</td><td data-label="位置"><code>createTokenStore</code></td></tr><tr><td data-label="威脅">時序側信道</td><td data-label="防護">定長摘要後用 <code>timingSafeEqual</code>；未設定權杖時仍比對全零摘要</td><td data-label="位置"><code>verify()</code></td></tr><tr><td data-label="威脅">PAT 權限擴張</td><td data-label="防護">權杖路由非本機一律 403，外部 PAT 無法輪替或撤銷</td><td data-label="位置"><code>/api/taiwan-ai-token</code></td></tr><tr><td data-label="威脅">算力耗盡</td><td data-label="防護">單一推論鎖（429）、90 秒逾時、主體 ≤ 16 KiB</td><td data-label="位置"><code>runOllama</code>、<code>readBody</code></td></tr></tbody></table></div>
+        <p>PAT 是 <code>randomBytes(32)</code> 產生的 256 位元隨機值，因此用快速雜湊即可，不需要 bcrypt 這類針對弱密碼的慢雜湊。比對 SHA-256 摘要還有一個好處：<code>timingSafeEqual</code> 要求等長輸入，摘要天生定長。</p>
+        <div class="callout">
+          <strong>2026-11-05 容器實測：</strong>無憑證 401、偽造 64 位 hex Bearer 401、跨來源 Origin 403、未授權讀取權杖狀態 401。有效 PAT 與「外部 PAT 不得管理權杖」由單元測試覆蓋；目前系統未設定 PAT，本次未產生權杖。
+        </div>
+      </section>
+
+      <section id="sec-grounding">
+        <h2>11. Grounding Validator 防幻覺因果鏈</h2>
+        <p>Validator 不是一次設計完成的。<code>backup/step7/</code> 保留了修復前版本，對照後能看到它在「安全」與「可用」之間來回校正。</p>
+        <figure class="svg-fig"><svg viewBox="0 0 420 664" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Grounding Validator 演進因果鏈：句子白名單過嚴、改規則式核驗、單位錯誤新增規則、截斷改為降級並放寬預算" font-family="-apple-system,BlinkMacSystemFont,&quot;PingFang TC&quot;,&quot;Noto Sans TC&quot;,&quot;Microsoft JhengHei&quot;,sans-serif"><title>Grounding Validator 演進因果鏈：句子白名單過嚴、改規則式核驗、單位錯誤新增規則、截斷改為降級並放寬預算</title><defs><marker id="gro-a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#8b8478"/></marker></defs><rect width="420" height="664" rx="14" fill="#fbf9f6"/><rect x="20" y="12" width="380" height="88" rx="10" fill="#ffffff" stroke="#b45309" stroke-width="1.4"/><text x="32" y="36" font-size="14.5" fill="#1a1a1a" font-weight="700">v1 句子白名單</text><text x="32" y="55" font-size="13.5" fill="#525866">每行須與確定性簡報逐字相同</text><text x="32" y="74" font-size="13.5" fill="#525866">安全，但等於禁止自由回答</text><line x1="210" y1="100" x2="210" y2="124" stroke="#8b8478" stroke-width="1.8" marker-end="url(#gro-a)"/><rect x="20" y="126" width="380" height="88" rx="10" fill="#ffffff" stroke="#3730a3" stroke-width="1.4"/><text x="32" y="150" font-size="14.5" fill="#1a1a1a" font-weight="700">v2 規則式核驗（a／b／c／d／d2）</text><text x="32" y="169" font-size="13.5" fill="#525866">數字、MMSI、船名須可回溯 Context</text><text x="32" y="188" font-size="13.5" fill="#525866">Context 上限 1,199 → 3,600 bytes</text><line x1="210" y1="214" x2="210" y2="238" stroke="#8b8478" stroke-width="1.8" marker-end="url(#gro-a)"/><rect x="20" y="240" width="380" height="88" rx="10" fill="#ffffff" stroke="#b91c1c" stroke-width="1.4"/><text x="32" y="264" font-size="14.5" fill="#1a1a1a" font-weight="700">新缺陷：單位</text><text x="32" y="283" font-size="13.5" fill="#525866">模型可把船速寫成 km/h</text><text x="32" y="302" font-size="13.5" fill="#525866">數字仍在白名單內，v2 攔不到</text><line x1="210" y1="328" x2="210" y2="352" stroke="#8b8478" stroke-width="1.8" marker-end="url(#gro-a)"/><rect x="20" y="354" width="380" height="68" rx="10" fill="#ffffff" stroke="#3730a3" stroke-width="1.4"/><text x="32" y="378" font-size="14.5" fill="#1a1a1a" font-weight="700">v3 新增 a2 規則＋提示詞單位規範</text><text x="32" y="397" font-size="13.5" fill="#525866">「航速」接 km/h 或公里即判失敗</text><line x1="210" y1="422" x2="210" y2="446" stroke="#8b8478" stroke-width="1.8" marker-end="url(#gro-a)"/><rect x="20" y="448" width="380" height="88" rx="10" fill="#ffffff" stroke="#b91c1c" stroke-width="1.4"/><text x="32" y="472" font-size="14.5" fill="#1a1a1a" font-weight="700">新缺陷：截斷</text><text x="32" y="491" font-size="13.5" fill="#525866">num_predict 仍為 512</text><text x="32" y="510" font-size="13.5" fill="#525866">回答可能在中途被截斷</text><line x1="210" y1="536" x2="210" y2="560" stroke="#8b8478" stroke-width="1.8" marker-end="url(#gro-a)"/><rect x="20" y="562" width="380" height="88" rx="10" fill="#ffffff" stroke="#15803d" stroke-width="1.4"/><text x="32" y="586" font-size="14.5" fill="#1a1a1a" font-weight="700">v3 done_reason=length 視同失敗</text><text x="32" y="605" font-size="13.5" fill="#525866">num_predict 提高到 1024（think 2048）</text><text x="32" y="624" font-size="13.5" fill="#525866">截斷的回答一律降級</text></svg><figcaption><span class="figure-tag">圖 11-1</span> 依 <code>*.pre-fix.bak</code>、<code>*.pre-unit-fix.bak</code> 與現行程式碼比對整理。</figcaption></figure>
+        <div class="table-wrap"><table class="data-table"><thead><tr><th>保護</th><th>機制</th><th>失敗時</th></tr></thead><tbody><tr><td data-label="保護">輸入端</td><td data-label="機制"><code>JSON 皆為不可信引用資料</code>；清除控制字元；欄位白名單</td><td data-label="失敗時">—</td></tr><tr><td data-label="保護">輸出端</td><td data-label="機制">緩衝全部 NDJSON，核驗通過才回傳</td><td data-label="失敗時"><code>grounding_failed</code></td></tr><tr><td data-label="保護">模型不可用</td><td data-label="機制">狀態與串流錯誤統一處理</td><td data-label="失敗時"><code>ollama_unavailable</code></td></tr><tr><td data-label="保護">來源異常</td><td data-label="機制"><code>source_error</code> 時禁止宣稱 0 艘</td><td data-label="失敗時">確定性簡報說明來源異常</td></tr></tbody></table></div>
+        <div class="callout">
+          <strong>實跑（2026-11-05）：</strong>「高雄港 30 公里內有幾艘油輪？」回答 26 艘，與 <code>matched_total.vessels</code> 一致，<code>fallback_used=false</code>，耗時 26.5 s，Context 3,580 bytes。<br>
+          <strong>邊界：</strong>規則確認每個值都能回溯，卻無法確認值與對象的配對。句子白名單移除後，把甲船距離寫給乙船的錯誤不會被攔下；需要逐項精確資料時，應以 Citations 或確定性檢索結果為準。
+        </div>
+      </section>
+
+    </article>
+
+    <footer class="article-footer">
+      <p>God's Eye View 深度研究與本機實測規劃報告 · 依據 GitHub <code>v0.3.0</code> 與 DeepWiki 知識庫實證編製</p>
+    </footer>
+  </div>
+
+  <!-- Lightbox Overlay -->
+  <div class="lightbox" id="lightbox">
+    <span class="lightbox-hint">點擊任意處或按 Esc 關閉</span>
+    <img src="" alt="">
+  </div>
+
+  <script>
+    (function(){
+      var lightbox = document.getElementById("lightbox");
+      var lightboxImg = lightbox.querySelector("img");
+      function openLightbox(img){
+        lightboxImg.src = img.currentSrc || img.src;
+        lightboxImg.alt = img.alt;
+        lightbox.classList.add("is-open");
+      }
+      function closeLightbox(){
+        lightbox.classList.remove("is-open");
+        lightboxImg.src = "";
+      }
+      document.querySelectorAll("figure.summary-figure img, figure.section-figure img").forEach(function(img){
+        img.addEventListener("click", function(){ openLightbox(img); });
+      });
+      lightbox.addEventListener("click", closeLightbox);
+      document.addEventListener("keydown", function(e){
+        if (e.key === "Escape") closeLightbox();
+      });
+    })();
+  </script>
+</body>
+</html>

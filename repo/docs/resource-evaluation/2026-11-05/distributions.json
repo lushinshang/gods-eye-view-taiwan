@@ -1,0 +1,616 @@
+{
+  "browser": [
+    {
+      "label": "live_static",
+      "stats": {
+        "container_cpu_percent": {
+          "n": 7,
+          "min": 16.81,
+          "mean": 20.908571428571427,
+          "max": 24.08
+        },
+        "container_memory_mib": {
+          "n": 7,
+          "min": 862.5,
+          "mean": 888.5857142857143,
+          "max": 893.7
+        },
+        "cgroup_anon_mib": {
+          "n": 7,
+          "min": 443.8046875,
+          "mean": 470.1517857142857,
+          "max": 476.25
+        },
+        "process_rss_mib": null,
+        "host_gpu_percent": {
+          "n": 7,
+          "min": 56,
+          "mean": 63.142857142857146,
+          "max": 79
+        },
+        "ollama_process_cpu_percent": {
+          "n": 7,
+          "min": 0.0,
+          "mean": 0.0,
+          "max": 0.0
+        },
+        "first": {
+          "BlockIO": "110MB / 49.4MB",
+          "CPUPerc": "24.08%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "10.87%",
+          "MemUsage": "862.5MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "150MB / 487MB",
+          "PIDs": "25"
+        },
+        "last": {
+          "BlockIO": "110MB / 49.4MB",
+          "CPUPerc": "22.45%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "11.26%",
+          "MemUsage": "893.3MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "151MB / 492MB",
+          "PIDs": "25"
+        }
+      }
+    },
+    {
+      "label": "live_moving",
+      "stats": {
+        "container_cpu_percent": {
+          "n": 7,
+          "min": 20.8,
+          "mean": 24.104285714285716,
+          "max": 31.06
+        },
+        "container_memory_mib": {
+          "n": 7,
+          "min": 894.6,
+          "mean": 894.9,
+          "max": 895.4
+        },
+        "cgroup_anon_mib": {
+          "n": 7,
+          "min": 475.61328125,
+          "mean": 477.265625,
+          "max": 477.73828125
+        },
+        "process_rss_mib": null,
+        "host_gpu_percent": {
+          "n": 7,
+          "min": 67,
+          "mean": 95.14285714285714,
+          "max": 100
+        },
+        "ollama_process_cpu_percent": {
+          "n": 7,
+          "min": 0.0,
+          "mean": 0.0,
+          "max": 0.0
+        },
+        "first": {
+          "BlockIO": "110MB / 49.4MB",
+          "CPUPerc": "25.61%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "11.28%",
+          "MemUsage": "894.8MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "152MB / 493MB",
+          "PIDs": "25"
+        },
+        "last": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "24.47%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "11.28%",
+          "MemUsage": "895MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "153MB / 494MB",
+          "PIDs": "25"
+        }
+      }
+    },
+    {
+      "label": "zero_ships_warm_static",
+      "stats": {
+        "container_cpu_percent": {
+          "n": 7,
+          "min": 20.19,
+          "mean": 31.61285714285714,
+          "max": 82.02
+        },
+        "container_memory_mib": {
+          "n": 7,
+          "min": 889.1,
+          "mean": 890.3571428571429,
+          "max": 895.1
+        },
+        "cgroup_anon_mib": {
+          "n": 7,
+          "min": 469.48828125,
+          "mean": 471.67689732142856,
+          "max": 477.71484375
+        },
+        "process_rss_mib": null,
+        "host_gpu_percent": {
+          "n": 7,
+          "min": 44,
+          "mean": 58.42857142857143,
+          "max": 68
+        },
+        "ollama_process_cpu_percent": {
+          "n": 7,
+          "min": 0.0,
+          "mean": 0.04285714285714286,
+          "max": 0.3
+        },
+        "first": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "23.05%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "11.28%",
+          "MemUsage": "895.1MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "154MB / 494MB",
+          "PIDs": "25"
+        },
+        "last": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "20.19%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "11.21%",
+          "MemUsage": "889.1MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "159MB / 499MB",
+          "PIDs": "25"
+        }
+      }
+    },
+    {
+      "label": "zero_ships_warm_moving",
+      "stats": {
+        "container_cpu_percent": {
+          "n": 7,
+          "min": 21.98,
+          "mean": 24.16,
+          "max": 30.6
+        },
+        "container_memory_mib": {
+          "n": 7,
+          "min": 889.0,
+          "mean": 889.4571428571429,
+          "max": 889.8
+        },
+        "cgroup_anon_mib": {
+          "n": 7,
+          "min": 465.5625,
+          "mean": 470.53683035714283,
+          "max": 471.84375
+        },
+        "process_rss_mib": null,
+        "host_gpu_percent": {
+          "n": 7,
+          "min": 65,
+          "mean": 94.85714285714286,
+          "max": 100
+        },
+        "ollama_process_cpu_percent": {
+          "n": 7,
+          "min": 0.0,
+          "mean": 0.6285714285714287,
+          "max": 4.4
+        },
+        "first": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "22.33%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "11.21%",
+          "MemUsage": "889.5MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "160MB / 500MB",
+          "PIDs": "25"
+        },
+        "last": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "22.56%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "11.21%",
+          "MemUsage": "889.2MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "161MB / 501MB",
+          "PIDs": "25"
+        }
+      }
+    },
+    {
+      "label": "9000_static",
+      "stats": {
+        "container_cpu_percent": {
+          "n": 7,
+          "min": 20.29,
+          "mean": 25.077142857142857,
+          "max": 32.66
+        },
+        "container_memory_mib": {
+          "n": 7,
+          "min": 956.7,
+          "mean": 956.9571428571429,
+          "max": 957.3
+        },
+        "cgroup_anon_mib": {
+          "n": 7,
+          "min": 536.0859375,
+          "mean": 537.3175223214286,
+          "max": 538.32421875
+        },
+        "process_rss_mib": {
+          "n": 7,
+          "min": 602.2578125,
+          "mean": 602.3303571428571,
+          "max": 602.34375
+        },
+        "host_gpu_percent": {
+          "n": 7,
+          "min": 51,
+          "mean": 58.142857142857146,
+          "max": 68
+        },
+        "ollama_process_cpu_percent": {
+          "n": 7,
+          "min": 0.0,
+          "mean": 0.0,
+          "max": 0.0
+        },
+        "first": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "25.69%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "12.06%",
+          "MemUsage": "957MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "181MB / 586MB",
+          "PIDs": "25"
+        },
+        "last": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "22.33%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "12.07%",
+          "MemUsage": "957.3MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "185MB / 590MB",
+          "PIDs": "25"
+        }
+      }
+    },
+    {
+      "label": "9000_moving",
+      "stats": {
+        "container_cpu_percent": {
+          "n": 7,
+          "min": 22.63,
+          "mean": 41.97142857142857,
+          "max": 118.41
+        },
+        "container_memory_mib": {
+          "n": 7,
+          "min": 954.6,
+          "mean": 957.6714285714286,
+          "max": 961.2
+        },
+        "cgroup_anon_mib": {
+          "n": 7,
+          "min": 534.25390625,
+          "mean": 540.8376116071429,
+          "max": 546.34765625
+        },
+        "process_rss_mib": {
+          "n": 7,
+          "min": 602.34765625,
+          "mean": 606.7767857142857,
+          "max": 610.4453125
+        },
+        "host_gpu_percent": {
+          "n": 7,
+          "min": 59,
+          "mean": 93.71428571428571,
+          "max": 100
+        },
+        "ollama_process_cpu_percent": {
+          "n": 7,
+          "min": 0.0,
+          "mean": 4.685714285714285,
+          "max": 32.8
+        },
+        "first": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "25.12%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "12.06%",
+          "MemUsage": "956.9MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "185MB / 590MB",
+          "PIDs": "25"
+        },
+        "last": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "37.47%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "12.12%",
+          "MemUsage": "961.2MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "191MB / 596MB",
+          "PIDs": "25"
+        }
+      }
+    },
+    {
+      "label": "9000_traffic_static",
+      "stats": {
+        "container_cpu_percent": {
+          "n": 7,
+          "min": 19.85,
+          "mean": 22.502857142857142,
+          "max": 24.77
+        },
+        "container_memory_mib": {
+          "n": 7,
+          "min": 961.0,
+          "mean": 961.6571428571428,
+          "max": 962.1
+        },
+        "cgroup_anon_mib": {
+          "n": 7,
+          "min": 545.140625,
+          "mean": 546.7907366071429,
+          "max": 549.09765625
+        },
+        "process_rss_mib": {
+          "n": 7,
+          "min": 611.24609375,
+          "mean": 611.24609375,
+          "max": 611.24609375
+        },
+        "host_gpu_percent": {
+          "n": 7,
+          "min": 45,
+          "mean": 51.57142857142857,
+          "max": 64
+        },
+        "ollama_process_cpu_percent": {
+          "n": 7,
+          "min": 0.0,
+          "mean": 0.0,
+          "max": 0.0
+        },
+        "first": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "19.85%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "12.12%",
+          "MemUsage": "961.4MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "193MB / 597MB",
+          "PIDs": "25"
+        },
+        "last": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "23.83%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "12.13%",
+          "MemUsage": "962.1MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "194MB / 598MB",
+          "PIDs": "25"
+        }
+      }
+    },
+    {
+      "label": "9000_after_ai_static",
+      "stats": {
+        "container_cpu_percent": {
+          "n": 5,
+          "min": 28.83,
+          "mean": 57.062,
+          "max": 124.48
+        },
+        "container_memory_mib": {
+          "n": 5,
+          "min": 962.3,
+          "mean": 962.78,
+          "max": 963.6
+        },
+        "cgroup_anon_mib": {
+          "n": 5,
+          "min": 542.29296875,
+          "mean": 545.1921875,
+          "max": 548.234375
+        },
+        "process_rss_mib": {
+          "n": 5,
+          "min": 612.32421875,
+          "mean": 612.59765625,
+          "max": 612.99609375
+        },
+        "host_gpu_percent": {
+          "n": 5,
+          "min": 46,
+          "mean": 52.6,
+          "max": 58
+        },
+        "ollama_process_cpu_percent": {
+          "n": 5,
+          "min": 0.0,
+          "mean": 0.12,
+          "max": 0.3
+        },
+        "first": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "28.83%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "12.13%",
+          "MemUsage": "962.4MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "205MB / 611MB",
+          "PIDs": "25"
+        },
+        "last": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "124.48%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "12.15%",
+          "MemUsage": "963.6MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "207MB / 617MB",
+          "PIDs": "25"
+        }
+      }
+    }
+  ],
+  "ollama": [
+    {
+      "label": "cold",
+      "stats": {
+        "container_cpu_percent": {
+          "n": 16,
+          "min": 15.18,
+          "mean": 35.005,
+          "max": 109.97
+        },
+        "container_memory_mib": {
+          "n": 16,
+          "min": 961.1,
+          "mean": 962.09375,
+          "max": 963.1
+        },
+        "cgroup_anon_mib": {
+          "n": 16,
+          "min": 540.87109375,
+          "mean": 549.463623046875,
+          "max": 591.85546875
+        },
+        "process_rss_mib": {
+          "n": 16,
+          "min": 611.24609375,
+          "mean": 611.840576171875,
+          "max": 612.32421875
+        },
+        "host_gpu_percent": {
+          "n": 16,
+          "min": 42,
+          "mean": 53,
+          "max": 96
+        },
+        "ollama_process_cpu_percent": {
+          "n": 16,
+          "min": 0.0,
+          "mean": 20.83125,
+          "max": 49.7
+        },
+        "first": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "15.18%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "12.12%",
+          "MemUsage": "961.8MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "194MB / 602MB",
+          "PIDs": "25"
+        },
+        "last": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "58.29%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "12.14%",
+          "MemUsage": "962.8MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "203MB / 610MB",
+          "PIDs": "26"
+        }
+      }
+    },
+    {
+      "label": "warm",
+      "stats": {
+        "container_cpu_percent": {
+          "n": 3,
+          "min": 15.8,
+          "mean": 29.393333333333334,
+          "max": 39.59
+        },
+        "container_memory_mib": {
+          "n": 3,
+          "min": 962.3,
+          "mean": 962.4666666666667,
+          "max": 962.7
+        },
+        "cgroup_anon_mib": {
+          "n": 3,
+          "min": 543.0859375,
+          "mean": 546.5247395833334,
+          "max": 548.25
+        },
+        "process_rss_mib": {
+          "n": 3,
+          "min": 612.32421875,
+          "mean": 612.32421875,
+          "max": 612.32421875
+        },
+        "host_gpu_percent": {
+          "n": 3,
+          "min": 48,
+          "mean": 80,
+          "max": 96
+        },
+        "ollama_process_cpu_percent": {
+          "n": 3,
+          "min": 1.9,
+          "mean": 28.96666666666667,
+          "max": 54.800000000000004
+        },
+        "first": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "32.79%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "12.13%",
+          "MemUsage": "962.4MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "204MB / 610MB",
+          "PIDs": "25"
+        },
+        "last": {
+          "BlockIO": "111MB / 49.4MB",
+          "CPUPerc": "39.59%",
+          "Container": "227297fadd629c0430f7cd8a0c2cccf1787a4373369ec3f4c7dfbf93561a7c92",
+          "ID": "227297fadd62",
+          "MemPerc": "12.13%",
+          "MemUsage": "962.3MiB / 7.748GiB",
+          "Name": "repo-gods-eye-view-1",
+          "NetIO": "205MB / 611MB",
+          "PIDs": "25"
+        }
+      }
+    }
+  ]
+}

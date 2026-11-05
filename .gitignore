@@ -1,0 +1,36 @@
+# Logs & OS metadata
+*.log
+.DS_Store
+Thumbs.db
+
+# Backups & Local Caches
+backup/
+.gev-cache/
+.gev-logs/
+data/
+*.bak
+
+# Playwright & QA Test artifacts
+.playwright-mcp/
+test-results/
+qa_desktop.png
+qa_mobile.png
+qa-artifacts/
+qa-shots/
+screenshots/
+output/
+
+# Dependencies & Build Outputs
+node_modules/
+dist/
+**/node_modules/
+**/dist/
+
+# Local Dev Tooling & Secrets
+.env
+.env.*
+!.env.example
+.claude/
+.gstack/
+sdd/
+scratch_readme_claude.md

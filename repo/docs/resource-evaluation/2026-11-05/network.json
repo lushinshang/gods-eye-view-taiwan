@@ -1,0 +1,162 @@
+{
+  "time": "2026-11-04T23:01:45.505877+00:00",
+  "requests": [
+    {
+      "label": "mpb_raw",
+      "url": "https://mpbais.motcmpb.gov.tw/aismpb/tools/geojsonais.ashx",
+      "exit": 0,
+      "stderr": "",
+      "decoded_bytes": 3820122,
+      "headers": "HTTP/1.1 200 OK\nCache-Control: private\nContent-Type: application/json; charset=utf-8\nAccess-Control-Allow-Origin: *\nStrict-Transport-Security: max-age=31536000;includeSubDomains;preload\nDate: Wed, 04 Nov 2026 23:01:05 GMT\nContent-Length: 3820122\n\n",
+      "metrics": {
+        "http_code": 200,
+        "size_download": 3820122,
+        "size_header": 255,
+        "time_total": 1.178843,
+        "speed_download": 3240568,
+        "content_type": "application/json; charset=utf-8"
+      }
+    },
+    {
+      "label": "tisv_events",
+      "url": "https://tisvcloud.freeway.gov.tw/history/motc20/LiveEvents.xml",
+      "exit": 0,
+      "stderr": "",
+      "decoded_bytes": 22730,
+      "headers": "HTTP/1.1 200 OK\nDate: Wed, 04 Nov 2026 23:01:05 GMT\nServer: Apache/2.4.52 (Ubuntu)\nLast-Modified: Wed, 04 Nov 2026 23:01:05 GMT\nETag: W/\"58ca-65f7b5a8c6702-gzip\"\nAccept-Ranges: bytes\nVary: Accept-Encoding\nContent-Encoding: gzip\nContent-Length: 2116\nContent-Type: application/xml\n\n",
+      "metrics": {
+        "http_code": 200,
+        "size_download": 2116,
+        "size_header": 291,
+        "time_total": 0.069308,
+        "speed_download": 30530,
+        "content_type": "application/xml"
+      }
+    },
+    {
+      "label": "tisv_traffic",
+      "url": "https://tisvcloud.freeway.gov.tw/history/motc20/LiveTraffic.xml",
+      "exit": 0,
+      "stderr": "",
+      "decoded_bytes": 336429,
+      "headers": "HTTP/1.1 200 OK\nDate: Wed, 04 Nov 2026 23:01:05 GMT\nServer: Apache/2.4.52 (Ubuntu)\nLast-Modified: Wed, 04 Nov 2026 23:01:05 GMT\nETag: W/\"5222d-65f7b5a8d8041-gzip\"\nAccept-Ranges: bytes\nVary: Accept-Encoding\nContent-Encoding: gzip\nContent-Length: 7007\nContent-Type: application/xml\n\n",
+      "metrics": {
+        "http_code": 200,
+        "size_download": 7007,
+        "size_header": 292,
+        "time_total": 0.076212,
+        "speed_download": 91940,
+        "content_type": "application/xml"
+      }
+    },
+    {
+      "label": "tisv_sections",
+      "url": "https://tisvcloud.freeway.gov.tw/history/motc20/Section.xml",
+      "exit": 0,
+      "stderr": "",
+      "decoded_bytes": 277815,
+      "headers": "HTTP/1.1 200 OK\nDate: Wed, 04 Nov 2026 23:01:05 GMT\nServer: Apache/2.4.52 (Ubuntu)\nLast-Modified: Wed, 04 Nov 2026 23:01:05 GMT\nETag: W/\"43d37-65f7b5a93f87b-gzip\"\nAccept-Ranges: bytes\nVary: Accept-Encoding\nContent-Encoding: gzip\nContent-Length: 16336\nContent-Type: application/xml\n\n",
+      "metrics": {
+        "http_code": 200,
+        "size_download": 16336,
+        "size_header": 293,
+        "time_total": 0.083667,
+        "speed_download": 195250,
+        "content_type": "application/xml"
+      }
+    },
+    {
+      "label": "tisv_shapes",
+      "url": "https://tisvcloud.freeway.gov.tw/history/motc20/SectionShape.xml",
+      "exit": 0,
+      "stderr": "",
+      "decoded_bytes": 1259070,
+      "headers": "HTTP/1.1 200 OK\nDate: Wed, 04 Nov 2026 23:01:05 GMT\nServer: Apache/2.4.52 (Ubuntu)\nLast-Modified: Wed, 04 Nov 2026 23:01:05 GMT\nETag: W/\"13363e-65f7b5a92df3c-gzip\"\nAccept-Ranges: bytes\nVary: Accept-Encoding\nContent-Encoding: gzip\nTransfer-Encoding: chunked\nContent-Type: application/xml\n\n",
+      "metrics": {
+        "http_code": 200,
+        "size_download": 328051,
+        "size_header": 299,
+        "time_total": 0.136406,
+        "speed_download": 2404960,
+        "content_type": "application/xml"
+      }
+    },
+    {
+      "label": "pbs",
+      "url": "https://od.moi.gov.tw/api/v1/rest/datastore/A01010000C-000674-015",
+      "exit": 28,
+      "stderr": "curl: (28) Connection timed out after 40001 milliseconds\n",
+      "decoded_bytes": 0,
+      "headers": "",
+      "metrics": {
+        "http_code": 0,
+        "size_download": 0,
+        "size_header": 0,
+        "time_total": 40.001905,
+        "speed_download": 0,
+        "content_type": null
+      }
+    },
+    {
+      "label": "proxy_vessels",
+      "url": "http://localhost:4173/api/taiwan-vessels",
+      "exit": 0,
+      "stderr": "",
+      "decoded_bytes": 4423299,
+      "headers": "HTTP/1.1 200 OK\nContent-Security-Policy: default-src 'none'; sandbox\nX-Content-Type-Options: nosniff\nX-Feed-Source: MOTC-Taiwan-MPB\nAccess-Control-Allow-Origin: *\nContent-Type: application/json; charset=utf-8\nCache-Control: no-store\nDate: Wed, 04 Nov 2026 23:01:06 GMT\nConnection: keep-alive\nKeep-Alive: timeout=5\nContent-Length: 4423299\n\n",
+      "metrics": {
+        "http_code": 200,
+        "size_download": 4423299,
+        "size_header": 351,
+        "time_total": 1.114069,
+        "speed_download": 3970399,
+        "content_type": "application/json; charset=utf-8"
+      },
+      "payload_summary": {
+        "total": 9823,
+        "data_health": {
+          "status": "ok",
+          "ageMs": 12
+        }
+      },
+      "rows_count": 9823
+    },
+    {
+      "label": "proxy_traffic",
+      "url": "http://localhost:4173/api/taiwan-traffic",
+      "exit": 0,
+      "stderr": "",
+      "decoded_bytes": 113901,
+      "headers": "HTTP/1.1 200 OK\nContent-Security-Policy: default-src 'none'; sandbox\nX-Content-Type-Options: nosniff\nContent-Type: application/json; charset=utf-8\nCache-Control: no-store\nDate: Wed, 04 Nov 2026 23:01:05 GMT\nConnection: keep-alive\nKeep-Alive: timeout=5\nContent-Length: 113901\n\n",
+      "metrics": {
+        "http_code": 200,
+        "size_download": 113901,
+        "size_header": 286,
+        "time_total": 0.294524,
+        "speed_download": 386729,
+        "content_type": "application/json; charset=utf-8"
+      },
+      "payload_summary": {
+        "summary": {
+          "totalEvents": 20,
+          "byType": {
+            "congestion": 12,
+            "other": 4,
+            "control": 1,
+            "roadwork": 3
+          },
+          "sections": 453,
+          "avgSpeedKmh": 92,
+          "slowSections": 12,
+          "congestedSections": 26
+        },
+        "data_health": {
+          "status": "ok",
+          "ageMs": 0
+        }
+      },
+      "events_count": 20,
+      "speeds_count": 453
+    }
+  ]
+}

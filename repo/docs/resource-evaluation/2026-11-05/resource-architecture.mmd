@@ -1,0 +1,17 @@
+flowchart TD
+    U["航港局 AIS／高公局路況"] -->|"HTTPS／按需刷新"| API["Docker：Node＋Vite API"]
+    API -->|"每 40 秒船位快照"| WEB["用戶端：Chrome＋Cesium"]
+    WEB --> GPU["用戶端 GPU：地球與船舶"]
+    API -->|"差量寫入"| DISK["NDJSON 航跡庫：7 天政策"]
+    API --> RAM["RAM 索引：最近 24 小時"]
+    WEB -->|"AI 參謀請求"| API
+    API -.->|"本機 HTTP"| AI["主機 Ollama：gemma4:e4b"]
+    AI --> UMA["Apple 統一記憶體＋GPU"]
+    classDef service fill:#112d46,stroke:#38bdf8,color:#e2e8f0,stroke-width:2px
+    classDef client fill:#113c3b,stroke:#2dd4bf,color:#d1fae5,stroke-width:2px
+    classDef storage fill:#352745,stroke:#c084fc,color:#f3e8ff,stroke-width:2px
+    classDef ai fill:#422e1e,stroke:#fbbf24,color:#fef3c7,stroke-width:2px
+    class API service
+    class WEB,GPU client
+    class DISK,RAM storage
+    class AI,UMA ai

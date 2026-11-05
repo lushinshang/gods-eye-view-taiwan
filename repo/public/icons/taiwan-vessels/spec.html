@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>Taiwan MOTC Vessels - Design Spec Sheet (Awwwards Standard)</title>
+<style>
+  body {
+    margin: 0;
+    padding: 40px;
+    background: #080e14;
+    color: #e2e8f0;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+  }
+  h1 { font-size: 24px; font-weight: 700; letter-spacing: 1px; color: #00f2fe; margin-bottom: 8px; }
+  p.subtitle { color: #94a3b8; font-size: 14px; margin-bottom: 30px; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+  .card {
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  }
+  .preview-box {
+    width: 100%;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    background: radial-gradient(circle at center, #0a192f 0%, #020617 100%);
+    border-radius: 8px;
+    margin-bottom: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .preview-box.light {
+    background: #1e293b;
+  }
+  .preview-box img {
+    width: 48px;
+    height: 48px;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.6));
+    transition: transform 0.2s;
+  }
+  .card:hover img {
+    transform: scale(1.15) translateY(-2px);
+  }
+  .title { font-size: 15px; font-weight: 600; color: #f8fafc; margin-bottom: 4px; }
+  .tag { font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+</style>
+</head>
+<body>
+  <h1>臺灣海域即時船舶 · 頂級數位戰情圖標規格書</h1>
+  <p class="subtitle">Design Standard: Awwwards / FWA Mil-Spec Micro-Optics (Chromium Rasterized 48x48 @2x)</p>
+
+  <div class="grid">
+    <div class="card">
+      <div class="preview-box">
+        <img src="./cargo.png" alt="Cargo">
+        <img src="./cargo_selected.png" alt="Selected">
+      </div>
+      <div class="title">貨輪 · Cargo Flagship</div>
+      <span class="tag" style="background:rgba(0,242,254,0.15);color:#00f2fe;border:1px solid #00f2fe;">Cyber Cyan</span>
+    </div>
+
+    <div class="card">
+      <div class="preview-box">
+        <img src="./tanker.png" alt="Tanker">
+        <img src="./tanker_selected.png" alt="Selected">
+      </div>
+      <div class="title">油輪 · Heavy Tanker</div>
+      <span class="tag" style="background:rgba(255,65,108,0.15);color:#ff416c;border:1px solid #ff416c;">Crimson Blaze</span>
+    </div>
+
+    <div class="card">
+      <div class="preview-box">
+        <img src="./fishing.png" alt="Fishing">
+        <img src="./fishing_selected.png" alt="Selected">
+      </div>
+      <div class="title">漁船 · Precision Fishing</div>
+      <span class="tag" style="background:rgba(0,198,251,0.15);color:#00c6fb;border:1px solid #00c6fb;">Electric Azure</span>
+    </div>
+
+    <div class="card">
+      <div class="preview-box">
+        <img src="./passenger.png" alt="Passenger">
+        <img src="./passenger_selected.png" alt="Selected">
+      </div>
+      <div class="title">客輪 · Luxury Liner</div>
+      <span class="tag" style="background:rgba(243,85,218,0.15);color:#f355da;border:1px solid #f355da;">Neon Orchid</span>
+    </div>
+
+    <div class="card">
+      <div class="preview-box">
+        <img src="./highspeed.png" alt="Highspeed">
+        <img src="./highspeed_selected.png" alt="Selected">
+      </div>
+      <div class="title">高速船 · Interceptor Craft</div>
+      <span class="tag" style="background:rgba(255,226,89,0.15);color:#ffe259;border:1px solid #ffe259;">Solar Amber</span>
+    </div>
+
+    <div class="card">
+      <div class="preview-box">
+        <img src="./special_ops.png" alt="Special Ops">
+        <img src="./special_ops_selected.png" alt="Selected">
+      </div>
+      <div class="title">引水/搜救 · SAR Shield</div>
+      <span class="tag" style="background:rgba(255,153,0,0.15);color:#ff9900;border:1px solid #ff9900;">Safety Hazard</span>
+    </div>
+
+    <div class="card">
+      <div class="preview-box">
+        <img src="./pleasure_craft.png" alt="Pleasure">
+        <img src="./pleasure_craft_selected.png" alt="Selected">
+      </div>
+      <div class="title">拖船/帆船/遊艇 · Carbon Yacht</div>
+      <span class="tag" style="background:rgba(0,245,212,0.15);color:#00f5d4;border:1px solid #00f5d4;">Aqua Mint</span>
+    </div>
+
+    <div class="card">
+      <div class="preview-box">
+        <img src="./unspecified.png" alt="Unspecified">
+        <img src="./unspecified_selected.png" alt="Selected">
+      </div>
+      <div class="title">未具體說明 · Radar Target</div>
+      <span class="tag" style="background:rgba(226,232,240,0.15);color:#e2e8f0;border:1px solid #e2e8f0;">Lunar Titanium</span>
+    </div>
+  </div>
+</body>
+</html>

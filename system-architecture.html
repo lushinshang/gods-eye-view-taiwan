@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>God's Eye View — 系統架構白皮書</title>
+  <meta name="description" content="God's Eye View 臺灣戰情子系統架構：航港局 AIS、高公局 TISVCloud、7 天航跡庫、本機 Ollama AI 參謀、本機 MCP 與 Cesium 戰情台。">
+  <style>
+    :root {
+      --bg-dark: #070d14;
+      --bg-card: rgba(13, 23, 38, 0.90);
+      --bg-card-hover: rgba(20, 35, 58, 0.95);
+      --border-cyan: rgba(56, 189, 248, 0.28);
+      --border-cyan-bright: #38bdf8;
+      --text-main: #e2e8f0;
+      --text-muted: #94a3b8;
+      --accent-cyan: #00f2fe;
+      --accent-blue: #38bdf8;
+      --accent-orange: #ff9900;
+      --accent-green: #10b981;
+      --accent-pink: #ec4899;
+      --accent-red: #ef4444;
+      --accent-purple: #a855f7;
+      --radius: 12px;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", sans-serif;
+      line-height: 1.75;
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: 90px;
+    }
+
+    .top-glow-bar {
+      height: 3px;
+      background: linear-gradient(90deg, #a855f7, #00f2fe, #38bdf8, #10b981);
+      width: 100%;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* 全站統一導航列 */
+    .site-nav {
+      background: rgba(10, 18, 30, 0.94);
+      border-bottom: 1px solid var(--border-cyan);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 3px;
+      z-index: 90;
+      padding: 10px 0;
+    }
+    .nav-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      overflow-x: auto;
+      white-space: nowrap;
+      scrollbar-width: none;
+    }
+    .nav-wrapper::-webkit-scrollbar { display: none; }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 15px;
+      color: #fff;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .nav-brand span {
+      background: linear-gradient(135deg, #00f2fe, #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .nav-links {
+      display: flex;
+      gap: 8px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .nav-link {
+      padding: 6px 14px;
+      border-radius: 6px;
+      text-decoration: none;
+      color: var(--text-muted);
+      font-size: 13.5px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .nav-link:hover {
+      color: #fff;
+      background: rgba(56, 189, 248, 0.15);
+    }
+    .nav-link.active {
+      color: #00f2fe;
+      background: rgba(0, 242, 254, 0.12);
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      font-weight: 600;
+    }
+
+    /* Hero */
+    .hero {
+      padding: 48px 0 28px;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 16px;
+      background: rgba(168, 85, 247, 0.15);
+      border: 1px solid rgba(168, 85, 247, 0.35);
+      border-radius: 20px;
+      font-size: 13px;
+      color: #c084fc;
+      margin-bottom: 18px;
+      letter-spacing: 0.5px;
+      font-family: var(--font-mono);
+    }
+    .hero h1 {
+      font-size: clamp(26px, 4.5vw, 40px);
+      font-weight: 900;
+      line-height: 1.28;
+      margin-bottom: 18px;
+      background: linear-gradient(135deg, #ffffff 30%, #38bdf8 70%, #a855f7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p.lead {
+      font-size: clamp(15.5px, 2.2vw, 18.5px);
+      color: var(--text-muted);
+      max-width: 860px;
+      margin: 0 auto 28px;
+    }
+
+    /* 顧問視角標註卡 */
+    .advisor-profile {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.10), rgba(56, 189, 248, 0.08));
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 40px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .advisor-avatar {
+      font-size: 32px;
+      line-height: 1;
+      padding: 10px;
+      background: rgba(168, 85, 247, 0.2);
+      border-radius: 12px;
+      flex-shrink: 0;
+    }
+    .advisor-text h3 {
+      font-size: 16.5px;
+      color: #fff;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .advisor-text p {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin: 0;
+      line-height: 1.65;
+    }
+
+    /* 章節與卡片 */
+    .section-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-cyan);
+      border-radius: var(--radius);
+      padding: 32px 28px;
+      margin-bottom: 36px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 22px;
+      border-bottom: 1px solid rgba(56, 189, 248, 0.15);
+      padding-bottom: 14px;
+    }
+    .section-icon {
+      font-size: 24px;
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid var(--border-cyan);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .section-title {
+      font-size: clamp(20px, 3vw, 24px);
+      font-weight: 800;
+      color: #fff;
+    }
+    .section-subtitle {
+      font-size: 13.5px;
+      color: var(--accent-cyan);
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    h3.subheading {
+      font-size: 18px;
+      color: var(--accent-blue);
+      margin: 28px 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    h3.subheading::before {
+      content: "";
+      display: inline-block;
+      width: 4px;
+      height: 18px;
+      background: var(--accent-cyan);
+      border-radius: 2px;
+    }
+
+    p { margin-bottom: 16px; color: var(--text-main); }
+    strong { color: #fff; }
+
+    /* 因果鏈分析方塊 */
+    .causal-chain {
+      background: rgba(10, 18, 32, 0.7);
+      border-left: 4px solid var(--accent-cyan);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 18px 22px;
+      margin: 20px 0 24px;
+      border-top: 1px solid rgba(56, 189, 248, 0.15);
+      border-right: 1px solid rgba(56, 189, 248, 0.15);
+      border-bottom: 1px solid rgba(56, 189, 248, 0.15);
+    }
+    .causal-title {
+      font-weight: 700;
+      color: var(--accent-cyan);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 15px;
+    }
+    .causal-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 14.5px;
+      color: var(--text-muted);
+    }
+    .causal-step-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .step-arrow {
+      color: var(--accent-cyan);
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    /* 網格系統 */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin: 20px 0;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+      margin: 20px 0;
+    }
+
+    .mini-card {
+      background: rgba(15, 27, 45, 0.6);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: 8px;
+      padding: 18px 20px;
+    }
+    .mini-card h4 {
+      color: #fff;
+      font-size: 16px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .mini-card p {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 0;
+      line-height: 1.6;
+    }
+
+    /* 數據表格與手機響應 */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      margin: 20px 0;
+      border: 1px solid var(--border-cyan);
+      border-radius: 8px;
+      background: rgba(10, 18, 30, 0.6);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      text-align: left;
+    }
+    th, td {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(56, 189, 248, 0.15);
+    }
+    th {
+      background: rgba(20, 35, 58, 0.7);
+      color: var(--accent-cyan);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(56, 189, 248, 0.05); }
+
+    /* 代碼區塊 (手機 390px 嚴禁橫向溢出，行內 code 自動折行) */
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.9em;
+      background: rgba(56, 189, 248, 0.12);
+      color: #7dd3fc;
+      padding: 2px 6px;
+      border-radius: 4px;
+      word-break: break-all;
+    }
+    pre {
+      background: #04080e;
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: 8px;
+      padding: 16px;
+      overflow-x: auto;
+      margin: 16px 0;
+    }
+    pre code {
+      background: transparent;
+      padding: 0;
+      color: #e2e8f0;
+      font-size: 13.5px;
+      line-height: 1.6;
+      word-break: normal;
+      white-space: pre;
+    }
+
+    /* 圖片展示箱 */
+    .figure-box {
+      margin: 24px 0;
+      border: 1px solid var(--border-cyan);
+      border-radius: 10px;
+      overflow: hidden;
+      background: rgba(10, 18, 30, 0.8);
+    }
+    .figure-box img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+    .figure-box figcaption {
+      padding: 12px 18px;
+      font-size: 13.5px;
+      color: var(--text-muted);
+      background: rgba(13, 23, 38, 0.95);
+      border-top: 1px solid rgba(56, 189, 248, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .figure-tag {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: rgba(0, 242, 254, 0.15);
+      color: var(--accent-cyan);
+      border: 1px solid var(--border-cyan);
+    }
+
+    /* Mermaid 容器優化 */
+    .mermaid-box {
+      background: rgba(7, 13, 20, 0.95);
+      border: 1px solid var(--border-cyan);
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px 0;
+      overflow-x: auto;
+    }
+
+    /* 徽章標籤 */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+    }
+    .badge-cyan { background: rgba(0, 242, 254, 0.15); color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.3); }
+    .badge-orange { background: rgba(255, 153, 0, 0.15); color: #ff9900; border: 1px solid rgba(255, 153, 0, 0.3); }
+    .badge-green { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-purple { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+
+    /* 行動裝置優化 (390px 零橫滾) */
+    @media (max-width: 640px) {
+      .section-card { padding: 22px 16px; margin-bottom: 24px; }
+      .advisor-profile { flex-direction: column; gap: 12px; padding: 16px; }
+      .advisor-avatar { align-self: flex-start; }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      th, td { padding: 10px 12px; font-size: 13px; }
+    }
+
+    /* Step 10：SVG 圖、堆疊表格與行內程式碼 */
+    .svg-fig { margin: 24px auto; max-width: 560px; }
+    .svg-fig svg { display: block; width: 100%; height: auto; }
+    .svg-fig figcaption { margin-top: 10px; font-size: 13.5px; line-height: 1.65; color: var(--text-muted); }
+    .svg-fig .figure-tag { font-family: var(--font-mono); font-size: 11px; padding: 2px 8px; border-radius: 4px; background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan); border: 1px solid rgba(56, 189, 248, 0.28); }
+    .mermaid { text-align: center; }
+    .mermaid svg { max-width: 100%; height: auto; }
+    section p a, .section-card p a { color: #7dd3fc; text-decoration: underline; }
+    td code, li code, p code { overflow-wrap: anywhere; }
+    .fact-list { padding-left: 20px; margin: 12px 0 18px; line-height: 1.8; }
+    .fact-list li { margin-bottom: 6px; }
+    @media (max-width: 640px) {
+      .mermaid-box { padding: 10px 6px; }
+      table.stack, table.stack tbody, table.stack tr, table.stack td { display: block; width: 100%; }
+      table.stack thead { display: none; }
+      table.stack tr { padding: 10px 12px; border-bottom: 1px solid rgba(56, 189, 248, 0.28); }
+      table.stack td { border: none; padding: 4px 0; font-size: 13.5px; }
+      table.stack td::before { content: attr(data-label); display: block; font-size: 12px; font-weight: 700; color: var(--accent-cyan); }
+    }
+  </style>
+</head>
+<body>
+  <div class="top-glow-bar"></div>
+
+  <nav class="site-nav">
+    <div class="container nav-wrapper">
+      <a href="readme.html" class="nav-brand">
+        <span>◉ GOD'S EYE VIEW</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="readme.html" class="nav-link">📖 發布手冊</a></li>
+        <li><a href="system-architecture.html" class="nav-link active">🏛️ 系統架構</a></li>
+        <li><a href="system-resource-evaluation.html" class="nav-link">💻 資源評估</a></li>
+        <li><a href="gods-eye-view-summary.html" class="nav-link">📊 演進實錄</a></li>
+        <li><a href="gods-eye-view-analysis.html" class="nav-link">🔬 技術分析</a></li>
+        <li><a href="repo/public/icons/taiwan-vessels/spec.html" target="_blank" class="nav-link" title="容器網址：http://localhost:4173/icons/taiwan-vessels/spec.html">🎨 圖標設計書 ↗</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="container">
+
+    <header class="hero">
+      <div class="hero-badge">SYSTEM ARCHITECTURE · 2026-11-05</div>
+      <h1>God's Eye View 系統架構白皮書<br>五大精進完成後的臺灣戰情子系統</h1>
+      <p class="lead">
+        在開源 3D 地球之上，本專案加入一條完全免金鑰、可本機離線推論的臺灣戰情資料鏈：<strong>航港局 AIS、高公局 TISVCloud、7 天滾動航跡庫、本機 Ollama AI 參謀、本機 MCP Server</strong>，最後匯流到 Cesium 地球與右側戰情台。
+      </p>
+    </header>
+
+    <div class="advisor-profile">
+      <div class="advisor-avatar">🧭</div>
+      <div class="advisor-text">
+        <h3>閱讀本文前的三個架構判斷</h3>
+        <p>
+          <strong>① 上游都不可靠。</strong>每條資料都有快取、失敗回退與 <code>data_health</code>，來源掛掉時回舊資料並標示狀態，不把「沒資料」說成「沒船」。<br>
+          <strong>② 模型只負責措辭。</strong>篩選與統計都由確定性程式完成，模型回答必須通過核驗才能離開伺服器。<br>
+          <strong>③ 歷史只收真實變化。</strong>航跡以定位時間為準，並依航速分級濾除 GPS 漂移。
+        </p>
+      </div>
+    </div>
+
+    <section class="section-card">
+      <div class="section-header">
+        <div class="section-icon">🌐</div>
+        <div>
+          <div class="section-subtitle">CHAPTER 01 · OVERVIEW</div>
+          <h2 class="section-title">全景架構：五層資料鏈</h2>
+        </div>
+      </div>
+
+      <p>系統由上而下分成五層。上游資料全部經由 Vite Middleware 代理（容器只綁定 <code>127.0.0.1:4173</code>），前端不直接連政府伺服器。原版全球 <code>/api/vessels</code>（AISStream）維持不動，臺灣資料走獨立的 <code>/api/taiwan-vessels</code>，兩條軌道互不影響。</p>
+      <figure class="svg-fig"><svg viewBox="0 0 420 812" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="God&#x27;s Eye View 臺灣戰情子系統五層架構：上游公開資料、後端代理與快取、儲存與推論、能力出口、前端戰情介面" font-family="-apple-system,BlinkMacSystemFont,&quot;PingFang TC&quot;,&quot;Noto Sans TC&quot;,&quot;Microsoft JhengHei&quot;,sans-serif"><title>God&#x27;s Eye View 臺灣戰情子系統五層架構：上游公開資料、後端代理與快取、儲存與推論、能力出口、前端戰情介面</title><defs><marker id="lay-a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#5b7391"/></marker></defs><rect width="420" height="812" rx="14" fill="#0a1422"/><rect x="10" y="10" width="400" height="132" rx="12" fill="#112034" stroke="#fb923c" stroke-width="1.4" opacity="0.35"/><text x="22" y="31" font-size="13.5" fill="#fb923c" font-weight="700">L1 上游公開資料（全程免金鑰）</text><rect x="22" y="40" width="182" height="92" rx="10" fill="#112034" stroke="#fb923c" stroke-width="1.4"/><text x="34" y="64" font-size="14.5" fill="#f1f5f9" font-weight="700">🛰️ 航港局 AIS</text><text x="34" y="83" font-size="12.5" fill="#a9b8cc">GeoJSON</text><text x="34" y="102" font-size="12.5" fill="#a9b8cc">geojsonais.ashx</text><rect x="216" y="40" width="182" height="92" rx="10" fill="#112034" stroke="#fb923c" stroke-width="1.4"/><text x="228" y="64" font-size="14" fill="#f1f5f9" font-weight="700">🛣️ 高公局 TISVCloud</text><text x="228" y="83" font-size="12.5" fill="#a9b8cc">XML：事件／車速</text><text x="228" y="102" font-size="12.5" fill="#a9b8cc">Section 靜態路網</text><line x1="113" y1="132" x2="113" y2="172" stroke="#5b7391" stroke-width="1.8" marker-end="url(#lay-a)"/><line x1="307" y1="132" x2="307" y2="172" stroke="#5b7391" stroke-width="1.8" marker-end="url(#lay-a)"/><rect x="10" y="164" width="400" height="132" rx="12" fill="#112034" stroke="#38bdf8" stroke-width="1.4" opacity="0.35"/><text x="22" y="185" font-size="13.5" fill="#38bdf8" font-weight="700">L2 Vite Middleware 代理與快取</text><rect x="22" y="194" width="182" height="92" rx="10" fill="#112034" stroke="#38bdf8" stroke-width="1.4"/><text x="34" y="218" font-size="13.5" fill="#f1f5f9" font-weight="700">/api/taiwan-vessels</text><text x="34" y="237" font-size="12.5" fill="#a9b8cc">40 s 記憶體快取</text><text x="34" y="256" font-size="12.5" fill="#a9b8cc">請求合併 data_health</text><rect x="216" y="194" width="182" height="92" rx="10" fill="#112034" stroke="#38bdf8" stroke-width="1.4"/><text x="228" y="218" font-size="13.5" fill="#f1f5f9" font-weight="700">/api/taiwan-traffic</text><text x="228" y="237" font-size="12.5" fill="#a9b8cc">60 s 事件／車速</text><text x="228" y="256" font-size="12.5" fill="#a9b8cc">路網 24 h・PBS 退避</text><line x1="113" y1="286" x2="113" y2="326" stroke="#5b7391" stroke-width="1.8" marker-end="url(#lay-a)"/><line x1="307" y1="286" x2="307" y2="326" stroke="#5b7391" stroke-width="1.8" marker-end="url(#lay-a)"/><rect x="10" y="318" width="400" height="132" rx="12" fill="#112034" stroke="#34d399" stroke-width="1.4" opacity="0.35"/><text x="22" y="339" font-size="13.5" fill="#34d399" font-weight="700">L3 儲存與推論</text><rect x="22" y="348" width="182" height="92" rx="10" fill="#112034" stroke="#34d399" stroke-width="1.4"/><text x="34" y="372" font-size="14" fill="#f1f5f9" font-weight="700">🗄️ 7 天航跡庫</text><text x="34" y="391" font-size="12.5" fill="#a9b8cc">NDJSON 差量去重</text><text x="34" y="410" font-size="12.5" fill="#a9b8cc">0700／0600 權限</text><rect x="216" y="348" width="182" height="92" rx="10" fill="#112034" stroke="#34d399" stroke-width="1.4"/><text x="228" y="372" font-size="13.5" fill="#f1f5f9" font-weight="700">🧠 retriever → Ollama</text><text x="228" y="391" font-size="12.5" fill="#a9b8cc">本機 gemma4:e4b</text><text x="228" y="410" font-size="12.5" fill="#a9b8cc">Grounding 核驗</text><line x1="113" y1="440" x2="113" y2="480" stroke="#5b7391" stroke-width="1.8" marker-end="url(#lay-a)"/><line x1="307" y1="440" x2="307" y2="480" stroke="#5b7391" stroke-width="1.8" marker-end="url(#lay-a)"/><rect x="10" y="472" width="400" height="132" rx="12" fill="#112034" stroke="#c084fc" stroke-width="1.4" opacity="0.35"/><text x="22" y="493" font-size="13.5" fill="#c084fc" font-weight="700">L4 對外能力出口</text><rect x="22" y="502" width="182" height="92" rx="10" fill="#112034" stroke="#c084fc" stroke-width="1.4"/><text x="34" y="526" font-size="11.5" fill="#f1f5f9" font-weight="700">/api/taiwan-vessel-tracks</text><text x="34" y="545" font-size="12.5" fill="#a9b8cc">GET 單船／摘要／區間</text><text x="34" y="564" font-size="12.5" fill="#a9b8cc">hours 上限 168</text><rect x="216" y="502" width="182" height="92" rx="10" fill="#112034" stroke="#c084fc" stroke-width="1.4"/><text x="228" y="526" font-size="13.5" fill="#f1f5f9" font-weight="700">/api/taiwan-ai-*</text><text x="228" y="545" font-size="12.5" fill="#a9b8cc">雙層閘門＋PAT</text><text x="228" y="564" font-size="12.5" fill="#a9b8cc">MCP：/mcp、stdio</text><line x1="113" y1="594" x2="113" y2="634" stroke="#5b7391" stroke-width="1.8" marker-end="url(#lay-a)"/><line x1="307" y1="594" x2="307" y2="634" stroke="#5b7391" stroke-width="1.8" marker-end="url(#lay-a)"/><rect x="10" y="626" width="400" height="176" rx="12" fill="#112034" stroke="#f472b6" stroke-width="1.4" opacity="0.35"/><text x="22" y="647" font-size="13.5" fill="#f472b6" font-weight="700">L5 前端戰情介面</text><rect x="22" y="656" width="182" height="136" rx="10" fill="#112034" stroke="#f472b6" stroke-width="1.4"/><text x="34" y="680" font-size="14" fill="#f1f5f9" font-weight="700">🌏 Cesium 3D 地球</text><text x="34" y="700" font-size="12.5" fill="#a9b8cc">BillboardCollection</text><text x="34" y="720" font-size="12.5" fill="#a9b8cc">微光學點陣圖標 13.4 px</text><text x="34" y="740" font-size="12.5" fill="#a9b8cc">PolylineCollection 航跡</text><text x="34" y="760" font-size="12.5" fill="#a9b8cc">PointPrimitive 路況</text><rect x="216" y="656" width="182" height="136" rx="10" fill="#112034" stroke="#f472b6" stroke-width="1.4"/><text x="228" y="680" font-size="14" fill="#f1f5f9" font-weight="700">🧭 右側戰情台</text><text x="228" y="700" font-size="12.5" fill="#a9b8cc">8 大船型過濾</text><text x="228" y="720" font-size="12.5" fill="#a9b8cc">路況開關與徽章</text><text x="228" y="740" font-size="12.5" fill="#a9b8cc">航跡卡 6h／24h／7d</text><text x="228" y="760" font-size="12.5" fill="#a9b8cc">AI 參謀面板</text></svg><figcaption><span class="figure-tag">SVG</span> 圖 1：五層架構。L3 的航跡庫由 AIS 抓取流程順帶寫入，AI 參謀則同時讀取船舶與路況快照。</figcaption></figure>
+      <h3 class="subheading">資料流全景</h3>
+      <div class="mermaid-box"><div class="mermaid">
+flowchart TD
+    AIS["🛰️ 航港局 AIS"] --> V["/api/taiwan-vessels<br/>40 s 快取"]
+    TIS["🛣️ TISVCloud"] --> T["/api/taiwan-traffic<br/>60 s／24 h"]
+    V --> DB[("🗄️ 7 天航跡庫")]
+    V --> SNAP["即時快照＋data_health"]
+    T --> SNAP
+    SNAP --> AI["🧠 AI 參謀"]
+    AI --> OUT["🌏 Cesium＋戰情台<br/>🔌 本機 MCP"]
+    DB --> OUT
+    SNAP --> OUT
+</div></div>
+      <h3 class="subheading">五大後端服務對照</h3>
+      <div class="table-container"><table class="stack"><thead><tr><th>服務</th><th>模組（server/providers/）</th><th>對外介面</th><th>時效</th><th>失敗行為</th></tr></thead><tbody><tr><td data-label="服務"><strong>航港局 AIS</strong></td><td data-label="模組（server/providers/）"><code>vessels/mpb-taiwan.js</code></td><td data-label="對外介面"><code>/api/taiwan-vessels</code></td><td data-label="時效">40 s</td><td data-label="失敗行為">回最後成功快取，標 <code>stale</code>；從未成功才是 <code>source_error</code></td></tr><tr><td data-label="服務"><strong>高公局路況</strong></td><td data-label="模組（server/providers/）"><code>traffic/taiwan-traffic.js</code></td><td data-label="對外介面"><code>/api/taiwan-traffic</code></td><td data-label="時效">事件／車速 60 s；路網 24 h</td><td data-label="失敗行為">全部上游失敗時回舊快照並標 <code>stale</code></td></tr><tr><td data-label="服務"><strong>7 天航跡庫</strong></td><td data-label="模組（server/providers/）"><code>vessels/taiwan-tracks.js</code></td><td data-label="對外介面"><code>/api/taiwan-vessel-tracks</code></td><td data-label="時效">保留 7 天</td><td data-label="失敗行為">寫入失敗只記 warn，不影響即時船位</td></tr><tr><td data-label="服務"><strong>AI 參謀</strong></td><td data-label="模組（server/providers/）"><code>ai/*.js</code></td><td data-label="對外介面"><code>/api/taiwan-ai-advisor</code>、<code>-status</code>、<code>-token</code></td><td data-label="時效">每次讀當下快照</td><td data-label="失敗行為">未通過核驗或 Ollama 不可用時，降級為確定性簡報</td></tr><tr><td data-label="服務"><strong>本機 MCP</strong></td><td data-label="模組（server/providers/）"><code>server/mcp/*</code>、<code>src/tools/queries/*</code></td><td data-label="對外介面"><code>npm run mcp</code>（stdio）</td><td data-label="時效">依上游快取</td><td data-label="失敗行為">工具沿用上游 <code>data_health</code> 與快照資訊</td></tr></tbody></table></div>
+    </section>
+
+    <section class="section-card">
+      <div class="section-header">
+        <div class="section-icon">🛰️</div>
+        <div>
+          <div class="section-subtitle">CHAPTER 02 · MPB AIS</div>
+          <h2 class="section-title">航港局 AIS：40 秒快取與資料契約</h2>
+        </div>
+      </div>
+
+      <p>後端以 <code>node:https</code> 收齊回應分塊後再解析 GeoJSON，抓取逾時 30 秒。<strong>40 秒記憶體快取</strong>搭配 <code>_fetchingPromise</code> 請求合併：快取期內直接回傳，到期時多個同時請求共用同一次上游抓取。抓取成功後以 fire-and-forget 交給航跡庫，磁碟問題不會拖累即時資料。</p>
+      <h3 class="subheading">資料契約</h3>
+      <div class="table-container"><table class="stack"><thead><tr><th>上游欄位</th><th>語意規則</th><th>輸出</th></tr></thead><tbody><tr><td data-label="上游欄位"><code>Ship_and_Cargo_Type</code></td><td data-label="語意規則">AIS 代碼 <strong>33</strong>（挖泥／抽砂等水下作業）歸 <code>special_ops</code>；代碼 34 仍為 <code>unspecified</code></td><td data-label="輸出"><code>categoryKey</code>、<code>shipTypeCode</code></td></tr><tr><td data-label="上游欄位"><code>Record_Time</code></td><td data-label="語意規則">無時區字串一律視為 <strong>UTC+8</strong>，與主機時區無關；不合法日期回 <code>null</code></td><td data-label="輸出"><code>recordEpochMs</code>、<code>last_position_UTC</code></td></tr><tr><td data-label="上游欄位"><code>SOG</code></td><td data-label="語意規則">≥ 102.3 是 AIS「不可用」哨兵值，轉為 <code>null</code></td><td data-label="輸出"><code>speed</code>（單位：節）</td></tr><tr><td data-label="上游欄位"><code>COG</code></td><td data-label="語意規則">≥ 360 或負值轉為 <code>null</code></td><td data-label="輸出"><code>course</code>、<code>heading</code></td></tr><tr><td data-label="上游欄位"><code>MMSI</code></td><td data-label="語意規則">快照保留所有非空值；航跡庫只收 9 位數字</td><td data-label="輸出"><code>mmsi</code></td></tr></tbody></table></div>
+      <div class="causal-chain"><div class="causal-title">🔍 為什麼時間戳非修不可？</div><div class="causal-steps"><div class="causal-step-item"><span class="step-arrow">1.</span><span>修復前 <code>last_position_epoch</code> 固定等於抓取時間，舊定位看起來永遠是最新資料。</span></div><div class="causal-step-item"><span class="step-arrow">2.</span><span>航跡庫要靠定位時間判斷「這艘船有沒有新回報」，錯誤的時間會變成永久的歷史污染。</span></div><div class="causal-step-item"><span class="step-arrow">3.</span><span>修復後，真實快照 8,933 筆的 epoch 全部與抓取時間不同，無效航向與無效時間皆為 0。</span></div></div></div>
+      <p>深層分析見 <a href="gods-eye-view-analysis.html#sec-ais-contract">實測規劃報告第 8 節</a>。</p>
+    </section>
+
+    <section class="section-card">
+      <div class="section-header">
+        <div class="section-icon">🛣️</div>
+        <div>
+          <div class="section-subtitle">CHAPTER 03 · TISVCLOUD</div>
+          <h2 class="section-title">高公局 TISVCloud：高低頻分層快取</h2>
+        </div>
+      </div>
+
+      <p>路況資料的更新頻率差很大，所以分層快取：事件與車速每 60 秒更新；路段名稱與幾何（<code>Section.xml</code>、<code>SectionShape.xml</code>）對齊上游 <code>UpdateInterval=86400</code>，每 24 小時校準一次。</p>
+      <div class="mermaid-box"><div class="mermaid">
+flowchart TD
+    R["GET /api/taiwan-traffic"] --> C{"60 s 快取有效？"}
+    C -->|是| H["回傳快取"]
+    C -->|否| B["build()"]
+    B --> P["PBS 背景更新<br/>不等待結果"]
+    B --> L["LiveEvents.xml<br/>LiveTraffic.xml"]
+    L --> N{"路網在 24 h 內？"}
+    N -->|是| M["記憶體路網"]
+    N -->|否| F["重抓 Section<br/>與 SectionShape"]
+    F -->|成功| M
+    F -->|失敗，有舊路網| M
+    M --> O["合併車速與事件<br/>寫入 60 s 快取"]
+    P -.->|下次組裝時併入| O
+</div></div>
+      <div class="grid-2">
+        <div class="mini-card"><h4>靜態路網保護</h4><p>過期重抓失敗時繼續用記憶體舊路網，453 個路段的車速不會因此歸零。</p></div>
+        <div class="mini-card"><h4>PBS 背景隔離</h4><p>警廣 PBS 不再阻塞 <code>build()</code>：成功快取 60 秒，失敗後 1 小時內不重試。</p></div>
+      </div>
+      <figure class="svg-fig"><svg viewBox="0 0 420 366" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="資料時效階梯（對數刻度）：AIS 快取 40 秒、路況快取 60 秒、PBS 成功快取 60 秒、PBS 失敗退避 1 小時、靜態路網 24 小時、航跡保留 7 天" font-family="-apple-system,BlinkMacSystemFont,&quot;PingFang TC&quot;,&quot;Noto Sans TC&quot;,&quot;Microsoft JhengHei&quot;,sans-serif"><title>資料時效階梯（對數刻度）：AIS 快取 40 秒、路況快取 60 秒、PBS 成功快取 60 秒、PBS 失敗退避 1 小時、靜態路網 24 小時、航跡保留 7 天</title><defs><marker id="ttl-a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#5b7391"/></marker></defs><rect width="420" height="366" rx="14" fill="#0a1422"/><text x="22" y="32" font-size="16" fill="#f1f5f9" font-weight="700">資料時效階梯</text><text x="22" y="53" font-size="13" fill="#a9b8cc">長度為對數刻度，每格越長代表更新越慢</text><text x="26" y="91" font-size="13.5" fill="#f1f5f9">AIS 記憶體快取</text><text x="394" y="91" font-size="13.5" fill="#f1f5f9" font-weight="700" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">40 s</text><rect x="26" y="99" width="368" height="10" rx="4" fill="#112034"/><rect x="26" y="99" width="46.3" height="10" rx="4" fill="#38bdf8"/><text x="26" y="137" font-size="13.5" fill="#f1f5f9">事件／車速快取</text><text x="394" y="137" font-size="13.5" fill="#f1f5f9" font-weight="700" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">60 s</text><rect x="26" y="145" width="368" height="10" rx="4" fill="#112034"/><rect x="26" y="145" width="59.9" height="10" rx="4" fill="#38bdf8"/><text x="26" y="183" font-size="13.5" fill="#f1f5f9">PBS 成功快取</text><text x="394" y="183" font-size="13.5" fill="#f1f5f9" font-weight="700" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">60 s</text><rect x="26" y="191" width="368" height="10" rx="4" fill="#112034"/><rect x="26" y="191" width="59.9" height="10" rx="4" fill="#38bdf8"/><text x="26" y="229" font-size="13.5" fill="#f1f5f9">PBS 失敗退避</text><text x="394" y="229" font-size="13.5" fill="#f1f5f9" font-weight="700" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">1 h</text><rect x="26" y="237" width="368" height="10" rx="4" fill="#112034"/><rect x="26" y="237" width="196.7" height="10" rx="4" fill="#38bdf8"/><text x="26" y="275" font-size="13.5" fill="#f1f5f9">Section 靜態路網</text><text x="394" y="275" font-size="13.5" fill="#f1f5f9" font-weight="700" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">24 h</text><rect x="26" y="283" width="368" height="10" rx="4" fill="#112034"/><rect x="26" y="283" width="303.0" height="10" rx="4" fill="#38bdf8"/><text x="26" y="321" font-size="13.5" fill="#f1f5f9">航跡庫保留</text><text x="394" y="321" font-size="13.5" fill="#f1f5f9" font-weight="700" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">7 d</text><rect x="26" y="329" width="368" height="10" rx="4" fill="#112034"/><rect x="26" y="329" width="368.0" height="10" rx="4" fill="#38bdf8"/></svg><figcaption><span class="figure-tag">SVG</span> 圖 2：各層時效。把 40 秒到 7 天放在同一把對數尺上，就能看出每層為何需要獨立的失敗策略。</figcaption></figure>
+      <p>Step 9 實測（2026-11-04，單次量測）：冷啟動由 6,047 ms 降到 <strong>197 ms</strong>，60 秒到期刷新由 6,007 ms 降到 <strong>87 ms</strong>。PBS 端點當時連線逾時，事件全部來自 TISVCloud；端點恢復後最久要等 1 小時才會重試。</p>
+    </section>
+
+    <section class="section-card">
+      <div class="section-header">
+        <div class="section-icon">🗄️</div>
+        <div>
+          <div class="section-subtitle">CHAPTER 04 · ROLLING TRACKS</div>
+          <h2 class="section-title">7 天滾動 NDJSON 航跡庫</h2>
+        </div>
+      </div>
+
+      <p><code>taiwan-tracks.js</code> 採單一寫入者的附加式日誌，不引入資料庫。每批寫入都序列化，同一批內的比較對象是剛暫存的上一點，避免並行刷新重複寫入。</p>
+      <figure class="svg-fig"><svg viewBox="0 0 420 642" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="航跡差量去重決策流程：定位時間未更新就略過；依航速是否低於 0.5 節分流；未達時間與位移門檻就略過，否則寫入 NDJSON" font-family="-apple-system,BlinkMacSystemFont,&quot;PingFang TC&quot;,&quot;Noto Sans TC&quot;,&quot;Microsoft JhengHei&quot;,sans-serif"><title>航跡差量去重決策流程：定位時間未更新就略過；依航速是否低於 0.5 節分流；未達時間與位移門檻就略過，否則寫入 NDJSON</title><defs><marker id="ded-a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#5b7391"/></marker></defs><rect width="420" height="642" rx="14" fill="#0a1422"/><rect x="70" y="14" width="280" height="64" rx="10" fill="#112034" stroke="#38bdf8" stroke-width="1.4"/><text x="210.0" y="38" font-size="15" fill="#f1f5f9" font-weight="700" text-anchor="middle">每 40 s 新批次（row）</text><text x="210.0" y="57" font-size="13" fill="#a9b8cc" text-anchor="middle">MMSI 9 位・定位時間有效</text><line x1="210" y1="78" x2="210" y2="106" stroke="#5b7391" stroke-width="1.8" marker-end="url(#ded-a)"/><rect x="70" y="108" width="280" height="64" rx="10" fill="#112034" stroke="#c084fc" stroke-width="1.4"/><text x="210.0" y="132" font-size="15" fill="#f1f5f9" font-weight="700" text-anchor="middle">定位時間比上一點新？</text><text x="210.0" y="151" font-size="13" fill="#a9b8cc" text-anchor="middle">p.t &gt; previous.t</text><path d="M70 140 H26 V590 H66" fill="none" stroke="#f87171" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#ded-a)"/><text x="30" y="132" font-size="13.5" fill="#f87171" font-weight="700">否</text><line x1="210" y1="172" x2="210" y2="200" stroke="#5b7391" stroke-width="1.8" marker-end="url(#ded-a)"/><text x="218" y="192" font-size="13.5" fill="#34d399" font-weight="700">是</text><rect x="70" y="202" width="280" height="64" rx="10" fill="#112034" stroke="#c084fc" stroke-width="1.4"/><text x="210.0" y="226" font-size="15" fill="#f1f5f9" font-weight="700" text-anchor="middle">航速 s &lt; 0.5 節？</text><text x="210.0" y="245" font-size="13" fill="#a9b8cc" text-anchor="middle">null 航速視為航行船</text><path d="M150 266 V296 H118 V314" fill="none" stroke="#5b7391" stroke-width="1.8" marker-end="url(#ded-a)"/><path d="M270 266 V296 H304 V314" fill="none" stroke="#5b7391" stroke-width="1.8" marker-end="url(#ded-a)"/><text x="124" y="290" font-size="13.5" fill="#a9b8cc" font-weight="700">否</text><text x="280" y="290" font-size="13.5" fill="#a9b8cc" font-weight="700">是</text><rect x="46" y="316" width="152" height="104" rx="10" fill="#112034" stroke="#34d399" stroke-width="1.4"/><text x="122.0" y="340" font-size="14.5" fill="#f1f5f9" font-weight="700" text-anchor="middle">航行級閘門</text><text x="122.0" y="359" font-size="13.5" fill="#a9b8cc" text-anchor="middle">位移 ≥ 30 m</text><text x="122.0" y="378" font-size="13.5" fill="#a9b8cc" text-anchor="middle">或 間隔 ≥ 10 分</text><rect x="222" y="316" width="152" height="104" rx="10" fill="#112034" stroke="#fb923c" stroke-width="1.4"/><text x="298.0" y="340" font-size="14.5" fill="#f1f5f9" font-weight="700" text-anchor="middle">停泊級閘門</text><text x="298.0" y="359" font-size="13.5" fill="#a9b8cc" text-anchor="middle">位移 ≥ 150 m</text><text x="298.0" y="378" font-size="13.5" fill="#a9b8cc" text-anchor="middle">或 間隔 ≥ 30 分</text><path d="M122 420 V448 H210 V464" fill="none" stroke="#5b7391" stroke-width="1.8" marker-end="url(#ded-a)"/><path d="M298 420 V448 H210 V464" fill="none" stroke="#5b7391" stroke-width="1.8" marker-end="url(#ded-a)"/><rect x="70" y="466" width="280" height="48" rx="10" fill="#112034" stroke="#c084fc" stroke-width="1.4"/><text x="210.0" y="495.4" font-size="15" fill="#f1f5f9" font-weight="700" text-anchor="middle">任一條件成立？</text><path d="M150 514 V536 H135 V556" fill="none" stroke="#f87171" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#ded-a)"/><path d="M270 514 V536 H288 V556" fill="none" stroke="#34d399" stroke-width="1.8" marker-end="url(#ded-a)"/><text x="158" y="532" font-size="13.5" fill="#f87171" font-weight="700">否</text><text x="262" y="532" font-size="13.5" fill="#34d399" font-weight="700" text-anchor="end">是</text><rect x="70" y="558" width="130" height="64" rx="10" fill="#112034" stroke="#f87171" stroke-width="1.4"/><text x="135.0" y="582" font-size="14.5" fill="#f1f5f9" font-weight="700" text-anchor="middle">略過</text><text x="135.0" y="601" font-size="13" fill="#a9b8cc" text-anchor="middle">不寫入</text><rect x="212" y="558" width="152" height="64" rx="10" fill="#112034" stroke="#34d399" stroke-width="1.4"/><text x="288.0" y="582" font-size="14" fill="#f1f5f9" font-weight="700" text-anchor="middle">✅ 寫入 NDJSON</text><text x="288.0" y="601" font-size="13" fill="#a9b8cc" text-anchor="middle">UTC+8 分日檔</text></svg><figcaption><span class="figure-tag">SVG</span> 圖 3：差量去重。兩級閘門都是「位移或時間任一達標就寫入」；停泊船門檻放大，以濾除 GPS 漂移。</figcaption></figure>
+      <h3 class="subheading">儲存與查詢規格</h3>
+      <div class="table-container"><table class="stack"><thead><tr><th>項目</th><th>規格</th></tr></thead><tbody><tr><td data-label="項目">檔案</td><td data-label="規格"><code>.gev-cache/taiwan-tracks/YYYY-MM-DD.ndjson</code>，依 UTC+8 分日</td></tr><tr><td data-label="項目">權限</td><td data-label="規格">目錄 <code>0700</code>、檔案 <code>0600</code></td></tr><tr><td data-label="項目">欄位</td><td data-label="規格"><code>mmsi, t, lat, lon, s, c, k, n</code>；座標四捨五入到 1e-5 度</td></tr><tr><td data-label="項目">清理</td><td data-label="規格">每批寫入後刪除超過 7 天的日檔，非日檔格式的檔案不動</td></tr><tr><td data-label="項目">記憶體索引</td><td data-label="規格">最近 24 小時，每船最多 360 點；啟動時載入今日與昨日檔</td></tr><tr><td data-label="項目">查詢路徑</td><td data-label="規格"><code>hours ≤ 24</code> 走記憶體；更長時間串流讀檔；超過 2,000 點均勻抽稀</td></tr></tbody></table></div>
+      <h3 class="subheading">GET /api/taiwan-vessel-tracks</h3>
+      <div class="table-container"><table class="stack"><thead><tr><th>查詢參數</th><th>用途</th><th>限制</th></tr></thead><tbody><tr><td data-label="查詢參數"><code>mmsi</code>＋<code>hours</code></td><td data-label="用途">單船航跡與統計</td><td data-label="限制">9 位 MMSI；<code>hours</code> 夾在 1–168，預設 24</td></tr><tr><td data-label="查詢參數"><code>mode=summary</code></td><td data-label="用途">庫存摘要：艘數、點數、KB、檔案數</td><td data-label="限制">—</td></tr><tr><td data-label="查詢參數"><code>since</code>＋<code>until</code>＋<code>limit</code></td><td data-label="用途">區間內活躍船舶排行</td><td data-label="限制">最長 7 天；<code>limit</code> 上限 500</td></tr></tbody></table></div>
+      <p>統計欄位包含里程、平均與最大航速、<code>straightness</code> 與 <code>loiter</code>。里程會排除隱含速度超過 100 節的跳點。徘徊判定為暫定門檻（跨度 ≥ 3 小時、里程 ≥ 2 km、straightness &lt; 0.2），尚未以真實行為校準。</p>
+      <h3 class="subheading">累積實測</h3>
+      <div class="table-container"><table class="stack"><thead><tr><th>時點</th><th>累計艘數</th><th>累計點數</th><th>KB</th><th>說明</th></tr></thead><tbody><tr><td data-label="時點">11-04 22:01</td><td data-label="累計艘數">8,237</td><td data-label="累計點數">13,424</td><td data-label="KB">1,605</td><td data-label="說明">第三次快照（約 100 秒）</td></tr><tr><td data-label="時點">11-04 容器約 29 分鐘</td><td data-label="累計艘數">9,183</td><td data-label="累計點數">18,541</td><td data-label="KB">2,219</td><td data-label="說明">Step 8 容器實測</td></tr><tr><td data-label="時點">11-05 01:04</td><td data-label="累計艘數">10,873</td><td data-label="累計點數">41,290</td><td data-label="KB">4,933</td><td data-label="說明">本次文件更新實查 <code>mode=summary</code></td></tr></tbody></table></div>
+    </section>
+
+    <section class="section-card">
+      <div class="section-header">
+        <div class="section-icon">🧠</div>
+        <div>
+          <div class="section-subtitle">CHAPTER 05 · AI ADVISOR</div>
+          <h2 class="section-title">本機 Ollama AI 參謀</h2>
+        </div>
+      </div>
+
+      <p>AI 參謀不使用向量資料庫，也不呼叫付費雲端 LLM。問題先由純函式檢索出可驗證的事實，再請本機 <code>gemma4:e4b</code> 組織成繁體中文。若本機只有 <code>gemma4:e4b-mlx</code> 或 <code>gemma4:e4b-it-qat</code>，會自動對應。</p>
+      <figure class="svg-fig"><svg viewBox="0 0 420 682" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AI 參謀請求管線：雙層閘門、確定性檢索、白名單 Context、Ollama 推論、Grounding 核驗，通過回傳模型回答，不通過降級為確定性簡報" font-family="-apple-system,BlinkMacSystemFont,&quot;PingFang TC&quot;,&quot;Noto Sans TC&quot;,&quot;Microsoft JhengHei&quot;,sans-serif"><title>AI 參謀請求管線：雙層閘門、確定性檢索、白名單 Context、Ollama 推論、Grounding 核驗，通過回傳模型回答，不通過降級為確定性簡報</title><defs><marker id="pip-a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#5b7391"/></marker></defs><rect width="420" height="682" rx="14" fill="#0a1422"/><rect x="30" y="14" width="360" height="70" rx="10" fill="#112034" stroke="#c084fc" stroke-width="1.4"/><text x="42" y="38" font-size="15" fill="#f1f5f9" font-weight="700">① 雙層閘門</text><text x="42" y="57" font-size="13.5" fill="#a9b8cc">同源瀏覽器 或 Bearer PAT</text><line x1="210" y1="84" x2="210" y2="108" stroke="#5b7391" stroke-width="1.8" marker-end="url(#pip-a)"/><rect x="30" y="110" width="360" height="88" rx="10" fill="#112034" stroke="#38bdf8" stroke-width="1.4"/><text x="42" y="134" font-size="15" fill="#f1f5f9" font-weight="700">② retriever.js 確定性檢索</text><text x="42" y="153" font-size="13.5" fill="#a9b8cc">意圖解析・篩選・Top-15</text><text x="42" y="172" font-size="13.5" fill="#a9b8cc">9,112 筆列實測最慢 25.6 ms</text><line x1="210" y1="198" x2="210" y2="222" stroke="#5b7391" stroke-width="1.8" marker-end="url(#pip-a)"/><rect x="30" y="224" width="360" height="88" rx="10" fill="#112034" stroke="#38bdf8" stroke-width="1.4"/><text x="42" y="248" font-size="15" fill="#f1f5f9" font-weight="700">③ prompt.js 白名單 Context</text><text x="42" y="267" font-size="13.5" fill="#a9b8cc">只取指定欄位，上限 3,600 bytes</text><text x="42" y="286" font-size="13.5" fill="#a9b8cc">超限先刪彙總、再刪明細</text><line x1="210" y1="312" x2="210" y2="336" stroke="#5b7391" stroke-width="1.8" marker-end="url(#pip-a)"/><rect x="30" y="338" width="360" height="88" rx="10" fill="#112034" stroke="#34d399" stroke-width="1.4"/><text x="42" y="362" font-size="15" fill="#f1f5f9" font-weight="700">④ Ollama gemma4:e4b</text><text x="42" y="381" font-size="13.5" fill="#a9b8cc">temperature 0・單一推論鎖 429</text><text x="42" y="400" font-size="13.5" fill="#a9b8cc">輸出全程緩衝，逾時 90 s</text><line x1="210" y1="426" x2="210" y2="450" stroke="#5b7391" stroke-width="1.8" marker-end="url(#pip-a)"/><rect x="30" y="452" width="360" height="88" rx="10" fill="#112034" stroke="#fb923c" stroke-width="1.4"/><text x="42" y="476" font-size="15" fill="#f1f5f9" font-weight="700">⑤ Grounding Validator</text><text x="42" y="495" font-size="13.5" fill="#a9b8cc">MMSI・船名・數字・單位</text><text x="42" y="514" font-size="13.5" fill="#a9b8cc">截斷（done_reason=length）</text><path d="M120 540 V564 H112 V576" fill="none" stroke="#34d399" stroke-width="1.8" marker-end="url(#pip-a)"/><path d="M300 540 V564 H308 V576" fill="none" stroke="#f87171" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#pip-a)"/><text x="128" y="562" font-size="13.5" fill="#34d399" font-weight="700">通過</text><text x="258" y="562" font-size="13.5" fill="#f87171" font-weight="700">不通過</text><rect x="20" y="578" width="186" height="90" rx="10" fill="#112034" stroke="#34d399" stroke-width="1.4"/><text x="32" y="602" font-size="14.5" fill="#f1f5f9" font-weight="700">✔ 模型回答</text><text x="32" y="621" font-size="12.5" fill="#a9b8cc">fallback_used=false</text><text x="32" y="640" font-size="12.5" fill="#a9b8cc">附 Citations</text><rect x="214" y="578" width="186" height="90" rx="10" fill="#112034" stroke="#f87171" stroke-width="1.4"/><text x="226" y="602" font-size="14.5" fill="#f1f5f9" font-weight="700">↩ 確定性簡報</text><text x="226" y="621" font-size="12.5" fill="#a9b8cc">fallback_used=true</text><text x="226" y="640" font-size="12.5" fill="#a9b8cc">附降級 reason</text></svg><figcaption><span class="figure-tag">SVG</span> 圖 4：請求管線。模型輸出全程緩衝，thinking 內容與未核驗文字都不會傳到瀏覽器。</figcaption></figure>
+      <h3 class="subheading">各模組職責</h3>
+      <div class="table-container"><table class="stack"><thead><tr><th>模組</th><th>職責</th><th>硬限制</th></tr></thead><tbody><tr><td data-label="模組"><code>retriever.js</code></td><td data-label="職責">解析 9 個港口／海域、半徑、船型、航速門檻、MMSI、船名與國道；輸出 Top-15 與 <code>matched_total</code></td><td data-label="硬限制">無 I/O、無時鐘、無模型呼叫</td></tr><tr><td data-label="模組"><code>prompt.js</code></td><td data-label="職責">白名單挑欄位並清除控制字元；<code>data_health=source_error</code> 時禁止宣稱 0 艘</td><td data-label="硬限制">系統提示＋資料 ≤ <strong>3,600 bytes</strong></td></tr><tr><td data-label="模組"><code>ollama-client.js</code></td><td data-label="職責">單一推論鎖、90 秒逾時、輸出上限 256 KiB、Grounding 核驗</td><td data-label="硬限制"><code>temperature 0</code>；<code>num_predict</code> 1024（think 2048）</td></tr><tr><td data-label="模組"><code>ollama-advisor.js</code></td><td data-label="職責">路由、雙層閘門、PAT 生命週期、JSON／SSE 回應</td><td data-label="硬限制">請求主體 ≤ 16 KiB；問題 ≤ 2,000 字</td></tr></tbody></table></div>
+      <h3 class="subheading">Grounding Validator 核驗規則</h3>
+      <div class="table-container"><table class="stack"><thead><tr><th>規則</th><th>檢查內容</th></tr></thead><tbody><tr><td data-label="規則">a 零值宣稱</td><td data-label="檢查內容">來源異常，或實際有符合資料時，不得說「0 艘」「無事故」</td></tr><tr><td data-label="規則">a2 航速單位</td><td data-label="檢查內容">「航速」後接 km/h 或公里即失敗</td></tr><tr><td data-label="規則">b MMSI</td><td data-label="檢查內容">9 位數字必須出現在 Context 的船舶明細</td></tr><tr><td data-label="規則">c 船名</td><td data-label="檢查內容">「船名」標示的名稱必須存在於 Context</td></tr><tr><td data-label="規則">d 數字</td><td data-label="檢查內容">所有數字須來自 Context、確定性簡報或序號 1–15</td></tr><tr><td data-label="規則">d2 計數</td><td data-label="檢查內容">「N 艘／件」須是真實總數，序號額度不能用來冒充計數</td></tr><tr><td data-label="規則">截斷</td><td data-label="檢查內容"><code>done_reason=length</code> 直接視為失敗</td></tr></tbody></table></div>
+      <p><strong>已知邊界：</strong>Validator 檢查的是「值是否可回溯」，不是語意配對。若模型把 Context 內的甲船數字寫到乙船身上，目前的規則攔不到。</p>
+      <h3 class="subheading">SHA-256 PAT 雙層安全閘門</h3>
+      <figure class="svg-fig"><svg viewBox="0 0 420 468" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AI 端點雙層閘門：Origin 精確比對後，本機同源瀏覽器可全部使用，外部客戶端需 SHA-256 Bearer PAT 且僅能呼叫 advisor 與 status" font-family="-apple-system,BlinkMacSystemFont,&quot;PingFang TC&quot;,&quot;Noto Sans TC&quot;,&quot;Microsoft JhengHei&quot;,sans-serif"><title>AI 端點雙層閘門：Origin 精確比對後，本機同源瀏覽器可全部使用，外部客戶端需 SHA-256 Bearer PAT 且僅能呼叫 advisor 與 status</title><defs><marker id="gat-a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#5b7391"/></marker></defs><rect width="420" height="468" rx="14" fill="#0a1422"/><rect x="60" y="14" width="300" height="62" rx="10" fill="#112034" stroke="#38bdf8" stroke-width="1.4"/><text x="210.0" y="38" font-size="15" fill="#f1f5f9" font-weight="700" text-anchor="middle">請求進入 /api/taiwan-ai-*</text><text x="210.0" y="57" font-size="13" fill="#a9b8cc" text-anchor="middle">帶 Origin 必須與 Host 完全相同</text><line x1="360" y1="45" x2="404" y2="45" stroke="#f87171" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#gat-a)"/><text x="384" y="36" font-size="13" fill="#f87171" font-weight="700" text-anchor="middle">403</text><path d="M130 76 V112 H96 V126" fill="none" stroke="#5b7391" stroke-width="1.8" marker-end="url(#gat-a)"/><path d="M290 76 V112 H324 V126" fill="none" stroke="#5b7391" stroke-width="1.8" marker-end="url(#gat-a)"/><rect x="14" y="128" width="190" height="114" rx="10" fill="#112034" stroke="#34d399" stroke-width="1.4"/><text x="26" y="152" font-size="14" fill="#f1f5f9" font-weight="700">第 1 層：本機瀏覽器</text><text x="26" y="171" font-size="12.5" fill="#a9b8cc">迴路位址・無代理標頭</text><text x="26" y="190" font-size="12.5" fill="#a9b8cc">Sec-Fetch-Site 同源</text><text x="26" y="209" font-size="12.5" fill="#a9b8cc">或 POST 帶相符 Origin</text><rect x="216" y="128" width="190" height="114" rx="10" fill="#112034" stroke="#fb923c" stroke-width="1.4"/><text x="228" y="152" font-size="14" fill="#f1f5f9" font-weight="700">第 2 層：外部 Bearer</text><text x="228" y="171" font-size="12.5" fill="#a9b8cc">64 位 hex PAT</text><text x="228" y="190" font-size="12.5" fill="#a9b8cc">SHA-256 後以</text><text x="228" y="209" font-size="12.5" fill="#a9b8cc">timingSafeEqual 比對</text><line x1="108" y1="242" x2="108" y2="276" stroke="#5b7391" stroke-width="1.8" marker-end="url(#gat-a)"/><line x1="310" y1="242" x2="310" y2="276" stroke="#5b7391" stroke-width="1.8" marker-end="url(#gat-a)"/><rect x="14" y="278" width="190" height="104" rx="10" fill="#112034" stroke="#34d399" stroke-width="1.4"/><text x="26" y="302" font-size="14" fill="#f1f5f9" font-weight="700">本機權限</text><text x="26" y="321" font-size="12.5" fill="#a9b8cc">advisor・status</text><text x="26" y="340" font-size="12.5" fill="#a9b8cc">token 產生／撤銷</text><rect x="216" y="278" width="190" height="104" rx="10" fill="#112034" stroke="#fb923c" stroke-width="1.4"/><text x="228" y="302" font-size="14" fill="#f1f5f9" font-weight="700">PAT 權限（唯讀）</text><text x="228" y="321" font-size="12.5" fill="#a9b8cc">advisor・status</text><text x="228" y="340" font-size="12.5" fill="#a9b8cc">token 路由一律 403</text><rect x="14" y="396" width="392" height="58" rx="10" fill="#112034" stroke="#5b7391" stroke-width="1.4"/><text x="26" y="420" font-size="13" fill="#a9b8cc">token.json：只存 SHA-256，檔案 0600、O_NOFOLLOW</text><text x="26" y="442" font-size="13" fill="#a9b8cc">未通過任一層：回 401</text></svg><figcaption><span class="figure-tag">SVG</span> 圖 5：雙層閘門只保護 AI 端點。船位、路況與航跡 API 為公開資料衍生的唯讀端點，不經過 PAT。</figcaption></figure>
+      <h3 class="subheading">本次實測（2026-11-05）</h3>
+      <ul class="fact-list">
+        <li><strong>檢索效能：</strong>5 類問題、9,112 筆船舶、各跑 200 次，p50 為 2.1–9.8 ms，最慢 <strong>25.6 ms</strong>（主機 Node，非容器）。</li>
+        <li><strong>Context 大小：</strong>同批問題 2,117–3,575 bytes，全部低於上限。</li>
+        <li><strong>端到端推論：</strong>「高雄港 30 公里內有幾艘油輪？」<code>think=false</code> 耗時 26.5 s，回答 26 艘，<code>fallback_used=false</code>。</li>
+        <li><strong>閘門：</strong>無憑證 401、偽造 Bearer 401、跨來源 Origin 403。</li>
+      </ul>
+    </section>
+
+    <section class="section-card">
+      <div class="section-header">
+        <div class="section-icon">🔌</div>
+        <div>
+          <div class="section-subtitle">CHAPTER 06 · LOCAL MCP</div>
+          <h2 class="section-title">本機 MCP Server</h2>
+        </div>
+      </div>
+
+      <p>Agent 透過 MCP 查到的資料，與戰情台看到的是同一份快取。工具目錄共 33 項，以下是臺灣戰情專用工具。<code>find_vessel</code> 與 <code>vessels_in_area</code> 也已併入航港局資料。</p>
+      <div class="mermaid-box"><div class="mermaid">
+flowchart TD
+    A["Claude Code／Codex<br/>等 MCP 用戶端"] --> S["stdio 傳輸<br/>npm run mcp"]
+    S --> C["工具目錄（33 項）"]
+    C --> T["taiwan_vessels_in_area<br/>taiwan_traffic_events<br/>taiwan_vessel_track"]
+    T --> API["執行中的 God's Eye View<br/>/api/taiwan-*"]
+</div></div>
+      <div class="table-container"><table class="stack"><thead><tr><th>工具</th><th>主要參數</th><th>用途</th><th>本次實呼叫結果</th></tr></thead><tbody><tr><td data-label="工具"><code>taiwan_vessels_in_area</code></td><td data-label="主要參數"><code>area, category, stats, limit</code></td><td data-label="用途">8 大船型區域查詢；預設以 23.7, 120.5 為中心、半徑 350 km</td><td data-label="本次實呼叫結果"><code>tanker</code>：255 艘</td></tr><tr><td data-label="工具"><code>taiwan_traffic_events</code></td><td data-label="主要參數"><code>area, type, road, stats, limit</code></td><td data-label="用途">國道事件與車速統計</td><td data-label="本次實呼叫結果">37 件事件</td></tr><tr><td data-label="工具"><code>taiwan_vessel_track</code></td><td data-label="主要參數"><code>mmsi, hours</code>（6／24／168）</td><td data-label="用途">單船歷史航跡、里程與徘徊判定</td><td data-label="本次實呼叫結果">MMSI 416460000：24h 內 2 點</td></tr></tbody></table></div>
+      <p><strong>傳輸方式：</strong>本次以主機執行 <code>npm run mcp -- --api-base http://localhost:4173</code> 連到容器 API，三支工具皆實測成功。Vite 外掛另有僅限本機的 <code>/mcp</code> HTTP 入口，但上游 README 註明 Docker 下不提供，本次對容器的 POST 也未取得回應，因此在 Docker 部署下應使用 stdio。</p>
+    </section>
+
+    <section class="section-card">
+      <div class="section-header">
+        <div class="section-icon">🌏</div>
+        <div>
+          <div class="section-subtitle">CHAPTER 07 · FRONTEND</div>
+          <h2 class="section-title">前端：Cesium 地球與右側戰情台</h2>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="mini-card"><h4>微光學點陣圖標</h4><p>48×48 PNG 以 <code>BillboardCollection</code> 繪製，比例 0.28，約 13.4 螢幕像素；選取時放大到 0.44（約 21 px）。</p></div>
+        <div class="mini-card"><h4>視距分級</h4><p>航速 ≥ 1.5 節或主要船型 8,000 km 內可見；其餘靜止小船 280 km 內才展開。</p></div>
+        <div class="mini-card"><h4>航跡折線</h4><p><code>PolylineCollection</code> 繪製，寬 3 px、船型色 90% 不透明。切換時段或換船時，舊回應會被丟棄。</p></div>
+        <div class="mini-card"><h4>路況圖元</h4><p><code>PointPrimitiveCollection</code>：車速 ≤ 70 km/h 的路段放大顯示，事件點帶白框，事故最大。</p></div>
+      </div>
+      <figure class="svg-fig"><svg viewBox="0 0 420 688" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="右側戰情台示意圖：航跡庫徽章、8 大船型過濾、路況開關與事件徽章、單船航跡卡、AI 參謀面板" font-family="-apple-system,BlinkMacSystemFont,&quot;PingFang TC&quot;,&quot;Noto Sans TC&quot;,&quot;Microsoft JhengHei&quot;,sans-serif"><title>右側戰情台示意圖：航跡庫徽章、8 大船型過濾、路況開關與事件徽章、單船航跡卡、AI 參謀面板</title><defs><marker id="pan-a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#5b7391"/></marker></defs><rect width="420" height="688" rx="14" fill="#0a1422"/><rect x="30" y="12" width="360" height="664" rx="14" fill="#112034" stroke="#38bdf8" stroke-width="1.4"/><text x="46" y="42" font-size="15" fill="#f1f5f9" font-weight="700">❖ 船舶顯示（臺灣海域）</text><rect x="306" y="26" width="72" height="24" rx="12" fill="#0a1422" stroke="#38bdf8" stroke-width="1.4"/><text x="342" y="43" font-size="12.5" fill="#f1f5f9" font-weight="700" text-anchor="middle">9,112 艘</text><text x="46" y="68" font-size="13" fill="#a9b8cc">🗄️ 航跡庫：10,873 艘・41,290 點</text><rect x="46" y="80" width="328" height="1" rx="10" fill="#5b7391"/><text x="46" y="104" font-size="14" fill="#f1f5f9" font-weight="700">☑ 即時船舶位置</text><rect x="50" y="113" width="12" height="12" rx="3" fill="#d9d9d9"/><text x="70" y="124" font-size="13" fill="#f1f5f9">未具體說明的船舶</text><text x="370" y="124" font-size="13" fill="#f1f5f9" font-weight="700" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">4,492</text><rect x="50" y="134" width="12" height="12" rx="3" fill="#13c2c2"/><text x="70" y="145" font-size="13" fill="#f1f5f9">拖船、帆船、遊艇</text><text x="370" y="145" font-size="13" fill="#f1f5f9" font-weight="700" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">88</text><rect x="50" y="155" width="12" height="12" rx="3" fill="#5b7cfa"/><text x="70" y="166" font-size="13" fill="#f1f5f9">漁船</text><text x="370" y="166" font-size="13" fill="#f1f5f9" font-weight="700" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">2,789</text><rect x="50" y="176" width="12" height="12" rx="3" fill="#faad14"/><text x="70" y="187" font-size="13" fill="#f1f5f9">高速船</text><text x="370" y="187" font-size="13" fill="#f1f5f9" font-weight="700" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">20</text><rect x="50" y="197" width="12" height="12" rx="3" fill="#fa8c16"/><text x="70" y="208" font-size="13" fill="#f1f5f9">引水船、搜索船、拖駁船等</text><text x="370" y="208" font-size="13" fill="#f1f5f9" font-weight="700" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">272</text><rect x="50" y="218" width="12" height="12" rx="3" fill="#eb2f96"/><text x="70" y="229" font-size="13" fill="#f1f5f9">客輪</text><text x="370" y="229" font-size="13" fill="#f1f5f9" font-weight="700" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">65</text><rect x="50" y="239" width="12" height="12" rx="3" fill="#39d5ff"/><text x="70" y="250" font-size="13" fill="#f1f5f9">貨輪</text><text x="370" y="250" font-size="13" fill="#f1f5f9" font-weight="700" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">1,105</text><rect x="50" y="260" width="12" height="12" rx="3" fill="#ff4d4f"/><text x="70" y="271" font-size="13" fill="#f1f5f9">油輪</text><text x="370" y="271" font-size="13" fill="#f1f5f9" font-weight="700" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">281</text><rect x="46" y="284" width="328" height="1" rx="10" fill="#5b7391"/><text x="46" y="306" font-size="14" fill="#f1f5f9" font-weight="700">☑ 🛣️ 臺灣即時路況與事件</text><rect x="46" y="318" width="60" height="23" rx="11" fill="#0a1422" stroke="#f87171" stroke-width="1.4"/><text x="76.0" y="334" font-size="12" fill="#f1f5f9" text-anchor="middle">事故 1</text><rect x="113" y="318" width="60" height="23" rx="11" fill="#0a1422" stroke="#fb923c" stroke-width="1.4"/><text x="143.0" y="334" font-size="12" fill="#f1f5f9" text-anchor="middle">施工 36</text><rect x="180" y="318" width="60" height="23" rx="11" fill="#0a1422" stroke="#fbbf24" stroke-width="1.4"/><text x="210.0" y="334" font-size="12" fill="#f1f5f9" text-anchor="middle">壅塞 0</text><rect x="247" y="318" width="60" height="23" rx="11" fill="#0a1422" stroke="#c084fc" stroke-width="1.4"/><text x="277.0" y="334" font-size="12" fill="#f1f5f9" text-anchor="middle">管制 0</text><rect x="314" y="318" width="60" height="23" rx="11" fill="#0a1422" stroke="#5b7391" stroke-width="1.4"/><text x="344.0" y="334" font-size="12" fill="#f1f5f9" text-anchor="middle">其他 0</text><text x="46" y="362" font-size="12.5" fill="#a9b8cc">國道均速 95 km/h・壅塞路段 10（≤40）/ 2（≤70）</text><rect x="46" y="376" width="328" height="132" rx="10" fill="#0a1422" stroke="#34d399" stroke-width="1.4"/><text x="58" y="400" font-size="13.5" fill="#f1f5f9" font-weight="700">DER YUN　MMSI 416460000</text><rect x="58" y="412" width="56" height="26" rx="6" fill="#112034" stroke="#34d399" stroke-width="1.4"/><text x="86" y="430" font-size="13" fill="#f1f5f9" font-weight="700" text-anchor="middle">6h</text><rect x="122" y="412" width="56" height="26" rx="6" fill="#34d399" stroke="#34d399" stroke-width="1.4"/><text x="150" y="430" font-size="13" fill="#06281d" font-weight="700" text-anchor="middle">24h</text><rect x="186" y="412" width="56" height="26" rx="6" fill="#112034" stroke="#34d399" stroke-width="1.4"/><text x="214" y="430" font-size="13" fill="#f1f5f9" font-weight="700" text-anchor="middle">7d</text><text x="58" y="460" font-size="13" fill="#a9b8cc">🧭 歷史航跡：點數／km／跨度</text><rect x="58" y="470" width="124" height="28" rx="6" fill="#112034" stroke="#38bdf8" stroke-width="1.4"/><text x="120" y="489" font-size="13" fill="#f1f5f9" font-weight="700" text-anchor="middle">🎥 飛覽航跡</text><rect x="46" y="520" width="328" height="142" rx="10" fill="#0a1422" stroke="#c084fc" stroke-width="1.4"/><text x="58" y="544" font-size="14" fill="#f1f5f9" font-weight="700">🧠 AI 戰情參謀</text><text x="362" y="544" font-size="12.5" fill="#34d399" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">● gemma4:e4b</text><rect x="58" y="556" width="304" height="27" rx="6" fill="#112034" stroke="#5b7391" stroke-width="1.4"/><text x="68" y="575" font-size="13" fill="#a9b8cc">輸入戰情問題…</text><text x="58" y="604" font-size="13" fill="#f1f5f9">☐ 🧠 深度研判 (think)</text><text x="58" y="626" font-size="13" fill="#a9b8cc">▸ 📚 RAG 檢索來源明細 (Citations)</text><text x="58" y="648" font-size="13" fill="#a9b8cc">▸ 🔐 PAT 權杖管理</text></svg><figcaption><span class="figure-tag">UI 示意</span> 圖 6：右側戰情台結構示意。艘數與路況數字取自 2026-11-05 01:04 快照，版面為示意，非實機截圖。</figcaption></figure>
+      <div class="figure-box">
+        <img src="test-results/taiwan-track-desktop.png" alt="單船歷史航跡折線實機截圖">
+        <figcaption><span class="figure-tag">實機截圖</span> 圖 7：Step 8 的單船歷史航跡。</figcaption>
+      </div>
+      <div class="figure-box">
+        <img src="test-results/16_screen_space_13px_overview.png" alt="13.4 像素固定尺度的臺灣海峽全景">
+        <figcaption><span class="figure-tag">實機截圖</span> 圖 8：固定螢幕尺度下的海峽全景。</figcaption>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <div class="section-header">
+        <div class="section-icon">📈</div>
+        <div>
+          <div class="section-subtitle">CHAPTER 08 · EVIDENCE</div>
+          <h2 class="section-title">可驗證指標與已知限制</h2>
+        </div>
+      </div>
+
+      <div class="table-container"><table class="stack"><thead><tr><th>指標</th><th>數值</th><th>量測口徑</th></tr></thead><tbody><tr><td data-label="指標">即時船舶快照</td><td data-label="數值">9,112 艘</td><td data-label="量測口徑">2026-11-05 01:04，<code>/api/taiwan-vessels</code></td></tr><tr><td data-label="指標">航跡庫</td><td data-label="數值">10,873 艘／41,290 點／4,933 KB</td><td data-label="量測口徑">同時段 <code>mode=summary</code></td></tr><tr><td data-label="指標">國道路段</td><td data-label="數值">453 段</td><td data-label="量測口徑">11-04 均速 84 km/h；11-05 01:04 為 95 km/h，隨時段變動</td></tr><tr><td data-label="指標">路況冷啟動／到期刷新</td><td data-label="數值">197 ms／87 ms</td><td data-label="量測口徑">Step 9 單次量測</td></tr><tr><td data-label="指標">檢索最慢耗時</td><td data-label="數值">25.6 ms</td><td data-label="量測口徑">5 類問題各 200 次，主機 Node</td></tr><tr><td data-label="指標">後端單元測試</td><td data-label="數值">52 項全過</td><td data-label="量測口徑"><code>node --test</code> 四個臺灣後端測試檔</td></tr></tbody></table></div>
+      <h3 class="subheading">尚未驗證或尚未實作</h3>
+      <ul class="fact-list">
+        <li><strong>7 天磁碟佔用：</strong>尚無完整 7 天樣本，不做外推。</li>
+        <li><strong>有效 PAT 的實機路徑：</strong>由單元測試覆蓋；本次未產生權杖，以免改動使用者狀態。</li>
+        <li><strong>路況圖元與點擊卡：</strong>無頭瀏覽器未能實證 3D 圖元渲染與點擊。</li>
+        <li><strong>GPU 指標：</strong>舊版白皮書的 FPS 與 Draw Call 對照表找不到本次可重現的量測，已自本文移除。</li>
+        <li><strong>未實作：</strong>台海 24 小時縮時回放、CCTV 多模態視覺辨識。</li>
+      </ul>
+    </section>
+
+    <footer style="text-align: center; color: var(--text-muted); font-size: 13.5px; padding-top: 20px;">
+      <p>God's Eye View 系統架構白皮書 · Step 10 重構 · 內容依 2026-11-05 程式碼與實測編製</p>
+    </footer>
+
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: false, theme: 'dark', flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' } });
+    document.fonts.ready.then(function () { mermaid.run({ querySelector: '.mermaid' }); });
+  </script>
+</body>
+</html>

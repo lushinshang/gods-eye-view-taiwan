@@ -63,7 +63,7 @@ def main():
             row['screenshot'] = full
             row['passed'] = (row['clientWidth'] == width == row['documentScrollWidth'] == row['bodyScrollWidth']
                              and not any(row[k] for k in ['horizontalOffenders','clippedText','imageFailures','tocBroken','errors','requestFailures','externalRequests','zoomOverflow'])
-                             and row['sections'] == 11 and row['svgCards'] == 4
+                             and row['sections'] == 12 and row['svgCards'] == 4
                              and all(row[k] for k in ['diagramZoomOpened','diagramZoomClosed','imageZoomOpened','imageZoomClosed']))
             result['viewports'].append(row)
             print(f"{row['viewport']}: scroll={row['documentScrollWidth']}/{row['clientWidth']}, errors={len(errors)}, passed={row['passed']}", flush=True)

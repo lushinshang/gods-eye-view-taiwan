@@ -7,8 +7,9 @@ Thumbs.db
 backup/
 .gev-cache/
 .gev-logs/
-data/
+/data/
 *.bak
+!repo/src/data/
 
 # Playwright & QA Test artifacts
 .playwright-mcp/

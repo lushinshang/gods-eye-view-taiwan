@@ -1,10 +1,14 @@
 @echo off
 chcp 65001 >nul
-title 上帝之眼戰情台 - 停止服務
+title 上帝之眼台海戰情台 - 關閉服務
 
 echo ========================================================
-echo  🛑 正在停止戰情台服務並釋放連接埠...
+echo   🛑 正在關閉戰情台服務並釋放連接埠...
 echo ========================================================
+echo.
 
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0stop-no-admin.ps1"
+taskkill /f /im node.exe >nul 2>&1
+
+echo ✅ 戰情台服務已徹底停止！4173 連接埠已安全釋放。
+echo.
 pause

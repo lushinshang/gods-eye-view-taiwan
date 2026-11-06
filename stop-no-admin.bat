@@ -1,14 +1,13 @@
 @echo off
-chcp 65001 >nul
-title 上帝之眼台海戰情台 - 關閉服務
+title Gods Eye View - Stop Service
 
 echo ========================================================
-echo   🛑 正在關閉戰情台服務並釋放連接埠...
+echo   Stopping God's Eye View service and releasing port 4173...
 echo ========================================================
 echo.
 
 taskkill /f /im node.exe >nul 2>&1
 
-echo ✅ 戰情台服務已徹底停止！4173 連接埠已安全釋放。
+echo [OK] All Node.js processes terminated. Port 4173 released!
 echo.
 pause

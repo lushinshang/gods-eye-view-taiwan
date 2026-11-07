@@ -31,11 +31,36 @@ echo "=========================================================="
 echo " 👁️  正在啟動 God's Eye View 臺灣海域戰情台..."
 echo "=========================================================="
 
-# 1. 檢查 Docker 是否運行中
+# 1. 檢查 Docker 是否運行中，若未運行則智慧自動喚醒
 if ! docker info >/dev/null 2>&1; then
-  echo "❌ 錯誤：Docker 尚未啟動！"
-  echo "👉 請先開啟 Docker Desktop 應用程式後，再重新執行 ./run.sh"
-  exit 1
+  echo "🐳 偵測到 Docker 尚未啟動，正在為您自動開啟 Docker Desktop..."
+  if [ "$(uname)" = "Darwin" ]; then
+    open -a Docker >/dev/null 2>&1 || open /Applications/Docker.app >/dev/null 2>&1 || true
+  elif command -v systemctl >/dev/null 2>&1; then
+    sudo systemctl start docker >/dev/null 2>&1 || true
+  fi
+
+  echo -n "⏳ 等待 Docker 守護程序初始化就緒"
+  DOCKER_RETRIES=40
+  DOCKER_COUNT=0
+  DOCKER_READY=false
+  while [ $DOCKER_COUNT -lt $DOCKER_RETRIES ]; do
+    if docker info >/dev/null 2>&1; then
+      DOCKER_READY=true
+      break
+    fi
+    sleep 2
+    DOCKER_COUNT=$((DOCKER_COUNT + 1))
+    printf "."
+  done
+  echo ""
+
+  if [ "$DOCKER_READY" != true ]; then
+    echo "❌ 啟動逾時：Docker Desktop 未能在預期時間內就緒。"
+    echo "👉 請確認 Docker Desktop 應用程式狀態後，再重新執行 ./run.sh"
+    exit 1
+  fi
+  echo "✅ Docker 引擎已順利就緒！"
 fi
 
 # 2. 進入 repo 目錄並以背景模式啟動容器

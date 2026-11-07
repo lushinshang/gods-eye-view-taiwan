@@ -21,11 +21,12 @@
 | **💻 資源實測與移植硬體規格評估** | [點此線上開啟](https://lushinshang.github.io/gods-eye-view-taiwan/system-resource-evaluation.html) | `system-resource-evaluation.html` | 實機壓測數據、三級硬體矩陣速查卡（最低/建議/極致戰情旗艦）、Ubuntu Docker / Win11 WSL2 部署手冊。 |
 | **📊 技術演進與實錄全歷程** | [點此線上開啟](https://lushinshang.github.io/gods-eye-view-taiwan/gods-eye-view-summary.html) | `gods-eye-view-summary.html` | 深入記錄本機 Docker 實測、Claude Code 逆向挖掘免金鑰官方雷達源、數據解耦、尺度災難復盤與修復實錄。 |
 | **🔬 深度研究與實測規劃報告** | [點此線上開啟](https://lushinshang.github.io/gods-eye-view-taiwan/gods-eye-view-analysis.html) | `gods-eye-view-analysis.html` | 基於 GitHub v0.3.0 與 DeepWiki 42 篇文件交叉實證、19/21 免金鑰圖層驗證、臺灣高公局 CCTV 與本土化實測存證。 |
+| **📡 全維度數據源與時效特性報告** | [點此線上開啟](https://lushinshang.github.io/gods-eye-view-taiwan/data-sources.html) | `data-sources.html`<br>[`DATA_SOURCES.md`](DATA_SOURCES.md) | 盤點 9 大領域 20+ 類數據源；剖析三層時效性（不可變動/不用變動/動態頻率），具備 Awwwards/FWA 得獎級戰術 HUD 互動 SVG 大盤與環境感知彈窗。 |
 | **🎨 微光學圖標設計展示書** | [點此線上開啟](https://lushinshang.github.io/gods-eye-view-taiwan/repo/public/icons/taiwan-vessels/spec.html) | `repo/public/icons/taiwan-vessels/spec.html` | Awwwards / FWA 規格 16 款（8 normal + 8 白金選取態）48×48 Texture Atlas 微光學船舶點陣圖標設計展示。 |
 
 ---
 
-## ⚡ 系統五大突破性工程架構
+## ⚡ 系統六大突破性工程架構
 
 ### 1. 雙軌 API 契約與邊界防護（Resilience Engineering）
 - **全球源與臺灣源徹底解耦**：保留原版 `/api/vessels`（全球 AISStream WebSocket），獨立掛載 `/api/taiwan-vessels`。
@@ -40,11 +41,20 @@
 ### 3. 人機工效雙面板戰情室（Dual-Dock Ergonomics）
 - **左側全域大盤**：全球多源圖層開關（飛機、全球船、衛星、地震、CCTV）與 GLSL 後製濾鏡（NVG 夜視鏡、CRT 掃描線、FLIR 熱成像）。
 - **右側臺灣專精台**：臺灣航港局 8 大船型勾選器、即時在席艘數徽章、單船點擊詳細情資卡與折疊手柄（`🚢 ➔`）。
+- **左下角數據來源直開**：戰情台左下角原生的 `Data attribution` 旁無縫掛載 `[ 📊 數據源時效報告 ↗ ]` 微光學按鈕，支援另開新分頁直達全維度報告。
 
 ### 4. AI 時代 Agentic C4ISR 演進藍圖
 - **Model Context Protocol (MCP)**：對外暴露海事時空查詢工具集，賦予 Claude、Gemini 等大模型自主調用衛星交會與船隻推估能力。
 - **多模態邊緣視覺推論**：針對全臺 1,781 支 CCTV 影像流進行無人機與不明集結視覺辨識。
 - **因果鏈異常預警**：AI 自主推論「AIS 突然靜默」、「非典型錨泊」與「灰區行動」。
+
+### 5. 全維度數據時效解構與 Awwwards 得獎級 HUD 大盤
+- **三層生命週期嚴格劃分**：
+  - 🟢 **不可變動層 (Immutable)**：7 天歷史航跡庫（Append-only NDJSON）、歷史地震與道路事故日誌。
+  - 🟡 **不用變動層 (Static)**：海底光纖電纜海床路由、基礎 3D 建築地形、1,800 支攝影機實體坐標、本機 AI 權重。
+  - 🔴 **動態遙測層 (Dynamic Refresh)**：從毫秒串流、5~10 秒航空、40 秒航港局快取，到 6 小時大氣風場數值預報。
+- **Awwwards / FWA 級別純向量 HUD SVG**：包含 Bézier 曲線動態光纖流光、呼吸燈微光晶片、直屏自適應排版與折疊式 Mermaid 雙軌透明架構。
+- **環境感知智慧彈窗 (方案 A)**：線上 GitHub Pages 訪客點擊自動彈出終端啟動指令（`./run.sh` / `run-no-admin.bat`）與一鍵複製指引，告別連線崩潰白畫面。
 
 ---
 

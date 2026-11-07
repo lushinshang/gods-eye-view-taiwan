@@ -2,6 +2,8 @@
 > 本專案為 God's Eye View 的臺灣延伸版：對接臺灣航港局 9,000+ 艘官方雷達源、陸地路況、7 天航跡庫與本機 AI 參謀。
 >
 > - 📚 線上完整文件庫（GitHub Pages）：<https://lushinshang.github.io/gods-eye-view-taiwan/>
+> - 📡 全維度數據源與時效分析：<https://lushinshang.github.io/gods-eye-view-taiwan/data-sources.html>
+> - 📜 官方數據授權與時效矩陣：見 [DATA_SOURCES.md](DATA_SOURCES.md)
 > - 🪟 **Windows**：免管理者權限，雙擊 `run-no-admin.bat`（停止用 `stop-no-admin.bat`），步驟見根目錄 `README.md`
 > - 🍎 **Mac**：終端機執行 `./run.sh`，開啟 `http://localhost:4173`
 

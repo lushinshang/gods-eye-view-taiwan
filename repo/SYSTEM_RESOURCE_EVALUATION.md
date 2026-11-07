@@ -337,9 +337,62 @@ processors=8
 
 ## 11｜實戰部署：x86 環境手把手安裝指引
 
-前面都在講「要買什麼」，這一章直接帶你把它裝起來。兩條路挑一條：Ubuntu 原生最省事，Windows 11 則適合手上已經是辦公桌機的人。**先說清楚：以下步驟依專案的 `compose.yaml`、`.env.example` 與 README 整理，並未在 x86 實機逐步跑過**；`gemma4:e4b` 在 x86 能不能直接拉下來、跑得多快，也要你實際驗收。
+前面都在講「要買什麼」，這一章直接帶你把它裝起來。Windows 有兩條路線：**路線 A 免管理者權限、雙擊即跑，已在 Windows 11／10 實機驗證通過，是公發筆電的首選**；路線 B 走 Docker Desktop 容器化，適合有 Admin 權限的工作站。Ubuntu 原生最省事，放在最後。**先說清楚：Windows 路線 A 為實戰驗證；Ubuntu 與 Windows 路線 B 依專案的 `compose.yaml`、`.env.example` 與 README 整理，並未在 x86 實機逐步跑過**；`gemma4:e4b` 在 x86 能不能直接拉下來、跑得多快，也要你實際驗收。
 
-### 路徑 A：Ubuntu 22.04／24.04＋Docker 原生
+### Windows 路線 A（最推薦、實戰驗證通過）：完全免管理者權限 Zero-Admin 便攜版
+
+**適用情境**：公發筆電、沒有 Admin 密碼、沒裝 Docker 的辦公環境。整個流程不改系統設定、不寫登錄檔，Node.js 只放在專案資料夾內的 `runtime\`，刪掉資料夾就等於解除安裝。本路線已在 Windows 11／10 實機走完整程序並驗證成功（Windows 內建的 `curl.exe`、`tar.exe` 需 Windows 10 1803 以上）。
+
+| 項目 | 說明 |
+|------|------|
+| 需要的權限 | 一般使用者即可，不需 Admin、不需 UAC 彈窗 |
+| 需要先裝 | 無（Node.js 由腳本自動下載便攜版，約 30 MB） |
+| 需要連網 | 下載專案 ZIP、Node.js、npm 套件 |
+| 預設網址 | `http://localhost:4173` |
+| 取捨 | 沒有 Docker 隔離，也沒設定本機 Ollama；要 AI 參謀請另見路線 B 的 Ollama 設定 |
+
+#### Step 1｜用內建 curl／tar 下載並解壓縮專案
+
+開一般權限的 PowerShell（不必「以系統管理員身分執行」），整段貼上：
+
+```powershell
+cd $env:USERPROFILE\Downloads
+curl.exe -L -o gev.zip `
+  https://github.com/lushinshang/gods-eye-view-taiwan/archive/refs/heads/main.zip
+tar.exe -xf gev.zip
+cd gods-eye-view-taiwan-main
+```
+
+注意要打 `curl.exe`，不要打 `curl`：Windows PowerShell 5.1 裡的 `curl` 是 `Invoke-WebRequest` 的別名，參數完全不同。解壓後的資料夾名稱是 `gods-eye-view-taiwan-main`，裡面就有 `run-no-admin.bat`。
+
+#### Step 2｜雙擊 `run-no-admin.bat`
+
+在檔案總管雙擊 `run-no-admin.bat`（或在 PowerShell 輸入 `.\run-no-admin.bat`）。腳本會依序自動做完：
+
+1. 沒有 `runtime\node.exe` 時，用 `curl.exe -#` 帶進度條下載官方便攜版 Node.js，再用 `tar.exe` 解壓縮、整理到 `runtime\`。
+2. 把 `runtime\` 只加進**當前視窗**的 `PATH`，不碰系統環境變數，所以不需要權限。
+3. 首次執行時在 `repo\` 跑 `npm install`，約 1～2 分鐘；之後有 `node_modules` 就直接跳過。
+4. 自動開啟預設瀏覽器到 `http://localhost:4173`，並以 `npm run dev` 啟動服務。
+
+看到 3D 地球就成功。第一次啟動時地球資料還在載入，請多等幾秒。
+
+#### Step 3｜關閉服務並釋放 4173 埠
+
+- 在批次檔視窗按 `Ctrl + C`（出現「是否終止批次檔工作」就輸入 `Y`），或直接關閉視窗。
+- 視窗已不見、但 4173 還被占著時，雙擊 `stop-no-admin.bat`，它會結束所有 `node.exe` 並釋放埠位。
+
+> 注意：`stop-no-admin.bat` 用的是 `taskkill /f /im node.exe`，會把這台電腦上**所有** Node.js 程序一起關掉。你同時在跑別的 Node 專案的話，改用下面速查表的「只殺 4173」指令。
+
+#### 避坑分析：為什麼批次檔是「零括號、純 ASCII」
+
+這兩支 `.bat` 刻意寫成非常陌生的樣子：沒有任何 `if (...) ( ... )` 區塊，只用 `if exist ... goto 標籤`，訊息也全是英文。原因是在繁體中文 Windows 上踩過兩個坑：
+
+- **Big5（CP950）衝碼**：`cmd.exe` 依系統碼頁（繁中是 CP950）逐行解析批次檔。檔案若含 UTF-8 中文，多位元組字元的第二個位元組可能剛好落在 `)`、`&`、`|` 等特殊字元的碼位上，造成語法被誤判，輕則亂碼，重則整支腳本在第一行就失敗。純 ASCII 在任何碼頁下位元組都一致，從根源避開。
+- **括號區塊靜默閃退**：括號區塊內若出現 `)`（例如訊息裡的「(approx. 30MB)」或 `%PATH%` 展開後含 `Program Files (x86)`），會提前結束區塊，視窗一閃就關，沒有任何錯誤訊息可查。改成 `goto` 標籤的扁平結構，就沒有「區塊提前結束」的問題。
+
+後續若要改這兩支 `.bat`，請守住三條：維持純 ASCII、不要新增括號區塊、用 `goto` 分支。`run-no-admin.ps1` 則是 PowerShell 版替代方案，檔案帶 UTF-8 BOM 以相容 Windows PowerShell 5.1；被執行原則擋下時，見下方速查表。
+
+### Linux 路線：Ubuntu 22.04／24.04＋Docker 原生
 
 #### Step 1｜裝 Docker 與 Git
 
@@ -390,9 +443,21 @@ curl -s http://localhost:11434/api/ps
 
 瀏覽器開 `http://localhost:4173`，看得到 3D 地球就成功了。要確認瀏覽器真的用到硬體繪圖，可以打開 `chrome://gpu`，看 WebGL 是否為 Hardware accelerated。
 
-### 路徑 B：Windows 11＋WSL2＋Docker Desktop＋原生 Ollama
+### Windows 路線 B：Docker Desktop 容器化標準路線
 
-這條路的分工是：**專案和 Docker 在 WSL2 裡，Ollama 裝在 Windows 本機**，這樣可以直接吃 Windows 的 NVIDIA 驅動，不用在 WSL2 裡另外折騰 GPU。
+**適用情境**：有 Admin 權限的工作站，想要容器隔離、可重現的環境，或要長時間穩定執行。這條路的分工是：**專案和 Docker 在 WSL2 裡，Ollama 裝在 Windows 本機**，直接吃 Windows 的 NVIDIA 驅動，不用在 WSL2 裡另外折騰 GPU。這條路尚未在本次實機驗證範圍內，請依 Step 逐步驗收。
+
+#### 一行安裝：用 winget 備齊軟體
+
+以「系統管理員」身分開 PowerShell，直接用 winget 安裝（Windows 11 與較新的 Windows 10 內建 winget）：
+
+```powershell
+winget install -e --id Docker.DockerDesktop
+winget install -e --id Git.Git
+winget install -e --id Ollama.Ollama
+```
+
+只要基本 3D 態勢台，前兩行即可；`Ollama.Ollama` 是選配的 AI 參謀。裝完 Docker Desktop 通常要登出再登入或重開機。
 
 #### 📦 Windows 必備與選配軟體包下載一覽表
 
@@ -436,7 +501,10 @@ Docker Desktop 要求 WSL 版本至少 2.1.5，`wsl --version` 要看一下。�
 
 ```powershell
 ollama pull gemma4:e4b
+ollama ps
 ```
+
+Ollama 原生跑在 Windows，會直接使用 NVIDIA 顯卡（顯卡加速直通），`ollama ps` 的 PROCESSOR 欄位顯示 `100% GPU` 即代表有吃到顯卡。容器端不必設定顯卡，`compose.yaml` 的 `host.docker.internal:11434` 會把請求轉到這個原生 Ollama。
 
 #### Step 4｜在 WSL2 裡下載專案並啟動
 
@@ -463,6 +531,36 @@ processors=8
 ```
 
 PowerShell 執行 `wsl --shutdown`，再重開 Docker Desktop。接著用 Windows 的 Chrome 打開 `http://localhost:4173`；`http://localhost:11434/api/ps` 也應該有回應。
+
+### 實戰避坑速查表
+
+| 症狀 | 原因 | 處理 |
+|------|------|------|
+| `.bat` 一閃就關、中文亂碼、報「不是內部或外部命令」 | 繁中 Windows 的 Big5（CP950）解析 UTF-8 檔案，或括號區塊被提前結束 | 批次檔維持純 ASCII、零括號、用 `goto` 分支；編輯器存檔選 ANSI／ASCII，不要含中文 |
+| 4173 埠被占用（`EADDRINUSE`） | 上次的 `node.exe` 沒有結束 | 見下方指令，只殺占用 4173 的程序 |
+| `.ps1` 顯示「已停用指令碼執行」 | ExecutionPolicy 預設為 Restricted | 單次繞過，不改系統設定，見下方指令 |
+| PowerShell 裡 `curl -o` 報參數錯誤 | `curl` 是 `Invoke-WebRequest` 別名 | 一律打 `curl.exe` |
+| 下載的 ZIP 解壓後 `.bat` 被 SmartScreen 擋 | 檔案帶網路來源標記 | 對 ZIP 按右鍵 → 內容 → 勾「解除封鎖」後再解壓；或 `Unblock-File` |
+| `npm install` 卡很久或失敗 | 公司 Proxy 或防火牆擋 npm registry | 先確認瀏覽器能連 `registry.npmjs.org`；需 Proxy 時先設 `HTTPS_PROXY` |
+
+釋放 4173 埠的兩種寫法（皆不需 Admin，只能結束自己帳號的程序）：
+
+```bat
+for /f "tokens=5" %a in ('netstat -ano ^| findstr :4173 ^| findstr LISTENING') do taskkill /f /pid %a
+```
+
+```powershell
+Stop-Process -Force -Id (Get-NetTCPConnection -LocalPort 4173 `
+  -State Listen).OwningProcess
+```
+
+上面第一行是在 `cmd` 直接輸入的版本；寫進 `.bat` 時 `%a` 要改成 `%%a`。
+
+單次繞過 ExecutionPolicy 執行 PowerShell 版啟動器（只影響這一次，不改系統設定）：
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\run-no-admin.ps1
+```
 
 ### 避坑 FAQ
 

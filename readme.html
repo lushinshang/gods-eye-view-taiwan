@@ -580,6 +580,16 @@
       </div>
 
       <div class="card" style="border: 1px solid var(--accent-cyan); background: rgba(0, 242, 254, 0.05);">
+        <h3 style="color: var(--accent-cyan);">🪟 Windows 極速啟動（免管理者權限雙擊即跑）</h3>
+        <p>公發筆電、沒有 Admin 密碼、沒裝 Docker 也能跑（Windows 11／10 實機驗證）。先用一般權限的 PowerShell 下載並解壓縮：</p>
+        <pre><code>cd $env:USERPROFILE\Downloads
+curl.exe -L -o gev.zip https://github.com/lushinshang/gods-eye-view-taiwan/archive/refs/heads/main.zip
+tar.exe -xf gev.zip</code></pre>
+        <p>進入 <code>gods-eye-view-taiwan-main</code> 資料夾，<strong>雙擊 <code>run-no-admin.bat</code></strong>：自動帶進度條下載綠色便攜版 Node.js、安裝套件並開啟瀏覽器進入 <code>http://localhost:4173</code>。關閉時按 <strong>[Ctrl + C]</strong>，或雙擊 <code>stop-no-admin.bat</code> 釋放 4173 埠。</p>
+        <p style="font-size: 13.5px;"><a href="system-resource-evaluation.html#handson">完整步驟與避坑速查表 → 資源評估報告第 11 章</a></p>
+      </div>
+
+      <div class="card" style="border: 1px solid var(--accent-cyan); background: rgba(0, 242, 254, 0.05);">
         <h3 style="color: var(--accent-cyan);">⚡ 0. 極速一鍵啟動（推薦首選）</h3>
         <p>在專案根目錄執行專屬 Shell 腳本，自動檢查 Docker、拉起背景容器、健康檢查並<strong>自動開啟瀏覽器</strong>；欲停止時在終端機按下 <strong>[Ctrl + C]</strong> 即自動安全關閉 Docker 容器：</p>
         <pre><code># 專案根目錄下直接執行 (按 Ctrl+C 可一鍵優雅退出)

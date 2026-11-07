@@ -50,7 +50,19 @@
 
 ## 🚀 快速啟動指南
 
-戰情室已在本機容器環境就緒，提供兩種啟動方式：
+### 🪟 Windows 極速啟動（免管理者權限雙擊即跑）
+
+公發筆電、沒有 Admin 密碼、沒裝 Docker 也能跑，已在 Windows 11／10 實機驗證。PowerShell（一般權限）下載並解壓縮：
+
+```powershell
+cd $env:USERPROFILE\Downloads
+curl.exe -L -o gev.zip https://github.com/lushinshang/gods-eye-view-taiwan/archive/refs/heads/main.zip
+tar.exe -xf gev.zip
+```
+
+接著進入 `gods-eye-view-taiwan-main` 資料夾，**雙擊 `run-no-admin.bat`**：自動帶進度條下載綠色便攜版 Node.js、安裝套件，並開啟瀏覽器進入 `http://localhost:4173`。要關閉時按 `Ctrl + C`，或雙擊 `stop-no-admin.bat` 釋放 4173 埠。完整說明與避坑見 [系統資源評估報告第 11 章](repo/SYSTEM_RESOURCE_EVALUATION.md)。
+
+戰情室已在本機容器環境就緒，提供（macOS／Linux／有 Docker 的環境）兩種啟動方式：
 
 ### 方法一：極速一鍵啟動（推薦）
 在專案根目錄直接執行腳本，自動檢查 Docker、啟動容器、開啟瀏覽器；**終端機按下 `Ctrl + C` 即自動優雅關閉容器**：

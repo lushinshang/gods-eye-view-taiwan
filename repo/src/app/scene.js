@@ -63,6 +63,14 @@ export async function createApplicationScene({
   defer(installTrackpadPinchZoom(viewer));
   registerDataCredits(viewer, credits);
   configureCreditKeyboardAccess(document);
+  const sourcesBtn = document.createElement('a');
+  sourcesBtn.id = 'data-sources-btn';
+  sourcesBtn.href = './data-sources.html';
+  sourcesBtn.target = '_blank';
+  sourcesBtn.rel = 'noopener noreferrer';
+  sourcesBtn.title = '開啟全維度數據來源與更新頻率分析報告';
+  sourcesBtn.textContent = '📊 數據源時效報告 ↗';
+  creditContainer.appendChild(sourcesBtn);
   defer(onLocaleChange(() => configureCreditKeyboardAccess(document)));
   loaderStatus.textContent =
     googleApiKey || googleTokens || cesiumToken

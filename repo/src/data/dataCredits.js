@@ -99,6 +99,22 @@ export const NYC_DOT_DISCLAIMER =
   'The public is advised to observe posted signage for compliance with applicable laws and regulations.';
 
 export const DATA_CREDITS = [
+  // ── 🇹🇼 Taiwan & Full Data Sources Telemetry Matrix Report ──────
+  {
+    key: 'full-data-sources-report',
+    html:
+      '<strong style="color:#00f2fe;">🇹🇼 <a href="./data-sources.html" target="_blank" rel="noopener" style="color:#38bdf8;text-decoration:underline;font-weight:bold;">開啟【全維度數據源與更新頻率分析報告 (Data Sources & Telemetry Matrix)】↗</a></strong>',
+  },
+  {
+    key: 'taiwan-vessels-ais',
+    html:
+      'Taiwan Coastal Vessels (AIS): <a href="https://www.motcmpb.gov.tw/" target="_blank" rel="noopener">Maritime and Port Bureau, MOTC (中華民國交通部航港局)</a> · Ingested via local 40s caching engine',
+  },
+  {
+    key: 'taiwan-police-radio',
+    html:
+      'Taiwan Highway Incidents: <a href="https://www.pbs.npa.gov.tw/" target="_blank" rel="noopener">Police Radio Station, NPA, MOI (內政部警政署警察廣播電臺)</a>',
+  },
   // ── Live sources ────────────────────────────────────────────────
   {
     key: 'opensky',

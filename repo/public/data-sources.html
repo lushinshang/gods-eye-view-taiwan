@@ -428,6 +428,94 @@
     }
     footer a { color: var(--accent-cyan); text-decoration: none; }
 
+    /* ══ Awwwards / Webby / FWA 級別戰術 HUD 互動架構圖樣式 ══ */
+    .hud-diagram-container {
+      background: radial-gradient(circle at 50% 30%, rgba(14, 30, 54, 0.9) 0%, rgba(7, 13, 20, 0.98) 85%);
+      border: 1px solid var(--border-cyan);
+      border-radius: 14px;
+      padding: 24px 16px;
+      margin: 28px 0;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), inset 0 0 30px rgba(0, 242, 254, 0.05);
+      position: relative;
+      overflow: hidden;
+    }
+    .hud-diagram-container::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, #00f2fe, #38bdf8, transparent);
+    }
+    .hud-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+      max-width: 960px;
+      filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.5));
+    }
+    /* 動態流光線條 */
+    @keyframes hudStreamFlow {
+      to { stroke-dashoffset: -48px; }
+    }
+    @keyframes hudBeaconPulse {
+      0%, 100% { opacity: 0.35; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.15); filter: drop-shadow(0 0 6px #00f2fe); }
+    }
+    @keyframes hudCoreGlow {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; filter: drop-shadow(0 0 12px rgba(251, 191, 36, 0.6)); }
+    }
+    .hud-pipe-active {
+      stroke-dasharray: 6 10;
+      animation: hudStreamFlow 2.4s linear infinite;
+    }
+    .hud-pipe-satellite {
+      stroke-dasharray: 4 8;
+      animation: hudStreamFlow 1.6s linear infinite;
+    }
+    .hud-pipe-stream {
+      stroke-dasharray: 5 8;
+      animation: hudStreamFlow 1.2s linear infinite;
+    }
+    .hud-beacon {
+      animation: hudBeaconPulse 2s ease-in-out infinite;
+      transform-origin: center;
+    }
+    .hud-node-card {
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+    }
+    .hud-node-card:hover {
+      filter: brightness(1.22) drop-shadow(0 0 10px rgba(56, 189, 248, 0.45));
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .hud-pipe-active, .hud-pipe-satellite, .hud-pipe-stream, .hud-beacon {
+        animation: none !important;
+      }
+    }
+    /* Mermaid 原始代碼折疊展示 */
+    .mermaid-source-details {
+      margin-top: 16px;
+      background: rgba(10, 18, 30, 0.75);
+      border: 1px dashed rgba(56, 189, 248, 0.3);
+      border-radius: 8px;
+      padding: 12px 18px;
+    }
+    .mermaid-source-details summary {
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-family: var(--font-mono);
+      outline: none;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .mermaid-source-details summary:hover {
+      color: var(--accent-cyan);
+    }
+
     @media (max-width: 768px) {
       .section-card { padding: 22px 16px; }
       .table-container { border: none; }
@@ -506,8 +594,314 @@
         戰情台採用「邊緣差量快取（Edge Ingestion Cache）」與「多源流式推播（Streaming Push）」雙軌設計。臺灣本地高頻數據（AIS 船舶、國道路況、CCTV）經由後端快取聚合後推播至前端；全球軌道與航空遙測則透過 SGP4 外推演算法與即時 WebSocket 達成低延遲呈現。
       </p>
 
-      <div class="mermaid-box">
-        <div class="mermaid">
+      <!-- ══ Awwwards / Webby / FWA 級別戰術 HUD 互動架構大盤 ══ -->
+      <div class="hud-diagram-container">
+        <svg class="hud-svg" viewBox="0 0 960 1260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="全維度數據流與生命週期戰術架構圖">
+          <defs>
+            <!-- 背景網格 -->
+            <pattern id="tactical-grid" width="30" height="30" patternUnits="userSpaceOnUse">
+              <path d="M 30 0 L 0 0 0 30" fill="none" stroke="rgba(56, 189, 248, 0.05)" stroke-width="1"/>
+            </pattern>
+
+            <!-- 漸層定義 -->
+            <linearGradient id="grad-tw" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#10b981" stop-opacity="0.25"/>
+              <stop offset="100%" stop-color="#064e3b" stop-opacity="0.6"/>
+            </linearGradient>
+            <linearGradient id="grad-global" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.25"/>
+              <stop offset="100%" stop-color="#1e3a8a" stop-opacity="0.6"/>
+            </linearGradient>
+            <linearGradient id="grad-core" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.3"/>
+              <stop offset="100%" stop-color="#78350f" stop-opacity="0.7"/>
+            </linearGradient>
+            <linearGradient id="grad-disp" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#00f2fe" stop-opacity="0.3"/>
+              <stop offset="50%" stop-color="#0369a1" stop-opacity="0.6"/>
+              <stop offset="100%" stop-color="#0c4a6e" stop-opacity="0.8"/>
+            </linearGradient>
+
+            <!-- 發光濾鏡 -->
+            <filter id="glow-cyan" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="4" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+            <filter id="glow-amber" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="5" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+
+          <!-- 背景紋理 -->
+          <rect width="100%" height="100%" fill="url(#tactical-grid)"/>
+
+          <!-- 頂部 HUD 標題列 -->
+          <g transform="translate(30, 25)">
+            <text x="0" y="20" fill="#00f2fe" font-family="ui-monospace, monospace" font-size="12" font-weight="700" letter-spacing="2">● TACTICAL HUD ARCHITECTURE // DATA FLOW MATRIX</text>
+            <text x="900" y="20" text-anchor="end" fill="#94a3b8" font-family="ui-monospace, monospace" font-size="11">LATENCY: EDGE &lt; 40ms | ENCRYPTION: TLS 1.3</text>
+            <line x1="0" y1="30" x2="900" y2="30" stroke="rgba(56, 189, 248, 0.25)" stroke-width="1"/>
+          </g>
+
+          <!-- ═══ 動態流光數據管線 (Bézier Animated Pipes) ═══ -->
+          <!-- 臺灣 5 源流向中央核心 (X: 250, Y: 120-560 -> CORE X: 360, Y: 720) -->
+          <g fill="none">
+            <!-- 底層暗軌 -->
+            <path d="M 440 140 C 470 140, 360 620, 380 720" stroke="rgba(16, 185, 129, 0.2)" stroke-width="2"/>
+            <path d="M 440 230 C 465 230, 370 630, 390 720" stroke="rgba(16, 185, 129, 0.2)" stroke-width="2"/>
+            <path d="M 440 320 C 460 320, 380 640, 400 720" stroke="rgba(16, 185, 129, 0.2)" stroke-width="2"/>
+            <path d="M 440 410 C 455 410, 390 650, 410 720" stroke="rgba(16, 185, 129, 0.2)" stroke-width="2"/>
+            <path d="M 440 500 C 450 500, 410 660, 420 720" stroke="rgba(16, 185, 129, 0.2)" stroke-width="2"/>
+
+            <!-- 動態光脈衝流線 (綠色臺灣流) -->
+            <path class="hud-pipe-active" d="M 440 140 C 470 140, 360 620, 380 720" stroke="#34d399" stroke-width="2"/>
+            <path class="hud-pipe-active" d="M 440 230 C 465 230, 370 630, 390 720" stroke="#34d399" stroke-width="2" style="animation-delay: -0.5s;"/>
+            <path class="hud-pipe-active" d="M 440 320 C 460 320, 380 640, 400 720" stroke="#34d399" stroke-width="2" style="animation-delay: -1.0s;"/>
+            <path class="hud-pipe-active" d="M 440 410 C 455 410, 390 650, 410 720" stroke="#34d399" stroke-width="2" style="animation-delay: -1.5s;"/>
+            <path class="hud-pipe-active" d="M 440 500 C 450 500, 410 660, 420 720" stroke="#10b981" stroke-width="2" style="animation-delay: -2.0s;"/>
+
+            <!-- 全球流向中央核心 (X: 520, Y -> CORE X: 580, Y: 720) -->
+            <path d="M 520 120 C 490 120, 560 620, 540 720" stroke="rgba(56, 189, 248, 0.2)" stroke-width="2"/>
+            <path d="M 520 205 C 495 205, 570 630, 550 720" stroke="rgba(56, 189, 248, 0.2)" stroke-width="2"/>
+            <path d="M 520 460 C 500 460, 580 650, 570 720" stroke="rgba(56, 189, 248, 0.2)" stroke-width="2"/>
+
+            <path class="hud-pipe-active" d="M 520 120 C 490 120, 560 620, 540 720" stroke="#38bdf8" stroke-width="2" style="animation-delay: -0.3s;"/>
+            <path class="hud-pipe-stream" d="M 520 205 C 495 205, 570 630, 550 720" stroke="#00f2fe" stroke-width="2.2" style="animation-delay: -0.8s;"/>
+            <path class="hud-pipe-active" d="M 520 460 C 500 460, 580 650, 570 720" stroke="#38bdf8" stroke-width="2" style="animation-delay: -1.3s;"/>
+
+            <!-- 全球直接注入 UI (軌道衛星、風場雷達、海底光纜走外側直通) -->
+            <path d="M 890 290 C 940 290, 930 960, 780 1010" stroke="rgba(192, 132, 252, 0.25)" stroke-width="1.8"/>
+            <path class="hud-pipe-satellite" d="M 890 290 C 940 290, 930 960, 780 1010" stroke="#c084fc" stroke-width="2" style="animation-delay: -0.4s;"/>
+
+            <path d="M 890 375 C 930 375, 915 970, 760 1020" stroke="rgba(56, 189, 248, 0.25)" stroke-width="1.8"/>
+            <path class="hud-pipe-stream" d="M 890 375 C 930 375, 915 970, 760 1020" stroke="#38bdf8" stroke-width="2" style="animation-delay: -1.1s;"/>
+
+            <path d="M 890 545 C 925 545, 900 980, 740 1030" stroke="rgba(148, 163, 184, 0.25)" stroke-width="1.8"/>
+            <path class="hud-pipe-active" d="M 890 545 C 925 545, 900 980, 740 1030" stroke="#94a3b8" stroke-width="1.8" style="animation-delay: -1.7s;"/>
+
+            <!-- 中央核心流向戰術大盤 (Y: 880 -> Y: 990) -->
+            <path d="M 360 880 C 360 930, 420 950, 440 990" stroke="rgba(251, 191, 36, 0.3)" stroke-width="2.5"/>
+            <path class="hud-pipe-stream" d="M 360 880 C 360 930, 420 950, 440 990" stroke="#fbbf24" stroke-width="2.5"/>
+
+            <path d="M 600 880 C 600 930, 540 950, 520 990" stroke="rgba(236, 72, 153, 0.3)" stroke-width="2.5"/>
+            <path class="hud-pipe-stream" d="M 600 880 C 600 930, 540 950, 520 990" stroke="#f472b6" stroke-width="2.5" style="animation-delay: -0.7s;"/>
+          </g>
+
+          <!-- ═══ 區域 1 左側：🇹🇼 臺灣本土特化數據源 ═══ -->
+          <g transform="translate(30, 65)">
+            <!-- 區域外框 -->
+            <rect width="420" height="575" rx="10" fill="rgba(6, 78, 59, 0.12)" stroke="rgba(16, 185, 129, 0.35)" stroke-width="1"/>
+            <text x="18" y="24" fill="#34d399" font-family="ui-monospace, monospace" font-size="13" font-weight="700">🇹🇼 臺灣本土官方特化源 (Taiwan Official Feeds)</text>
+
+            <!-- 卡片 1: 航港局 AIS -->
+            <g class="hud-node-card" transform="translate(15, 42)">
+              <rect width="390" height="74" rx="6" fill="url(#grad-tw)" stroke="#10b981" stroke-width="1.2"/>
+              <circle cx="20" cy="22" r="4.5" fill="#10b981" class="hud-beacon"/>
+              <text x="32" y="25" fill="#fff" font-size="14.5" font-weight="700">交通部航港局 MPB AIS 船舶動態</text>
+              <rect x="290" y="11" width="88" height="20" rx="3" fill="rgba(16, 185, 129, 0.3)"/>
+              <text x="334" y="25" text-anchor="middle" fill="#34d399" font-family="ui-monospace, monospace" font-size="11" font-weight="700">40s 快取合併</text>
+              <text x="32" y="48" fill="#cbd5e1" font-size="12.5">9,000+ 艘在席商漁船動態 · 本機防擊穿快取保護</text>
+              <text x="32" y="64" fill="#94a3b8" font-family="ui-monospace, monospace" font-size="10.5">PROTOCOL: MOTC REST API | REFRESH: HIGH-FREQ</text>
+            </g>
+
+            <!-- 卡片 2: 高公局路況 -->
+            <g class="hud-node-card" transform="translate(15, 130)">
+              <rect width="390" height="74" rx="6" fill="url(#grad-tw)" stroke="#10b981" stroke-width="1.2"/>
+              <circle cx="20" cy="22" r="4.5" fill="#34d399" class="hud-beacon"/>
+              <text x="32" y="25" fill="#fff" font-size="14.5" font-weight="700">交通部高公局 TISVCloud 國道路況</text>
+              <rect x="290" y="11" width="88" height="20" rx="3" fill="rgba(16, 185, 129, 0.3)"/>
+              <text x="334" y="25" text-anchor="middle" fill="#34d399" font-family="ui-monospace, monospace" font-size="11" font-weight="700">1 ~ 2 分鐘</text>
+              <text x="32" y="48" fill="#cbd5e1" font-size="12.5">453 個國道路段即時平均車速與壅塞燈號標示</text>
+              <text x="32" y="64" fill="#94a3b8" font-family="ui-monospace, monospace" font-size="10.5">PROTOCOL: MOTC 2.0 XML | COVERAGE: HWY 1/3/5/6</text>
+            </g>
+
+            <!-- 卡片 3: 國道 1,800 支 CCTV -->
+            <g class="hud-node-card" transform="translate(15, 218)">
+              <rect width="390" height="74" rx="6" fill="url(#grad-tw)" stroke="#10b981" stroke-width="1.2"/>
+              <circle cx="20" cy="22" r="4.5" fill="#00f2fe" class="hud-beacon"/>
+              <text x="32" y="25" fill="#fff" font-size="14.5" font-weight="700">全臺國道即時閉路電視 (CCTV)</text>
+              <rect x="290" y="11" width="88" height="20" rx="3" fill="rgba(0, 242, 254, 0.25)"/>
+              <text x="334" y="25" text-anchor="middle" fill="#38bdf8" font-family="ui-monospace, monospace" font-size="11" font-weight="700">5 ~ 15 秒快照</text>
+              <text x="32" y="48" fill="#cbd5e1" font-size="12.5">1,800 支高公局攝影機 · 即時 MJPEG 串流與靜態圖</text>
+              <text x="32" y="64" fill="#94a3b8" font-family="ui-monospace, monospace" font-size="10.5">STREAMS: NORTH / CENTRAL / SOUTH 4 HIGHWAY SERVERS</text>
+            </g>
+
+            <!-- 卡片 4: 警廣突發路況 -->
+            <g class="hud-node-card" transform="translate(15, 306)">
+              <rect width="390" height="74" rx="6" fill="url(#grad-tw)" stroke="#10b981" stroke-width="1.2"/>
+              <circle cx="20" cy="22" r="4.5" fill="#34d399" class="hud-beacon"/>
+              <text x="32" y="25" fill="#fff" font-size="14.5" font-weight="700">內政部警政署警廣突發事件 (PBS)</text>
+              <rect x="290" y="11" width="88" height="20" rx="3" fill="rgba(16, 185, 129, 0.3)"/>
+              <text x="334" y="25" text-anchor="middle" fill="#34d399" font-family="ui-monospace, monospace" font-size="11" font-weight="700">1 ~ 3 分鐘</text>
+              <text x="32" y="48" fill="#cbd5e1" font-size="12.5">全島重大交通事故、施工與障礙通報 (指數退避防護)</text>
+              <text x="32" y="64" fill="#94a3b8" font-family="ui-monospace, monospace" font-size="10.5">SOURCE: POLICE RADIO STATION | EVENT DISPATCH</text>
+            </g>
+
+            <!-- 卡片 5: 7 天歷史航跡庫 -->
+            <g class="hud-node-card" transform="translate(15, 394)">
+              <rect width="390" height="74" rx="6" fill="rgba(16, 185, 129, 0.15)" stroke="#34d399" stroke-width="1.5" stroke-dasharray="4 2"/>
+              <circle cx="20" cy="22" r="4.5" fill="#34d399"/>
+              <text x="32" y="25" fill="#34d399" font-size="14.5" font-weight="700">臺灣海域 7 天歷史航跡庫</text>
+              <rect x="290" y="11" width="88" height="20" rx="3" fill="rgba(16, 185, 129, 0.3)"/>
+              <text x="334" y="25" text-anchor="middle" fill="#34d399" font-family="ui-monospace, monospace" font-size="11" font-weight="700">不可變動層</text>
+              <text x="32" y="48" fill="#cbd5e1" font-size="12.5">本地 Append-only NDJSON 時空日誌 · 支援航跡回放</text>
+              <text x="32" y="64" fill="#94a3b8" font-family="ui-monospace, monospace" font-size="10.5">STORAGE: LOCAL UTC+8 DISK LOG | ZERO MUTATION</text>
+            </g>
+          </g>
+
+          <!-- ═══ 區域 1 右側：🌐 全球開放空間與環境遙測 ═══ -->
+          <g transform="translate(510, 65)">
+            <!-- 區域外框 -->
+            <rect width="420" height="575" rx="10" fill="rgba(30, 58, 138, 0.12)" stroke="rgba(56, 189, 248, 0.35)" stroke-width="1"/>
+            <text x="18" y="24" fill="#38bdf8" font-family="ui-monospace, monospace" font-size="13" font-weight="700">🌐 全球開放空間與環境遙測 (Global Feeds)</text>
+
+            <!-- 卡片 1: 全球民航與軍機 -->
+            <g class="hud-node-card" transform="translate(15, 42)">
+              <rect width="390" height="68" rx="6" fill="url(#grad-global)" stroke="#38bdf8" stroke-width="1.2"/>
+              <circle cx="20" cy="20" r="4.5" fill="#38bdf8" class="hud-beacon"/>
+              <text x="32" y="24" fill="#fff" font-size="14" font-weight="700">OpenSky / ADS-B.one 航班與軍機</text>
+              <rect x="290" y="9" width="88" height="20" rx="3" fill="rgba(56, 189, 248, 0.25)"/>
+              <text x="334" y="23" text-anchor="middle" fill="#38bdf8" font-family="ui-monospace, monospace" font-size="11" font-weight="700">5 ~ 10 秒</text>
+              <text x="32" y="45" fill="#cbd5e1" font-size="12">全球在空民航機、電偵巡邏軍用機 3D 向量姿態</text>
+              <text x="32" y="59" fill="#94a3b8" font-family="ui-monospace, monospace" font-size="10">ADS-B TELEMETRY | MILITARY FILTER | LAT/LON/ALT</text>
+            </g>
+
+            <!-- 卡片 2: 公海商船 WebSocket -->
+            <g class="hud-node-card" transform="translate(15, 118)">
+              <rect width="390" height="68" rx="6" fill="url(#grad-global)" stroke="#00f2fe" stroke-width="1.2"/>
+              <circle cx="20" cy="20" r="4.5" fill="#00f2fe" class="hud-beacon"/>
+              <text x="32" y="24" fill="#fff" font-size="14" font-weight="700">AISStream.io 公海商船串流</text>
+              <rect x="290" y="9" width="88" height="20" rx="3" fill="rgba(236, 72, 153, 0.25)"/>
+              <text x="334" y="23" text-anchor="middle" fill="#f472b6" font-family="ui-monospace, monospace" font-size="11" font-weight="700">毫秒即時串流</text>
+              <text x="32" y="45" fill="#cbd5e1" font-size="12">跨國遠洋航線、各國港口公海商船即時 WebSocket</text>
+              <text x="32" y="59" fill="#94a3b8" font-family="ui-monospace, monospace" font-size="10">PROTOCOL: WEBSOCKET PUSH | BROADCAST TELEMETRY</text>
+            </g>
+
+            <!-- 卡片 3: 低軌衛星 SGP4 -->
+            <g class="hud-node-card" transform="translate(15, 194)">
+              <rect width="390" height="68" rx="6" fill="url(#grad-global)" stroke="#c084fc" stroke-width="1.2"/>
+              <circle cx="20" cy="20" r="4.5" fill="#c084fc" class="hud-beacon"/>
+              <text x="32" y="24" fill="#fff" font-size="14" font-weight="700">CelesTrak / NORAD 衛星星群 (TLE)</text>
+              <rect x="290" y="9" width="88" height="20" rx="3" fill="rgba(192, 132, 252, 0.25)"/>
+              <text x="334" y="23" text-anchor="middle" fill="#c084fc" font-family="ui-monospace, monospace" font-size="11" font-weight="700">每秒 SGP4 外推</text>
+              <text x="32" y="45" fill="#cbd5e1" font-size="12">Starlink、GPS、太空站 (ISS) 軌道外推演算 (直通前端)</text>
+              <text x="32" y="59" fill="#94a3b8" font-family="ui-monospace, monospace" font-size="10">TLE FEEDS: 2-12H UPDATES | CLIENT SGP4 INTERPOLATION</text>
+            </g>
+
+            <!-- 卡片 4: 氣象雷達與風場 -->
+            <g class="hud-node-card" transform="translate(15, 270)">
+              <rect width="390" height="68" rx="6" fill="url(#grad-global)" stroke="#38bdf8" stroke-width="1.2"/>
+              <circle cx="20" cy="20" r="4.5" fill="#38bdf8" class="hud-beacon"/>
+              <text x="32" y="24" fill="#fff" font-size="14" font-weight="700">NOAA nowCOAST / GFS 風場雲圖</text>
+              <rect x="290" y="9" width="88" height="20" rx="3" fill="rgba(56, 189, 248, 0.25)"/>
+              <text x="334" y="23" text-anchor="middle" fill="#38bdf8" font-family="ui-monospace, monospace" font-size="11" font-weight="700">15分 ~ 6小時</text>
+              <text x="32" y="45" fill="#cbd5e1" font-size="12">0.25° GRIB2 10m 風場向量、MRMS 降雨都卜勒雷達</text>
+              <text x="32" y="59" fill="#94a3b8" font-family="ui-monospace, monospace" font-size="10">PRODUCTS: MRMS RADAR / GOES-16 IR / GFS WIND FIELD</text>
+            </g>
+
+            <!-- 卡片 5: 地震與林火熱點 -->
+            <g class="hud-node-card" transform="translate(15, 346)">
+              <rect width="390" height="68" rx="6" fill="url(#grad-global)" stroke="#f43f5e" stroke-width="1.2"/>
+              <circle cx="20" cy="20" r="4.5" fill="#f43f5e" class="hud-beacon"/>
+              <text x="32" y="24" fill="#fff" font-size="14" font-weight="700">USGS 地震 與 NASA FIRMS 林火</text>
+              <rect x="290" y="9" width="88" height="20" rx="3" fill="rgba(244, 63, 94, 0.25)"/>
+              <text x="334" y="23" text-anchor="middle" fill="#fb7185" font-family="ui-monospace, monospace" font-size="11" font-weight="700">1分 ~ 3小時</text>
+              <text x="32" y="45" fill="#cbd5e1" font-size="12">全球 M2.5+ 即時地震深度與 MODIS/VIIRS 紅外光熱異常</text>
+              <text x="32" y="59" fill="#94a3b8" font-family="ui-monospace, monospace" font-size="10">FEEDS: USGS SEISMIC GEOJSON | NASA THERMAL ANOMALIES</text>
+            </g>
+
+            <!-- 卡片 6: 全球海底光纖電纜 -->
+            <g class="hud-node-card" transform="translate(15, 422)">
+              <rect width="390" height="68" rx="6" fill="rgba(148, 163, 184, 0.12)" stroke="#94a3b8" stroke-width="1.2"/>
+              <circle cx="20" cy="20" r="4.5" fill="#94a3b8"/>
+              <text x="32" y="24" fill="#cbd5e1" font-size="14" font-weight="700">TeleGeography 全球海底通訊光纜</text>
+              <rect x="290" y="9" width="88" height="20" rx="3" fill="rgba(148, 163, 184, 0.25)"/>
+              <text x="334" y="23" text-anchor="middle" fill="#cbd5e1" font-family="ui-monospace, monospace" font-size="11" font-weight="700">常態不用變動</text>
+              <text x="32" y="45" fill="#94a3b8" font-size="12">實體海床工程路由、臺灣八里/頭城/枋山海纜登陸站</text>
+              <text x="32" y="59" fill="#94a3b8" font-family="ui-monospace, monospace" font-size="10">STRATEGIC INFRASTRUCTURE | PHYSICAL SEABED CABLES</text>
+            </g>
+          </g>
+
+          <!-- ═══ 區域 2 中央樞紐：⚙️ 戰情台後端聚合與推論引擎 ═══ -->
+          <g transform="translate(140, 680)">
+            <rect width="680" height="210" rx="14" fill="rgba(15, 23, 42, 0.85)" stroke="url(#grad-core)" stroke-width="2" filter="url(#glow-amber)"/>
+            
+            <!-- 標頭 -->
+            <text x="340" y="32" text-anchor="middle" fill="#fbbf24" font-family="ui-monospace, monospace" font-size="14" font-weight="800" letter-spacing="1">
+              ⚙️ 戰情台邊緣聚合與推論大腦 (Local Fusion &amp; Tactical AI Core)
+            </text>
+
+            <!-- 左核心：差量去重與防擊穿快取 -->
+            <g transform="translate(30, 52)">
+              <rect width="295" height="135" rx="8" fill="rgba(251, 191, 36, 0.1)" stroke="#f59e0b" stroke-width="1.2"/>
+              <text x="18" y="26" fill="#fbbf24" font-size="14" font-weight="700">差量去重與防擊穿快取引擎</text>
+              <text x="18" y="44" fill="#fcd34d" font-family="ui-monospace, monospace" font-size="10.5">RATE-LIMIT GUARD &amp; DEDUPLICATION</text>
+              <line x1="18" y1="52" x2="275" y2="52" stroke="rgba(251, 191, 36, 0.3)" stroke-width="1"/>
+              <text x="18" y="72" fill="#e2e8f0" font-size="12">• 40 秒聚合滑動窗口 (Sliding Window)</text>
+              <text x="18" y="92" fill="#e2e8f0" font-size="12">• 指數退避保護 (Exponential Backoff)</text>
+              <text x="18" y="112" fill="#e2e8f0" font-size="12">• MMSI 差量驗證與空間封包修補</text>
+            </g>
+
+            <!-- 右核心：本機 Ollama 戰術參謀 -->
+            <g transform="translate(355, 52)">
+              <rect width="295" height="135" rx="8" fill="rgba(236, 72, 153, 0.1)" stroke="#ec4899" stroke-width="1.2"/>
+              <text x="18" y="26" fill="#f472b6" font-size="14" font-weight="700">本機 Ollama 邊緣戰術參謀</text>
+              <text x="18" y="44" fill="#fbcfe8" font-family="ui-monospace, monospace" font-size="10.5">LOCAL EDGE TACTICAL AI ADVISOR</text>
+              <line x1="18" y1="52" x2="275" y2="52" stroke="rgba(236, 72, 153, 0.3)" stroke-width="1"/>
+              <text x="18" y="72" fill="#e2e8f0" font-size="12">• Google Gemma 4B / Llama 3 離線推論</text>
+              <text x="18" y="92" fill="#e2e8f0" font-size="12">• 100% 本機端執行 · 零敏感數據洩漏</text>
+              <text x="18" y="112" fill="#e2e8f0" font-size="12">• 即時海空異常識別與戰術摘要簡報</text>
+            </g>
+          </g>
+
+          <!-- ═══ 區域 3 底端大盤：🖥️ 臺灣海域戰術指揮大盤 ═══ -->
+          <g transform="translate(80, 940)">
+            <rect width="800" height="190" rx="14" fill="url(#grad-disp)" stroke="#00f2fe" stroke-width="2" filter="url(#glow-cyan)"/>
+            
+            <text x="400" y="34" text-anchor="middle" fill="#00f2fe" font-family="ui-monospace, monospace" font-size="16" font-weight="900" letter-spacing="1.5">
+              🖥️ 臺灣海域戰術指揮台 (Tactical Multi-Domain Common Operating Picture)
+            </text>
+
+            <g transform="translate(35, 55)">
+              <!-- 左模組: 3D 地球與 2D 大盤 -->
+              <rect width="225" height="110" rx="6" fill="rgba(15, 23, 42, 0.6)" stroke="rgba(56, 189, 248, 0.4)" stroke-width="1"/>
+              <text x="16" y="28" fill="#38bdf8" font-size="13.5" font-weight="700">Cesium 3D / 2D 平面大盤</text>
+              <text x="16" y="52" fill="#cbd5e1" font-size="12">• 正垂 -90° 臺灣平面大盤全覽</text>
+              <text x="16" y="72" fill="#cbd5e1" font-size="12">• Google 3D / Esri 高解析衛星</text>
+              <text x="16" y="92" fill="#cbd5e1" font-size="12">• 全球星空與太陽動態投影</text>
+            </g>
+
+            <g transform="translate(285, 55)">
+              <!-- 中模組: 即時戰術圖層 -->
+              <rect width="225" height="110" rx="6" fill="rgba(15, 23, 42, 0.6)" stroke="rgba(0, 242, 254, 0.4)" stroke-width="1"/>
+              <text x="16" y="28" fill="#00f2fe" font-size="13.5" font-weight="700">多源時空戰術態勢繪製</text>
+              <text x="16" y="52" fill="#cbd5e1" font-size="12">• 萬艘船舶 / 航班動態姿態向量</text>
+              <text x="16" y="72" fill="#cbd5e1" font-size="12">• 7 天歷史航跡單艦回溯折線</text>
+              <text x="16" y="92" fill="#cbd5e1" font-size="12">• 1,800 支國道 CCTV 點選直出</text>
+            </g>
+
+            <g transform="translate(535, 55)">
+              <!-- 右模組: 告警與自動化反應 -->
+              <rect width="230" height="110" rx="6" fill="rgba(15, 23, 42, 0.6)" stroke="rgba(244, 114, 182, 0.4)" stroke-width="1"/>
+              <text x="16" y="28" fill="#f472b6" font-size="13.5" font-weight="700">威脅感知與決策支援</text>
+              <text x="16" y="52" fill="#cbd5e1" font-size="12">• USGS 地震動態震波擴散動效</text>
+              <text x="16" y="72" fill="#cbd5e1" font-size="12">• 警廣路況施工事故即時標章</text>
+              <text x="16" y="92" fill="#cbd5e1" font-size="12">• 本機 AI 語音與文字戰情研判</text>
+            </g>
+          </g>
+        </svg>
+
+        <!-- 雙軌相容：可折疊之 Mermaid 原始工程代碼 -->
+        <details class="mermaid-source-details">
+          <summary>〈/〉 檢視 Mermaid 原始工程架構代碼 (Mermaid Architecture Source Code)</summary>
+          <div style="margin-top: 14px;">
+            <div class="mermaid">
 flowchart TD
     subgraph S1["🇹🇼 臺灣本土官方特化源 (Taiwan Official)"]
         direction TB
@@ -552,7 +946,9 @@ flowchart TD
 
     AGG --> DISP
     AI_ENG --> DISP
-        </div>
+            </div>
+          </div>
+        </details>
       </div>
     </section>
 

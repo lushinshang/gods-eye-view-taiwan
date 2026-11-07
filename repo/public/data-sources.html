@@ -453,15 +453,6 @@
       }
     }
   </style>
-  <script type="module">
-    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-    mermaid.initialize({
-      startOnLoad: true,
-      theme: 'dark',
-      securityLevel: 'loose',
-      fontFamily: 'ui-monospace, monospace'
-    });
-  </script>
 </head>
 <body>
   <div class="top-glow-bar"></div>
@@ -516,34 +507,34 @@
       </p>
 
       <div class="mermaid-box">
-        <pre class="mermaid">
+        <div class="mermaid">
 flowchart TD
     subgraph S1["🇹🇼 臺灣本土官方特化源 (Taiwan Official)"]
         direction TB
-        TW_AIS["航港局 MPB AIS\n9,000+ 艘在席船舶 (40s 快取)"]
-        TW_ROAD["高公局 TISVCloud\n453 路段即時時速 (1-2min)"]
-        TW_CCTV["國道 1,800 支 CCTV\nMJPEG 串流 / 快照 (5-15s)"]
-        TW_PBS["警廣 PBS 即時路況\n突發事故與路障告警 (1-3min)"]
-        TW_TRACK["本地 7 天航跡庫\nAppend-only NDJSON (不可變動)"]
+        TW_AIS["航港局 MPB AIS<br/>9,000+ 艘在席船舶 (40s 快取)"]
+        TW_ROAD["高公局 TISVCloud<br/>453 路段即時時速 (1-2min)"]
+        TW_CCTV["國道 1,800 支 CCTV<br/>MJPEG 串流 / 快照 (5-15s)"]
+        TW_PBS["警廣 PBS 即時路況<br/>突發事故與路障告警 (1-3min)"]
+        TW_TRACK["本地 7 天航跡庫<br/>Append-only NDJSON (不可變動)"]
     end
 
     subgraph S2["🌐 全球開放空間與環境遙測 (Global Telemetry)"]
         direction TB
-        GL_AIR["OpenSky / ADS-B.one\n全球在空航班與軍用機 (5-10s)"]
-        GL_SEA["AISStream.io\n公海商船 WebSocket (毫秒串流)"]
-        GL_SPACE["CelesTrak / NORAD TLE\n低軌衛星軌道根數 (前端每秒外推)"]
-        GL_ENV["NOAA nowCOAST / GFS\n風場向量與降雨雷達 (15m-6h)"]
-        GL_DIS["USGS 地震 & NASA FIRMS\n顯著地震與林火熱點 (1m-3h)"]
-        GL_CABLE["TeleGeography 海底光纜\n全球海纜與登陸站 (物理不用變動)"]
+        GL_AIR["OpenSky / ADS-B.one<br/>全球在空航班與軍用機 (5-10s)"]
+        GL_SEA["AISStream.io<br/>公海商船 WebSocket (毫秒串流)"]
+        GL_SPACE["CelesTrak / NORAD TLE<br/>低軌衛星軌道根數 (前端每秒外推)"]
+        GL_ENV["NOAA nowCOAST / GFS<br/>風場向量與降雨雷達 (15m-6h)"]
+        GL_DIS["USGS 地震 與 NASA FIRMS<br/>顯著地震與林火熱點 (1m-3h)"]
+        GL_CABLE["TeleGeography 海底光纜<br/>全球海纜與登陸站 (物理不用變動)"]
     end
 
     subgraph CORE["⚙️ 戰情台後端聚合與推論引擎 (Local Server / Ingest)"]
-        AGG["差量聚合 & 防擊穿快取\n(Rate-limit Guard & Deduplication)"]
-        AI_ENG["本機 Ollama 戰術參謀\n(Gemma / Llama 離線推論)"]
+        AGG["差量聚合 與 防擊穿快取<br/>(Rate-limit Guard 與 Deduplication)"]
+        AI_ENG["本機 Ollama 戰術參謀<br/>(Gemma / Llama 離線推論)"]
     end
 
     subgraph UI["🖥️ 臺灣海域戰術指揮台 (Cesium 3D / 2D 平面大盤)"]
-        DISP["3D 逼真地貌 / 2D 平面臺灣視角\n動態航跡回溯 / CCTV 彈窗 / 警報動效"]
+        DISP["3D 逼真地貌 / 2D 平面臺灣視角<br/>動態航跡回溯 / CCTV 彈窗 / 警報動效"]
     end
 
     TW_AIS --> AGG
@@ -561,7 +552,7 @@ flowchart TD
 
     AGG --> DISP
     AI_ENG --> DISP
-        </pre>
+        </div>
       </div>
     </section>
 
@@ -865,5 +856,17 @@ flowchart TD
       </p>
     </div>
   </footer>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'dark',
+      securityLevel: 'loose',
+      fontFamily: 'ui-monospace, monospace'
+    });
+    document.fonts.ready.then(function () {
+      mermaid.run({ querySelector: '.mermaid' });
+    });
+  </script>
 </body>
 </html>

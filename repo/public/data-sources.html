@@ -516,6 +516,73 @@
       color: var(--accent-cyan);
     }
 
+    /* ══ HUD 啟動指引彈窗樣式 (方案 A) ══ */
+    .hud-modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .hud-modal-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(8px);
+    }
+    .hud-modal-content {
+      position: relative;
+      background: rgba(13, 23, 38, 0.96);
+      border: 1px solid var(--border-cyan);
+      border-radius: 12px;
+      max-width: 520px;
+      width: 100%;
+      padding: 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 25px rgba(0, 242, 254, 0.18);
+      animation: modalFadeIn 0.22s ease-out;
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.96) translateY(8px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .hud-modal-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+      padding-bottom: 12px;
+    }
+    .hud-modal-close {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 26px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0 4px;
+    }
+    .hud-modal-close:hover { color: #fff; }
+    .copy-cmd-btn {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid var(--border-cyan);
+      color: var(--accent-cyan);
+      padding: 5px 12px;
+      border-radius: 4px;
+      font-size: 11.5px;
+      cursor: pointer;
+      font-family: var(--font-mono);
+      transition: all 0.2s ease;
+    }
+    .copy-cmd-btn:hover {
+      background: rgba(56, 189, 248, 0.32);
+      border-color: #00f2fe;
+      color: #fff;
+    }
+
     @media (max-width: 768px) {
       .section-card { padding: 22px 16px; }
       .table-container { border: none; }
@@ -570,7 +637,7 @@
         本報告依據「物理不變性」、「靜態穩定性」與「動態即時頻率」分層剖析，並提供中英雙語對照與官方數據授權依據。
       </p>
       <div class="hero-actions">
-        <a href="http://localhost:4173/" target="_blank" class="btn btn-primary">👁️ 開啟本機 3D/2D 戰情台 (Port 4173) ↗</a>
+        <a href="http://localhost:4173/" target="_blank" class="btn btn-primary launch-app-btn">👁️ 開啟本機 3D/2D 戰情台 (Port 4173) ↗</a>
         <a href="https://github.com/lushinshang/gods-eye-view-taiwan" target="_blank" class="btn btn-secondary">🐙 GitHub 專案倉庫 ↗</a>
       </div>
     </header>
@@ -1232,11 +1299,58 @@ flowchart TD
 
     <!-- 底部導覽 -->
     <div style="text-align: center; margin: 40px 0 20px;">
-      <a href="http://localhost:4173/" target="_blank" class="btn btn-primary" style="padding: 12px 28px; font-size: 15px;">
+      <a href="http://localhost:4173/" target="_blank" class="btn btn-primary launch-app-btn" style="padding: 12px 28px; font-size: 15px;">
         👁️ 開啟戰情台實體畫面 (Port 4173) ↗
       </a>
     </div>
   </main>
+
+  <!-- ══ HUD 啟動指引彈窗 (方案 A: 環境感知與終端指令) ══ -->
+  <div id="launch-modal" class="hud-modal" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="hud-modal-overlay"></div>
+    <div class="hud-modal-content">
+      <div class="hud-modal-header">
+        <span style="font-size: 20px;">💡</span>
+        <h3 id="modal-title" style="margin:0; font-size:16px; color:#fff; font-weight:700;">本機戰術指揮台啟動指引</h3>
+        <button id="close-modal-btn" class="hud-modal-close" aria-label="關閉視窗">&times;</button>
+      </div>
+      <div class="hud-modal-body">
+        <p style="font-size:13.5px; color:var(--text-main); margin-bottom:14px; line-height:1.6;">
+          您目前正在 <strong>GitHub 雲端環境</strong> 閱讀架構文件。<br>
+          戰情台結合了本機差量去重引擎、即時 AIS 串流聚合與本機 Ollama 戰術 AI，需要於您的本機電腦執行服務後方可連線。
+        </p>
+
+        <div style="background:rgba(7,13,20,0.85); border:1px solid var(--border-cyan); border-radius:6px; padding:12px 14px; margin-bottom:12px;">
+          <div style="font-size:11.5px; color:var(--accent-cyan); font-family:var(--font-mono); margin-bottom:6px; font-weight:600;">
+            ▶ macOS / Linux 終端啟動指令：
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <code style="color:#fff; font-size:13px; font-family:var(--font-mono);">./run.sh</code>
+            <button class="copy-cmd-btn" data-cmd="./run.sh">一鍵複製</button>
+          </div>
+        </div>
+
+        <div style="background:rgba(7,13,20,0.85); border:1px solid var(--border-cyan); border-radius:6px; padding:12px 14px; margin-bottom:18px;">
+          <div style="font-size:11.5px; color:var(--accent-cyan); font-family:var(--font-mono); margin-bottom:6px; font-weight:600;">
+            ▶ Windows (免管理者權限) 雙擊啟動：
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <code style="color:#fff; font-size:13px; font-family:var(--font-mono);">run-no-admin.bat</code>
+            <button class="copy-cmd-btn" data-cmd="run-no-admin.bat">一鍵複製</button>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px;">
+          <a href="http://localhost:4173/" target="_blank" class="btn btn-secondary" style="flex:1; text-align:center; font-size:12.5px; padding:8px 12px; justify-content:center;">
+            若已在席，直接前往 4173 ↗
+          </a>
+          <button id="modal-confirm-btn" class="btn btn-primary" style="flex:1; font-size:12.5px; padding:8px 12px; justify-content:center;">
+            瞭解，返回文件
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <footer>
     <div class="container">
@@ -1252,6 +1366,55 @@ flowchart TD
       </p>
     </div>
   </footer>
+
+  <!-- ══ 環境感知智慧切換腳本 (方案 A) ══ -->
+  <script>
+    (function () {
+      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const launchBtns = document.querySelectorAll('.launch-app-btn');
+      const modal = document.getElementById('launch-modal');
+      const closeModal = function () { if (modal) modal.style.display = 'none'; };
+
+      launchBtns.forEach(function (btn) {
+        if (isLocal) {
+          btn.innerHTML = '👁️ 切換至 3D/2D 戰情台 (Port 4173) ↗';
+          btn.href = './';
+        } else {
+          btn.innerHTML = '🖥️ 本機實體台 (需啟動 ./run.sh) ↗';
+          btn.href = 'javascript:void(0);';
+          btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (modal) modal.style.display = 'flex';
+          });
+        }
+      });
+
+      if (modal) {
+        modal.querySelector('.hud-modal-overlay')?.addEventListener('click', closeModal);
+        document.getElementById('close-modal-btn')?.addEventListener('click', closeModal);
+        document.getElementById('modal-confirm-btn')?.addEventListener('click', closeModal);
+      }
+
+      document.querySelectorAll('.copy-cmd-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          const cmd = btn.getAttribute('data-cmd');
+          if (cmd && navigator.clipboard) {
+            navigator.clipboard.writeText(cmd).then(function () {
+              const orig = btn.textContent;
+              btn.textContent = '已複製！';
+              btn.style.color = '#34d399';
+              btn.style.borderColor = '#10b981';
+              setTimeout(function () {
+                btn.textContent = orig;
+                btn.style.color = '';
+                btn.style.borderColor = '';
+              }, 1800);
+            });
+          }
+        });
+      });
+    })();
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <script>
     mermaid.initialize({

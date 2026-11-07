@@ -1,6 +1,6 @@
 import { catalogControlServices } from './catalog.js';
 import { StyleManager } from '../ui/composition.js';
-import { flyToKaohsiung } from '../camera.js';
+import { flyToTaiwan2D } from '../camera.js';
 import { installZoomOutGuard } from './zoomOutGuard.js';
 import { initCockpitCloudEffects } from '../cockpitCloudEffects.js';
 import { t } from '../i18n/index.js';
@@ -57,10 +57,10 @@ export function createApplicationControls({
   });
   defer(() => cockpitCloudEffects?.destroy());
 
-  // If no share link state, do default tactical fly-to Kaohsiung Harbor
+  // If no share link state, default fly-to 2D Taiwan Tactical Overview
   if (!styleManager.hasShareState) {
-    loaderStatus.textContent = t('Flying to Kaohsiung Tactical Zone...');
-    defer(flyToKaohsiung(viewer));
+    loaderStatus.textContent = t('Flying to Taiwan 2D Tactical View...');
+    defer(flyToTaiwan2D(viewer));
   } else {
     loaderStatus.textContent = t('Restoring shared view...');
   }

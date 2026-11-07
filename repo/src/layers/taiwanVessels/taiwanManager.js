@@ -533,6 +533,20 @@ class TaiwanVesselsManager {
     this.pollTimer = setInterval(() => this.fetchVessels(), 40000);
   }
 
+  flyToTaiwan2D() {
+    if (!this.viewer || this.viewer.isDestroyed()) return;
+    this.viewer.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(120.98, 23.85, 850000),
+      orientation: {
+        heading: Cesium.Math.toRadians(0),
+        pitch: Cesium.Math.toRadians(-90),
+        roll: 0.0,
+      },
+      duration: 2.0,
+      easingFunction: Cesium.EasingFunction.CUBIC_IN_OUT,
+    });
+  }
+
   destroy() {
     this.clearTrack();
     if (this.trackLines && this.viewer) {

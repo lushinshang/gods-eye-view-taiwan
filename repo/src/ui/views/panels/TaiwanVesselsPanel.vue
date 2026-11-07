@@ -151,7 +151,17 @@ function closeTraffic() {
           <span class="icon-layers">❖</span>
           <span>船舶顯示（臺灣海域）</span>
         </div>
-        <div class="header-badge">{{ stats.total }} 艘</div>
+        <div class="header-actions">
+          <button
+            class="tw-btn-overview-2d"
+            type="button"
+            @click="taiwanVesselsManager.flyToTaiwan2D()"
+            title="一鍵重置為 2D 臺灣平面戰術大盤（正垂俯瞰・正北朝上）"
+          >
+            🇹🇼 2D 大盤
+          </button>
+          <div class="header-badge">{{ stats.total }} 艘</div>
+        </div>
       </div>
       <div class="tw-track-db" data-testid="track-db-badge">
         <template v-if="trackSummary">
@@ -636,5 +646,31 @@ function closeTraffic() {
   padding-left: 12px;
   font-size: 11px;
   color: #88a0b0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tw-btn-overview-2d {
+  background: rgba(10, 30, 48, 0.85);
+  border: 1px solid rgba(57, 213, 255, 0.5);
+  color: #39d5ff;
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tw-btn-overview-2d:hover {
+  background: rgba(57, 213, 255, 0.25);
+  border-color: #39d5ff;
+  color: #ffffff;
+  box-shadow: 0 0 8px rgba(57, 213, 255, 0.4);
 }
 </style>

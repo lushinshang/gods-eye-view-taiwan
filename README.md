@@ -52,15 +52,13 @@
 
 ### 🪟 Windows 極速啟動（免管理者權限雙擊即跑）
 
-公發筆電、沒有 Admin 密碼、沒裝 Docker 也能跑，已在 Windows 11／10 實機驗證。PowerShell（一般權限）下載並解壓縮：
+公發筆電、沒有 Admin 密碼、沒裝 Docker 也能跑，已在 Windows 11／10 實機驗證。PowerShell（一般權限）複製下面**整行**貼上按 Enter，即依序完成下載 ➔ 解壓 ➔ 進入目錄 ➔ 啟動 `run-no-admin.bat`：
 
 ```powershell
-cd $env:USERPROFILE\Downloads
-curl.exe -L -o gev.zip https://github.com/lushinshang/gods-eye-view-taiwan/archive/refs/heads/main.zip
-tar.exe -xf gev.zip
+cd $env:USERPROFILE\Downloads; curl.exe -L -o gev.zip https://github.com/lushinshang/gods-eye-view-taiwan/archive/refs/heads/main.zip; tar.exe -xf gev.zip; cd gods-eye-view-taiwan-main; start .\run-no-admin.bat
 ```
 
-接著進入 `gods-eye-view-taiwan-main` 資料夾，**雙擊 `run-no-admin.bat`**：自動帶進度條下載綠色便攜版 Node.js、安裝套件，並開啟瀏覽器進入 `http://localhost:4173`。要關閉時按 `Ctrl + C`，或雙擊 `stop-no-admin.bat` 釋放 4173 埠。完整說明與避坑見 [系統資源評估報告第 11 章](repo/SYSTEM_RESOURCE_EVALUATION.md)。
+啟動後（也可手動雙擊該資料夾內的 `run-no-admin.bat`）會自動帶進度條下載綠色便攜版 Node.js、安裝套件，並開啟瀏覽器進入 `http://localhost:4173`。要關閉時按 `Ctrl + C`，或雙擊 `stop-no-admin.bat` 釋放 4173 埠。完整說明與避坑見 [系統資源評估報告第 11 章](repo/SYSTEM_RESOURCE_EVALUATION.md)。
 
 戰情室已在本機容器環境就緒，提供（macOS／Linux／有 Docker 的環境）兩種啟動方式：
 

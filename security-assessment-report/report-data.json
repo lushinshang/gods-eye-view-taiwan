@@ -1,11 +1,11 @@
 {
  "metadata": {
-  "data_version": "1.3.0",
+  "data_version": "1.4.0",
   "implementation_stage": "TASK_8_DELIVERED_WITH_QA_LIMITATIONS",
   "language": "zh-Hant-TW",
   "title": "A24 戰情台安全評估報告",
   "subtitle": "紅隊導向攻擊面分析與原生 macOS 受控驗證",
-  "cutoff_label": "截至 Review 45、2026-11-09 交接文件勘誤，以及同日四輪後續session（F-001/vite/主動測試/413死碼修補、v1.1.0改版、記憶體監控與PAT畫面隱藏、C-004正向對照測試）",
+  "cutoff_label": "截至 Review 45、2026-11-09 交接文件勘誤，以及同日五輪後續session（F-001/vite/主動測試/413死碼修補、v1.1.0改版、記憶體監控與PAT畫面隱藏、C-004正向對照測試、C-002風險接受）",
   "prepared_date": "2026-11-09",
   "timezone": "Asia/Taipei",
   "product_commit": "7ae38a7",
@@ -251,7 +251,13 @@
     ],
     "owner_label": "待指定",
     "target_date": null,
-    "risk_acceptance": null
+    "risk_acceptance": {
+     "accepted": true,
+     "accepted_by": "開發/維護者",
+     "accepted_date": "2026-11-09",
+     "rationale": "上游為固定、受信任官方來源，且已加系統記憶體監控（OBS-003）可觀察/預警異常負載；在單人自架部署情境下，不再要求額外byte上限。",
+     "residual_risk": "若未來改為多租戶或不受信任上游，此接受失效，須重新評估。"
+    }
    },
    "proof_levels": [
     "SOURCE",
@@ -1520,7 +1526,7 @@
      {
       "title": "目前判斷",
       "paragraphs": [
-       "本次評估已確認一項 Grounding 邏輯缺陷並已修補，另確認並修補兩項本次新發現的問題（vite已知CVE、API錯誤回應死碼），並取得部分本機准入、PAT 生命週期、代理隔離、取消恢復、受控建置及六面向主動動態測試的驗證證據。三項候選風險（C-002／C-003／C-004）仍需釐清部署前提與產品契約，補文件不等於風險解除。完整主 App、目前受控瀏覽器流程及 Docker 實體拓樸、真模型／真上游測試尚未完成，現有證據仍不足以支持整體安全驗收或發布放行。"
+       "本次評估已確認一項 Grounding 邏輯缺陷並已修補，另確認並修補兩項本次新發現的問題（vite已知CVE、API錯誤回應死碼），並取得部分本機准入、PAT 生命週期、代理隔離、取消恢復、受控建置及六面向主動動態測試的驗證證據。三項候選風險中，C-002 已由開發/維護者正式接受風險；C-003／C-004 仍需釐清部署前提與產品契約，補文件不等於風險解除。完整主 App、目前受控瀏覽器流程及 Docker 實體拓樸、真模型／真上游測試尚未完成，現有證據仍不足以支持整體安全驗收或發布放行。"
       ],
       "source_refs": [
        "SRC-003",
@@ -1570,7 +1576,7 @@
      {
       "title": "仍待確認的風險",
       "paragraphs": [
-       "C-002 關注上游回應缺少累積位元組上限；C-003 關注 PAT 父目錄鏈與本機使用者信任；C-004 關注代理敏感路由的責任及副作用邊界。SECURITY.md已新增Deployment model段落文件化C-002與C-003的既有信任假設（commit 375dfa7），但補文件不等於新增byte cap或父目錄鏈驗證，三者風險判斷不變，維持 NEEDS VALIDATION。另OBS-002（Docker閘道信任）機制已查明是docker-start.mjs開機時主動設定，非意外；部署拓樸層面風險判斷仍待確認。已知程式行為不足以直接證明可利用的阻斷服務、跨使用者越權或完整授權繞過。"
+       "C-002（上游回應缺少累積位元組上限）已由開發/維護者於2026-11-09正式接受風險（risk_acceptance.accepted=true）：上游為固定、受信任官方來源，且已有系統記憶體監控（OBS-003）作為可觀察/預警手段，單人自架部署情境下不再要求額外byte上限；若未來改為多租戶或不受信任上游，此接受失效需重新評估。技術上confirmation_status仍維持NEEDS VALIDATION（風險接受是業務決定，不等於技術上已確認無風險）。C-003 關注 PAT 父目錄鏈與本機使用者信任；C-004 關注代理敏感路由的責任及副作用邊界。SECURITY.md已新增Deployment model段落文件化C-002與C-003的既有信任假設（commit 375dfa7），但補文件不等於新增父目錄鏈驗證，兩者風險判斷不變，維持 NEEDS VALIDATION。另OBS-002（Docker閘道信任）機制已查明是docker-start.mjs開機時主動設定，非意外；部署拓樸層面風險判斷仍待確認。已知程式行為不足以直接證明可利用的阻斷服務、跨使用者越權或完整授權繞過。"
       ],
       "source_refs": [
        "SRC-007",
@@ -1964,9 +1970,9 @@
   }
  ],
  "document_control": {
-  "report_version": "1.3.0",
+  "report_version": "1.4.0",
   "document_status": "DELIVERABLE_WITH_QA_LIMITATIONS",
-  "data_cutoff": "2026-11-09 Asia/Taipei；至Review45、交接文件勘誤，以及同日後續四輪session",
+  "data_cutoff": "2026-11-09 Asia/Taipei；至Review45、交接文件勘誤，以及同日後續五輪session",
   "assessment_execution_dates": "2026-11-07至2026-11-09既有證據，以及2026-11-09同日三輪後續session的實際執行（EXECUTED）；不表示連續演練或完整執行窗口",
   "report_author_role": "工作區使用者授權之報告整理；Codex協助",
   "endorsement": null,

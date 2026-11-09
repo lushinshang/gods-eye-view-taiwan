@@ -1,6 +1,14 @@
 # A24 戰情台安全評估 HTML 報告
 
-版本：1.3.0（2026-11-09 同日第四輪後續session更新；v1.0.0/v1.1.0/v1.2.0原文見下方「版本歷史」）。**產品安全評估仍為 INCOMPLETE，無發布放行。** F-001／F-002／F-003已修補，C-002／C-003／C-004 仍維持 NEEDS_VALIDATION（補測試不等於C-004解決）。SDD 紀錄：v1.0.0文件曾稱其記錄位於`sdd/archive/2026-11-09-a24-security-html-report/`，但本次核實該路徑不存在，無法追溯；v1.1.0／v1.2.0改版已分別歸檔於`sdd/archive/2026-11-09-update-security-report-v1.1/`、`sdd/archive/2026-11-09-update-security-report-v1.2/`；v1.3.0改版的SDD提案目前在`sdd/update-security-report-v1.3/`（尚未歸檔）。
+版本：1.4.0（2026-11-09 同日第五輪後續session更新；v1.0.0/v1.1.0/v1.2.0/v1.3.0原文見下方「版本歷史」）。**產品安全評估仍為 INCOMPLETE，無發布放行。** F-001／F-002／F-003已修補，C-002已由開發/維護者正式接受風險（risk_acceptance，confirmation_status技術上仍維持NEEDS_VALIDATION），C-003／C-004仍維持 NEEDS_VALIDATION（補測試不等於C-004解決）。SDD 紀錄：v1.0.0文件曾稱其記錄位於`sdd/archive/2026-11-09-a24-security-html-report/`，但核實該路徑不存在，無法追溯；v1.1.0／v1.2.0／v1.3.0改版已分別歸檔於`sdd/archive/2026-11-09-update-security-report-v1.1/`、`sdd/archive/2026-11-09-update-security-report-v1.2/`、`sdd/archive/2026-11-09-update-security-report-v1.3/`；v1.4.0改版的SDD提案目前在`sdd/accept-risk-c002/`（尚未歸檔）。
+
+## v1.4.0 更新了什麼（不是只改雜湊）
+
+本次無程式碼變更，`product_commit`維持`7ae38a7`。
+
+- **GEV-C-002 風險接受**：使用者決定接受此風險，不再要求上游接收加byte上限；理由是上游為固定、受信任官方來源，且已有OBS-003記憶體監控可觀察/預警。寫入`details.risk_acceptance`（accepted/accepted_by＝開發/維護者/accepted_date/rationale/residual_risk）。**confirmation_status技術上維持NEEDS_VALIDATION**——風險接受是業務決定，不是技術上重新確認此finding為假或已修補；若未來改為多租戶或不受信任上游，接受失效需重新評估。
+- **C-003／C-004 不受影響**：僅C-002記錄風險接受，其他兩項candidate risk的`risk_acceptance`維持null，未被誤標。
+- **本次未做、仍是缺口**：Standalone建置、受控瀏覽器DOM、Docker實體拓樸、真模型／真上游測試；happy-dom的2筆dev相依漏洞；C-003父目錄鏈驗證；C-004完整路由責任契約文件，`overall_status`維持`INCOMPLETE`。
 
 ## v1.3.0 更新了什麼（不是只改雜湊）
 
@@ -36,6 +44,7 @@
 - **v1.1.0**（2026-11-09同日後續session）：見上「v1.1.0 更新了什麼」。
 - **v1.2.0**（2026-11-09同日第三輪後續session）：見上「v1.2.0 更新了什麼」。
 - **v1.3.0**（2026-11-09同日第四輪後續session）：見上「v1.3.0 更新了什麼」。
+- **v1.4.0**（2026-11-09同日第五輪後續session）：見上「v1.4.0 更新了什麼」。
 
 ## 開啟報告
 
@@ -47,7 +56,7 @@ HTML 可單獨攜出閱讀；完整證據檔沒有嵌入。來源相對連結需
 
 ## QA 結果與限制
 
-v1.3.0 新增 `qa/check_v1.3.py`，取代`check_v1.2.py`作為目前版本的通用稽核：來源雜湊/連結、證據節錄逐字核對、15情境原名不變、v1.3.0應有事實（GEV-C-004仍NEEDS_VALIDATION但引用SRC-058、product_commit等）全部PASS，見`qa/check-v1.3-audit.json`。`qa/check_v1.2.py`與`qa/check_v1.1.py`的metadata版本斷言分別從v1.3.0／v1.2.0起預期失敗（檔頭已補註記），但其餘通用檢查section仍應通過——這證明每次改版沒有意外改壞前一版已確立的事實，只是版本號本身往前移。`qa/check_task7.py`與`qa/task4-dom.mjs`／`task5-diagrams.mjs`／`task6-coverage.mjs`／`task8-final.mjs`釘死在v1.0.0的具體內容，從v1.1.0起預期會失敗，各檔頭已加註記；這些都是版本釘死的歷史稽核，不是未知迴歸。
+v1.4.0 新增 `qa/check_v1.4.py`，取代`check_v1.3.py`作為目前版本的通用稽核：來源雜湊/連結、證據節錄逐字核對、15情境原名不變、v1.4.0應有事實（GEV-C-002的risk_acceptance已填且accepted=true、confirmation_status仍NEEDS_VALIDATION、C-003／C-004的risk_acceptance維持null、product_commit不變等）全部PASS，見`qa/check-v1.4-audit.json`。`qa/check_v1.3.py`／`check_v1.2.py`／`check_v1.1.py`的metadata版本斷言分別從v1.4.0／v1.3.0／v1.2.0起預期失敗（檔頭已補註記），但其餘通用檢查section仍應通過——這證明每次改版沒有意外改壞前一版已確立的事實，只是版本號本身往前移。`qa/check_task7.py`與`qa/task4-dom.mjs`／`task5-diagrams.mjs`／`task6-coverage.mjs`／`task8-final.mjs`釘死在v1.0.0的具體內容，從v1.1.0起預期會失敗，各檔頭已加註記；這些都是版本釘死的歷史稽核，不是未知迴歸。
 
 v1.0.0的既有結果如下（未重新驗證視覺／瀏覽器部分，狀態不變）：
 

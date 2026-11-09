@@ -19,6 +19,11 @@ test.mjs is new in this v1.3.0 update, so it never had a v1.0.0 snapshot
 entry to diverge from). These are *expected* to
 diverge from the frozen v1.0.0 snapshot for exactly those files — diffing
 against it would not catch a real error, only each update's own intent.
+
+UPDATE (v1.4.0, same day): section 6's exact-metadata assertions
+(data_version==1.3.0, report_version==1.3.0) are now PINNED TO v1.3.0 and
+EXPECTED TO FAIL from v1.4.0 onward. Sections 1-5 are still generic and
+should still pass. See qa/check_v1.4.py for the current version's audit.
 """
 from pathlib import Path
 import hashlib

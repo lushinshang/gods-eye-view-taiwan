@@ -1,18 +1,18 @@
 {
-  "report_version": "1.3.0",
+  "report_version": "1.4.0",
   "scope": "Core report and selected QA deliverables; not original security evidence. Excludes manifest itself and optional raster QA files.",
   "signature": null,
   "assessment_status": "INCOMPLETE",
   "files": [
     {
       "path": "index.html",
-      "bytes": 401482,
-      "sha256": "799e2779d658e1c41f46b000879dd5684675f4a74bdf6b9ab5ea4f1cf67609f9"
+      "bytes": 402926,
+      "sha256": "74c39d9a4172d7059a12ca9cd1733dff328b3721d496a58418ea8894d4984101"
     },
     {
       "path": "report-data.json",
-      "bytes": 139437,
-      "sha256": "ae4099ed5a14ce4c370860cb4a1fa862a0bed9d4c250af6a4e995009b72a338a"
+      "bytes": 140371,
+      "sha256": "16a0886580ef233536fe7f2a88378060057e8c7bb2c44ab64e36bd9a71d07a21"
     },
     {
       "path": "source-index.json",
@@ -26,8 +26,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 11281,
-      "sha256": "b6844eeacfa2ed971420937cd94343a7e6d63a7ecaaaeea1946a54180f60014f"
+      "bytes": 12735,
+      "sha256": "f72ffdbfc8cc8c4787f7d41752811825d5afbb8df8072c79e69108967855e085"
     },
     {
       "path": "qa/task-8-summary.json",
@@ -101,13 +101,23 @@
     },
     {
       "path": "qa/check_v1.3.py",
-      "bytes": 8353,
-      "sha256": "efa7ef74ec6f4d7c2f36396db2b312c94eb58e5e43171a6b08c461323ee46853"
+      "bytes": 8638,
+      "sha256": "90dc2303f84d22a1b34203642d3f103c6e1972297274a8fa4e0a91c340e24ccd"
     },
     {
       "path": "qa/check-v1.3-audit.json",
       "bytes": 246,
       "sha256": "cc19fd23f059e7905a9ccd38dd764483cce79e72138630ce3282963da474398b"
+    },
+    {
+      "path": "qa/check_v1.4.py",
+      "bytes": 8219,
+      "sha256": "fd8f32777f87ff3b7b0b1b34a0c2699499efecd1cffc09224556ee459d77658c"
+    },
+    {
+      "path": "qa/check-v1.4-audit.json",
+      "bytes": 246,
+      "sha256": "befaf043ce4e56de5656df9501f334e968e6b6ba0d0a66cd18ab3b8c1fdde6ab"
     }
   ]
 }

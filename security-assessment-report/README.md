@@ -1,6 +1,14 @@
 # A24 戰情台安全評估 HTML 報告
 
-版本：1.1.0（2026-11-09 同日後續session更新；v1.0.0原文見下方「版本歷史」）。**產品安全評估仍為 INCOMPLETE，無發布放行。** F-001 已於本次更新確認修補（FIXED），C-002／C-003／C-004 仍維持 NEEDS_VALIDATION。SDD 紀錄：v1.0.0文件曾稱其記錄位於`sdd/archive/2026-11-09-a24-security-html-report/`，但本次核實該路徑不存在，無法追溯；v1.1.0改版的SDD提案目前在`sdd/update-security-report-v1.1/`（尚未歸檔，歸檔後路徑會變為`sdd/archive/<歸檔日期>-update-security-report-v1.1/`）。
+版本：1.2.0（2026-11-09 同日第三輪後續session更新；v1.0.0/v1.1.0原文見下方「版本歷史」）。**產品安全評估仍為 INCOMPLETE，無發布放行。** F-001／F-002／F-003已修補，C-002／C-003／C-004 仍維持 NEEDS_VALIDATION（加記憶體監控不等於C-002解決）。SDD 紀錄：v1.0.0文件曾稱其記錄位於`sdd/archive/2026-11-09-a24-security-html-report/`，但本次核實該路徑不存在，無法追溯；v1.1.0改版已歸檔於`sdd/archive/2026-11-09-update-security-report-v1.1/`；v1.2.0改版的SDD提案目前在`sdd/update-security-report-v1.2/`（尚未歸檔）。
+
+## v1.2.0 更新了什麼（不是只改雜湊）
+
+本報告鎖定的 commit 從 `375dfa7` 更新到 `72b1d17`。期間完成並反映進本報告：
+
+- **新增 OBS-003（系統記憶體監控）**：操作者選擇不對上游接收加byte上限，改為用`os.totalmem()/os.freemem()`每60秒監控系統整體記憶體（commit `ac81914`）。**這不是修補C-002**，是替代方案，C-002的confirmation_status維持NEEDS_VALIDATION。已知限制：Docker容器內讀到的是Docker Desktop VM配額（本次互動實測7.75 GiB），不是宿主機實際總量（16.0 GiB）。
+- **新增 OBS-004（PAT畫面不渲染明文，已修補）**：PAT建立/輪替後改為先自動複製到剪貼簿，成功時畫面只顯示確認訊息，原始token字串從未指派給會被渲染的ref（commit `72b1d17`）。複製失敗時仍退回顯示明文當備援。
+- **本次未做、仍是缺口**：與v1.1.0相同（Standalone建置、受控瀏覽器DOM、Docker實體拓樸、真模型／真上游測試；happy-dom的2筆dev相依漏洞；C-002實際byte cap；C-003父目錄鏈驗證），`overall_status`維持`INCOMPLETE`。
 
 ## v1.1.0 更新了什麼（不是只改雜湊）
 
@@ -18,6 +26,7 @@
 
 - **v1.0.0**（2026-11-09上午）：原始交付版，鎖定commit `e50944f`，F-001 CONFIRMED/OPEN。
 - **v1.1.0**（2026-11-09同日後續session）：見上「v1.1.0 更新了什麼」。
+- **v1.2.0**（2026-11-09同日第三輪後續session）：見上「v1.2.0 更新了什麼」。
 
 ## 開啟報告
 
@@ -25,11 +34,11 @@
 
 內容包括管理摘要、範圍方法、攻擊面／信任邊界、F-001 與三項候選、其他觀察、原 15 情境、改善交接及證據附錄。可搜尋／篩選、展開節錄、暫停動畫及列印。JavaScript 停用時核心內容與安全節錄仍靜態存在。
 
-HTML 可單獨攜出閱讀；完整證據檔沒有嵌入。來源相對連結需要保留本工作區的資料夾結構。來源索引記錄52份選取檔案的SHA-256（v1.0.0為45份，v1.1.0新增7份），不是數位簽章或整個歷史執行範圍的證明。
+HTML 可單獨攜出閱讀；完整證據檔沒有嵌入。來源相對連結需要保留本工作區的資料夾結構。來源索引記錄57份選取檔案的SHA-256（v1.0.0為45份，v1.1.0新增7份，v1.2.0新增5份），不是數位簽章或整個歷史執行範圍的證明。
 
 ## QA 結果與限制
 
-v1.1.0 新增 `qa/check_v1.1.py`：來源雜湊/連結、證據節錄逐字核對（含標記為`frozen_historical`的歷史節錄另外處理）、15情境原名不變、v1.1.0應有事實（F-001 FIXED、product_commit等）全部PASS，見`qa/check-v1.1-audit.json`。`qa/check_task7.py`與`qa/task4-dom.mjs`／`task5-diagrams.mjs`／`task6-coverage.mjs`／`task8-final.mjs`釘死在v1.0.0的具體內容（如「4筆finding」「GEV-07是KNOWN_OPEN_FINDING」），從v1.1.0起預期會失敗，各檔頭已加註記；這是版本釘死的歷史稽核，不是未知迴歸。
+v1.2.0 新增 `qa/check_v1.2.py`，取代`check_v1.1.py`作為目前版本的通用稽核：來源雜湊/連結、證據節錄逐字核對、15情境原名不變、v1.2.0應有事實（OBS-003/OBS-004、product_commit等）全部PASS，見`qa/check-v1.2-audit.json`。`qa/check_v1.1.py`的第6節（metadata版本斷言）從v1.2.0起預期失敗（檔頭已補註記），但其第1-5、7節（通用檢查）仍應通過——這證明v1.2.0沒有意外改壞v1.1.0已確立的事實，只是版本號本身往前移。`qa/check_task7.py`與`qa/task4-dom.mjs`／`task5-diagrams.mjs`／`task6-coverage.mjs`／`task8-final.mjs`釘死在v1.0.0的具體內容，從v1.1.0起預期會失敗，各檔頭已加註記；這些都是版本釘死的歷史稽核，不是未知迴歸。
 
 v1.0.0的既有結果如下（未重新驗證視覺／瀏覽器部分，狀態不變）：
 
@@ -67,8 +76,10 @@ python3 -B /完整路徑/1151104_gods-eye-view/security-assessment-report/build_
 
 ```sh
 python3 -B 1151104_gods-eye-view/security-assessment-report/qa/check_task4.py
+python3 -B 1151104_gods-eye-view/security-assessment-report/qa/check_v1.2.py
+# 以下與 check_task7.py 各自釘死在自己的版本，之後版本起第6節metadata斷言
+# 預期失敗（見各檔頭註記），其餘通用檢查仍應通過：
 python3 -B 1151104_gods-eye-view/security-assessment-report/qa/check_v1.1.py
-# 以下四支與 check_task7.py 釘死在 v1.0.0，v1.1.0起預期失敗，見各檔頭註記：
 python3 -B 1151104_gods-eye-view/security-assessment-report/qa/check_task7.py
 node 1151104_gods-eye-view/security-assessment-report/qa/task4-dom.mjs
 node 1151104_gods-eye-view/security-assessment-report/qa/task5-diagrams.mjs

@@ -1,14 +1,14 @@
 {
  "metadata": {
-  "data_version": "1.1.0",
+  "data_version": "1.2.0",
   "implementation_stage": "TASK_8_DELIVERED_WITH_QA_LIMITATIONS",
   "language": "zh-Hant-TW",
   "title": "A24 戰情台安全評估報告",
   "subtitle": "紅隊導向攻擊面分析與原生 macOS 受控驗證",
-  "cutoff_label": "截至 Review 45、2026-11-09 交接文件勘誤，以及同日後續session（F-001修補、vite升級、主動滲透測試、413死碼修補）",
+  "cutoff_label": "截至 Review 45、2026-11-09 交接文件勘誤，以及同日三輪後續session（F-001/vite/主動測試/413死碼修補、安全報告v1.1.0改版、記憶體監控與PAT畫面隱藏）",
   "prepared_date": "2026-11-09",
   "timezone": "Asia/Taipei",
-  "product_commit": "375dfa7",
+  "product_commit": "72b1d17",
   "working_tree_status": "DIRTY_HISTORICAL_TRACKED_PYC_DELETIONS",
   "overall_status": "INCOMPLETE",
   "release_authorization": false,
@@ -179,7 +179,8 @@
     "SRC-042",
     "SRC-043",
     "SRC-025",
-    "SRC-050"
+    "SRC-050",
+    "SRC-053"
    ],
    "content_state": "DRAFT_CONTENT_COMPLETE",
    "details": {
@@ -218,13 +219,15 @@
      "固定官方來源與timeout是既有控制，不能忽略也不能當成容量上限。",
      "原payload總bytes與摘要2943B／4chunks存在未完全對齊的計量，正式風險判讀不引用總量。",
      "未壓測至heap崩潰，不要求為確認架構事實而做破壞式測試。",
-     "SECURITY.md已於2026-11-09新增Deployment model段落，文件化「上游固定、操作者信任」的既有假設；補文件不等於新增byte cap，風險判斷不變。"
+     "SECURITY.md已於2026-11-09新增Deployment model段落，文件化「上游固定、操作者信任」的既有假設；補文件不等於新增byte cap，風險判斷不變。",
+     "操作者已於2026-11-09新增系統整體記憶體監控（OBS-003）作為替代方案，但這是觀察/告警，不是byte上限，C-002本身（上游回應缺少累積位元組上限）的風險判斷不變。"
     ],
     "recommendations": [
      "先由責任人定義合理單次回應上限、timeout與降級契約，不直接採歷史示例容量作需求。",
      "在實際data接收層累計bytes並於超限終止；涵蓋錯誤傳遞、清理與stale／恢復。",
      "Traffic的文字／XML接收與解析也應獨立評估其上限。",
-     "參考SECURITY.md的Deployment model段落，決定是否仍要新增實際byte cap。"
+     "參考SECURITY.md的Deployment model段落，決定是否仍要新增實際byte cap。",
+     "參考OBS-003的限制（尤其Docker VM配額非宿主機總量），決定是否仍要在接收層加實際byte上限。"
     ],
     "acceptance_criteria": [
      "契約上限明定後，以有界fixture驗證低於、等於、超過1byte，並量測拒絕後不持續累積。",
@@ -243,7 +246,8 @@
      "SRC-012",
      "SRC-025",
      "SRC-011",
-     "SRC-050"
+     "SRC-050",
+     "SRC-053"
     ],
     "owner_label": "待指定",
     "target_date": null,
@@ -1358,6 +1362,18 @@
     "SRC-051",
     "SRC-052"
    ]
+  },
+  {
+   "task_id": "TASK-6",
+   "execution_kind": "EXECUTED",
+   "origin_run": "session-2026-11-09-v1.2",
+   "refs": [
+    "SRC-053",
+    "SRC-054",
+    "SRC-055",
+    "SRC-056",
+    "SRC-057"
+   ]
   }
  ],
  "conflict_decisions": [
@@ -1934,10 +1950,10 @@
   }
  ],
  "document_control": {
-  "report_version": "1.1.0",
+  "report_version": "1.2.0",
   "document_status": "DELIVERABLE_WITH_QA_LIMITATIONS",
-  "data_cutoff": "2026-11-09 Asia/Taipei；至Review45、交接文件勘誤，以及同日後續session",
-  "assessment_execution_dates": "2026-11-07至2026-11-09既有證據，以及2026-11-09同日後續session的實際執行（EXECUTED，非沿用）；不表示連續演練或完整執行窗口",
+  "data_cutoff": "2026-11-09 Asia/Taipei；至Review45、交接文件勘誤，以及同日後續三輪session",
+  "assessment_execution_dates": "2026-11-07至2026-11-09既有證據，以及2026-11-09同日三輪後續session的實際執行（EXECUTED）；不表示連續演練或完整執行窗口",
   "report_author_role": "工作區使用者授權之報告整理；Codex協助",
   "endorsement": null,
   "assessment_operators": "歷史記錄為AGY執行、Codex來源及交付複核；具名人員未填定",
@@ -2350,6 +2366,51 @@
    "qualification": "文件新增（commit 375dfa7）；文件化C-002與C-003的既有信任假設。補文件不等於風險解除，C-002／C-003仍維持NEEDS_VALIDATION，是否可接受留給你決定。",
    "contains_only": "non_secret_product_code",
    "render_as": "plain_text"
+  },
+  {
+   "id": "EV-MEMMON-CODE",
+   "source_ref": "SRC-053",
+   "label": "formatMemoryLine：計算已用百分比與門檻判定",
+   "locator": {
+    "kind": "lines",
+    "start": 13,
+    "end": 20
+   },
+   "format": "text",
+   "text": "export function formatMemoryLine(totalBytes, freeBytes, thresholdPct = 70) {\n  const usedBytes = totalBytes - freeBytes;\n  const usedPct = totalBytes > 0 ? (usedBytes / totalBytes) * 100 : 0;\n  const gib = (bytes) => (bytes / 1024 ** 3).toFixed(1);\n  const warn = usedPct >= thresholdPct;\n  const line = `總記憶體 ${gib(totalBytes)} GiB · 已用 ${gib(usedBytes)} GiB (${usedPct.toFixed(1)}%)`;\n  return { usedPct, warn, line };\n}",
+   "qualification": "靜態程式碼；系統整體觀察，非針對單一功能資料量的上限，不修補C-002。",
+   "contains_only": "non_secret_product_code",
+   "render_as": "plain_text"
+  },
+  {
+   "id": "EV-TOKENREVEAL-CODE",
+   "source_ref": "SRC-055",
+   "label": "copyNewToken：複製成功不渲染，失敗才退回顯示",
+   "locator": {
+    "kind": "lines",
+    "start": 15,
+    "end": 23
+   },
+   "format": "text",
+   "text": "export async function copyNewToken(token, { clipboard = globalThis.navigator?.clipboard } = {}) {\n  if (!clipboard?.writeText) return { copied: false, revealed: true };\n  try {\n    await clipboard.writeText(token);\n    return { copied: true, revealed: false };\n  } catch {\n    return { copied: false, revealed: true };\n  }\n}",
+   "qualification": "靜態程式碼；失敗時仍退回顯示明文，否則使用者完全拿不到權杖，是刻意的備援不是殘留風險。",
+   "contains_only": "non_secret_product_code",
+   "render_as": "plain_text"
+  },
+  {
+   "id": "EV-TOKENREVEAL-USAGE",
+   "source_ref": "SRC-057",
+   "label": "TaiwanAiAdvisor.vue：原始token只在revealed為真時才賦值",
+   "locator": {
+    "kind": "lines",
+    "start": 95,
+    "end": 100
+   },
+   "format": "text",
+   "text": "    const { copied, revealed } = await copyNewToken(data.token);\n    copiedNotice.value = copied;\n    // Only ever assigned to this (rendered) ref when the clipboard write\n    // failed — otherwise the raw token never enters a value the template\n    // can display.\n    newToken.value = revealed ? data.token : '';",
+   "qualification": "靜態程式碼；複製成功路徑上原始token字串從未指派給任何會被渲染的ref。",
+   "contains_only": "non_secret_product_code",
+   "render_as": "plain_text"
   }
  ],
  "observations": [
@@ -2412,6 +2473,73 @@
     "SRC-011",
     "SRC-006",
     "SRC-052"
+   ]
+  },
+  {
+   "id": "OBS-003",
+   "title": "新增系統記憶體監控（取代C-002的byte上限方案）",
+   "category": "OBSERVABILITY_HARDENING",
+   "confirmation_status": "CONFIRMED",
+   "risk_rating": {
+    "value": null,
+    "status": "NOT_APPLICABLE",
+    "cvss": null
+   },
+   "remediation_status": "IMPLEMENTED",
+   "owner": null,
+   "summary": "操作者選擇不對上游接收加byte上限，改為系統整體記憶體監控：`server/standalone/memory-monitor.js` 每60秒讀`os.totalmem()/os.freemem()`，印一行狀態，已用達70%另印WARNING。這是觀察/告警，不是防止手段，不改變C-002（上游回應缺少累積位元組上限）的風險判斷。",
+   "recommendations": [
+    "如需真正防止上游回應過大，仍需在接收層加byte上限（C-002原建議）；本監控只提供事後告警。",
+    "若要讓監控反映真實使用壓力而非Docker VM配額，需調大Docker Desktop的記憶體分配或改在原生node執行。"
+   ],
+   "acceptance_criteria": [
+    "終端機每60秒出現一行`[Memory]`狀態；已用達70%時額外出現WARNING行（已於本次互動實測確認格式與門檻觸發）。"
+   ],
+   "limitations": [
+    "Docker容器內`os.totalmem()`讀到的是Docker Desktop VM分配到的配額，不是宿主機實際總量；本次互動用`docker info`與`sysctl hw.memsize`實測比對，VM配額7.75 GiB vs 宿主機16.0 GiB，兩者不是同一件事。",
+    "監控只讀系統整體記憶體，看不出是哪個功能造成的用量，也不會主動中止任何請求；超過門檻只是印一行警告。",
+    "macOS的`os.freemem()`常態偏低（系統會把閒置記憶體用於檔案快取），70%門檻在這類環境可能經常觸發，實際參考價值需搭配人工判讀。"
+   ],
+   "evidence_ids": [
+    "EV-MEMMON-CODE"
+   ],
+   "source_refs": [
+    "SRC-053",
+    "SRC-054"
+   ]
+  },
+  {
+   "id": "OBS-004",
+   "title": "PAT建立/輪替後畫面不再渲染明文權杖",
+   "category": "EXPOSURE_SURFACE_REDUCTION",
+   "confirmation_status": "CONFIRMED",
+   "risk_rating": {
+    "value": null,
+    "status": "NOT_APPLICABLE",
+    "cvss": null
+   },
+   "remediation_status": "FIXED",
+   "owner": null,
+   "summary": "原設計：PAT建立/輪替後直接以`<code>`渲染成明文並附複製按鈕，警告「僅顯示這一次」。已改為先嘗試`navigator.clipboard.writeText`自動複製；成功時畫面只顯示「已複製」確認訊息，原始token字串從未指派給任何會被渲染的ref（見EV-TOKENREVEAL-USAGE）。",
+   "recommendations": [
+    "若要再降低暴露面，可考慮同時處理瀏覽器devtools網路面板、瀏覽紀錄等其他可能殘留明文的路徑（本次範圍只處理畫面渲染這一層）。"
+   ],
+   "acceptance_criteria": [
+    "複製成功時，整份頁面HTML找不到權杖字串（本次以程式邏輯靜態確認，未實跑瀏覽器肉眼驗證——環境無可用瀏覽器）。",
+    "複製失敗（clipboard被拒、不存在）時退回顯示明文，使用者仍能拿到權杖，不會卡住。"
+   ],
+   "limitations": [
+    "複製失敗時仍會把明文渲染到畫面上當備援，這個分支目前沒有改變；只處理了「複製成功」這條最常見路徑。",
+    "未實際用瀏覽器開發工具肉眼確認DOM，只用程式邏輯推導（複製成功時token變數從未被賦值給渲染用的ref）。"
+   ],
+   "evidence_ids": [
+    "EV-TOKENREVEAL-CODE",
+    "EV-TOKENREVEAL-USAGE"
+   ],
+   "source_refs": [
+    "SRC-055",
+    "SRC-056",
+    "SRC-057"
    ]
   }
  ],
@@ -3746,6 +3874,28 @@
      "json_pointer": null,
      "precision": "DOCUMENT_DATE"
     }
+   },
+   {
+    "id": "session-2026-11-09-v1.2",
+    "date_label": "11/09｜同日再後續session",
+    "title": "新增記憶體監控與PAT畫面隱藏（v1.2.0）",
+    "kind": "EXECUTED",
+    "summary": "新增系統記憶體監控（OBS-003，取代C-002的byte上限方案，commit ac81914）；PAT建立/輪替後畫面不再渲染明文（OBS-004，commit 72b1d17）。兩者皆非修補既有確認缺陷，記為observation。",
+    "qualification": "C-002仍維持NEEDS_VALIDATION；OBS-004只處理畫面渲染這一層，複製失敗時仍會退回顯示明文。",
+    "source_refs": [
+     "SRC-053",
+     "SRC-054",
+     "SRC-055",
+     "SRC-056",
+     "SRC-057"
+    ],
+    "time_basis": {
+     "timezone": "Asia/Taipei",
+     "source_timestamp": null,
+     "source_ref": "SRC-053",
+     "json_pointer": null,
+     "precision": "DOCUMENT_DATE"
+    }
    }
   ],
   "source_refs": [
@@ -3753,7 +3903,9 @@
    "SRC-005",
    "SRC-029",
    "SRC-006",
-   "SRC-051"
+   "SRC-051",
+   "SRC-053",
+   "SRC-057"
   ]
  },
  "proof_level_definitions": [

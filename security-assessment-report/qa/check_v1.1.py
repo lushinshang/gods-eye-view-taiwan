@@ -7,6 +7,12 @@ invariants (every source_ref resolves, every source's hash/size/link match
 the live file, every evidence excerpt's text matches its locator) and adds
 the v1.1.0-specific facts this update is supposed to establish.
 
+UPDATE (v1.2.0, same day): section 6's exact-metadata assertions
+(data_version==1.1.0, product_commit==375dfa7) are now PINNED TO v1.1.0 and
+are EXPECTED TO FAIL from v1.2.0 onward — the version moved on. Everything
+else in this script (sections 1-5, 7) is generic and should still pass. See
+qa/check_v1.2.py for the current version's equivalent audit.
+
 Deliberately NOT cross-checked here: security-assessment/execution/
 snapshot.json. That file is a frozen hash record of the files as they stood
 for v1.0.0; source-index.json now reflects the live (v1.1.0) state of files

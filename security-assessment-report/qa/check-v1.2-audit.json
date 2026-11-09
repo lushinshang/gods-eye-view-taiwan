@@ -1,0 +1,10 @@
+{
+  "check": "v1.2.0",
+  "status": "PASS",
+  "sources": 57,
+  "findings": 6,
+  "observations": 4,
+  "evidence_excerpts": 23,
+  "frozen_historical_excerpts": 1,
+  "scope": "Structural/content consistency only; not browser or visual acceptance."
+}

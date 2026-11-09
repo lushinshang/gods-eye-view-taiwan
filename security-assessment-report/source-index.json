@@ -733,6 +733,91 @@
    },
    "summary": "docker-start.mjs第116行：開機時讀取/proc/net/route的預設閘道，寫入執行中行程記憶體的GEV_KEY_SETUP_TRUSTED_PEERS（不落檔案、不落容器OS環境變數）",
    "embed_policy": "selected_safe_excerpt_only"
+  },
+  {
+   "id": "SRC-053",
+   "path": "1151104_gods-eye-view/repo/server/standalone/memory-monitor.js",
+   "href": "../../1151104_gods-eye-view/repo/server/standalone/memory-monitor.js",
+   "sha256": "ba77d5662db27e5327d8422d1e7ac56079b1263fbe0617a590dc9e02f60c7bc0",
+   "size_bytes": 1943,
+   "role": "product_source",
+   "source_run": null,
+   "locator": {
+    "kind": "lines",
+    "start": 30,
+    "end": 30,
+    "anchor_text": "    const { usedPct, warn, line } = formatMemoryLine(os.totalmem(), os.freemem(), thresholdPct);"
+   },
+   "summary": "2026-11-09新增：系統記憶體監控，用os.totalmem()/os.freemem()每60秒印一行",
+   "embed_policy": "selected_safe_excerpt_only"
+  },
+  {
+   "id": "SRC-054",
+   "path": "1151104_gods-eye-view/repo/server/standalone/memory-monitor.test.mjs",
+   "href": "../../1151104_gods-eye-view/repo/server/standalone/memory-monitor.test.mjs",
+   "sha256": "fbff7b087688410767daab68b4250408fe1c42ddf4b89f927361a29695849c72",
+   "size_bytes": 1414,
+   "role": "current_observation",
+   "source_run": null,
+   "locator": {
+    "kind": "lines",
+    "start": 5,
+    "end": 5,
+    "anchor_text": "test('69% usage does not warn', () => {"
+   },
+   "summary": "2026-11-09新增：69/70/71%等門檻邊界的單元測試",
+   "embed_policy": "selected_safe_excerpt_only"
+  },
+  {
+   "id": "SRC-055",
+   "path": "1151104_gods-eye-view/repo/src/ui/views/panels/tokenReveal.js",
+   "href": "../../1151104_gods-eye-view/repo/src/ui/views/panels/tokenReveal.js",
+   "sha256": "8baab0f731676a77f12aa99fa5b6d893951b1e35f183af885d04fc8105438b52",
+   "size_bytes": 971,
+   "role": "product_source",
+   "source_run": null,
+   "locator": {
+    "kind": "lines",
+    "start": 15,
+    "end": 15,
+    "anchor_text": "export async function copyNewToken(token, { clipboard = globalThis.navigator?.clipboard } = {}) {"
+   },
+   "summary": "2026-11-09新增：PAT複製成功即不渲染明文，失敗才退回顯示（備援）",
+   "embed_policy": "selected_safe_excerpt_only"
+  },
+  {
+   "id": "SRC-056",
+   "path": "1151104_gods-eye-view/repo/src/ui/views/panels/tokenReveal.test.mjs",
+   "href": "../../1151104_gods-eye-view/repo/src/ui/views/panels/tokenReveal.test.mjs",
+   "sha256": "9fdc317df8ca802b629f3cd473b6010c58ae77e416b53967002958bad72e1d8d",
+   "size_bytes": 1142,
+   "role": "current_observation",
+   "source_run": null,
+   "locator": {
+    "kind": "lines",
+    "start": 5,
+    "end": 5,
+    "anchor_text": "test('clipboard write succeeds: copied, never revealed', async () => {"
+   },
+   "summary": "2026-11-09新增：複製成功/失敗/無clipboard等情況的單元測試",
+   "embed_policy": "selected_safe_excerpt_only"
+  },
+  {
+   "id": "SRC-057",
+   "path": "1151104_gods-eye-view/repo/src/ui/views/panels/TaiwanAiAdvisor.vue",
+   "href": "../../1151104_gods-eye-view/repo/src/ui/views/panels/TaiwanAiAdvisor.vue",
+   "sha256": "dbaed76b9f9ba051e9698de6bb7f610dbcd29d9223c24d162336ca01e3115c39",
+   "size_bytes": 12296,
+   "role": "product_source",
+   "source_run": null,
+   "locator": {
+    "kind": "lines",
+    "start": 95,
+    "end": 95,
+    "anchor_text": "    const { copied, revealed } = await copyNewToken(data.token);"
+   },
+   "summary": "2026-11-09修改：generateToken()改用copyNewToken，複製成功時原始token不賦值給會渲染的ref",
+   "embed_policy": "selected_safe_excerpt_only"
   }
  ]
 }

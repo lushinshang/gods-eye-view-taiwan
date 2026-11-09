@@ -13,14 +13,20 @@ const digest = (token) => createHash('sha256').update(token).digest();
 
 /**
  * O_NOFOLLOW on the token file itself only guards the final path component —
- * a symlinked `.gev-cache/ai-advisor/` would still be followed transparently.
- * Walk every directory between `file` and `root` and refuse if any of them
- * is a symlink. A single lstat here is not a full TOCTOU guard (the
- * directory could still be swapped between this check and the open/write
- * that follows), so this narrows the known parent-chain risk without
- * claiming to close it.
+ * a symlinked `.gev-cache/ai-advisor/` would still be followed transparently,
+ * and a shared-host attacker who controls a writable or differently-owned
+ * ancestor directory could redirect it the same way. This product only
+ * supports a single-OS-user deployment (documented in SECURITY.md); walk
+ * every directory between `file` and `root` and refuse if any of them is a
+ * symlink, world-writable, or owned by a different user — each is a sign the
+ * deployment has left that supported model. A single lstat here is not a
+ * full TOCTOU guard (the directory could still be swapped between this check
+ * and the open/write that follows), so this narrows the known parent-chain
+ * risk without claiming to close it, and it says nothing about genuine
+ * multi-user deployments, which remain unsupported and unverified.
  */
-function assertNoSymlinkAncestors(file, root) {
+function assertTrustedAncestors(file, root) {
+  const uid = process.getuid?.();
   let dir = path.dirname(file);
   while (dir !== root && dir !== path.dirname(dir)) {
     let entry;
@@ -33,13 +39,26 @@ function assertNoSymlinkAncestors(file, root) {
       }
       throw error;
     }
-    if (entry.isSymbolicLink()) {
-      const error = new Error(
+    const refuse = (code, message) => {
+      const error = new Error(message);
+      error.code = code;
+      throw error;
+    };
+    if (entry.isSymbolicLink())
+      refuse(
+        'GEV_PARENT_SYMLINK',
         'refusing to use a PAT store whose parent directory is a symlink',
       );
-      error.code = 'GEV_PARENT_SYMLINK';
-      throw error;
-    }
+    if (uid !== undefined && entry.uid !== uid)
+      refuse(
+        'GEV_PARENT_UNTRUSTED_OWNER',
+        'refusing to use a PAT store whose parent directory is owned by a different user',
+      );
+    if ((entry.mode & 0o002) !== 0)
+      refuse(
+        'GEV_PARENT_WORLD_WRITABLE',
+        'refusing to use a PAT store whose parent directory is world-writable',
+      );
     dir = path.dirname(dir);
   }
 }
@@ -51,7 +70,7 @@ export function createTokenStore(
   const read = () => {
     let fd;
     try {
-      assertNoSymlinkAncestors(file, root);
+      assertTrustedAncestors(file, root);
       fd = fs.openSync(file, fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW);
       const stat = fs.fstatSync(fd);
       if (!stat.isFile() || (stat.mode & 0o777) !== 0o600) return null;
@@ -85,7 +104,7 @@ export function createTokenStore(
       );
     },
     rotate() {
-      assertNoSymlinkAncestors(file, root);
+      assertTrustedAncestors(file, root);
       const token = randomBytes(32).toString('hex');
       fs.mkdirSync(path.dirname(file), { recursive: true, mode: 0o700 });
       const temporary = `${file}.${randomBytes(8).toString('hex')}.tmp`;

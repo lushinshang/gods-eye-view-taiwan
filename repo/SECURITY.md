@@ -105,18 +105,22 @@ consequences of that assumption rather than gaps to close with more code:
   timeout, not a byte ceiling. This is an accepted limitation, not a defense
   against a hostile upstream — if a deployment ever needs to point these
   providers at a source it does not fully trust, add an explicit cap first.
-- **PAT storage trusts the single OS user running the process.** The advisor
-  token file (`createTokenStore` in `server/providers/ai/ollama-advisor.js`)
-  opens the terminal file with `O_NOFOLLOW` and a `0600` mode check, which
-  guards that one file; it does not independently verify every directory in
-  the path above it. On a machine where another account can write into that
-  parent chain, that account can redirect the path (for example via a
-  symlink) to read or replace the token file itself — not merely "influence
-  where it resolves." This is fine on the assumed single-user machine and is
-  **not supported** on a
-  shared or multi-tenant host — do not point `GEV_KEY_SETUP_TRUSTED_PEERS` or
-  the token store path at a shared filesystem without first adding that
-  verification.
+- **PAT storage trusts the single OS user running the process, and now
+  refuses to run otherwise.** The advisor token file (`createTokenStore` in
+  `server/providers/ai/ollama-advisor.js`) opens the terminal file with
+  `O_NOFOLLOW` and a `0600` mode check, which guards that one file.
+  `assertTrustedAncestors` additionally walks every directory between the
+  token file and the configured root and refuses (fail-closed; `read()`
+  reports unconfigured, `rotate()` throws) if any of them is a symlink,
+  world-writable, or — where the platform reports a uid (POSIX) — owned by a
+  user other than the one running the process. Multi-tenant or shared-host
+  deployment is **not supported**: do not point `GEV_KEY_SETUP_TRUSTED_PEERS`
+  or the token store path at a shared filesystem. These checks detect the
+  clearest ways a deployment has left the supported single-user model; they
+  are a single `lstat` each, not a full TOCTOU guard (the directory could
+  still be swapped between the check and the following open/write), and a
+  genuinely adversarial other account on the same machine has not been
+  tested against them.
 
 ## Network exposure — the operator threat model
 

@@ -487,6 +487,45 @@ test('PAT store works normally when the parent chain has no symlink', () => {
     fs.rmSync(root, { recursive: true, force: true });
   }
 });
+test('PAT store refuses a world-writable parent directory (GEV-C-003)', {
+  skip: process.platform === 'win32' && 'POSIX mode bits only',
+}, () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'advisor-root-'));
+  try {
+    const dir = path.join(root, 'ai-advisor');
+    fs.mkdirSync(dir);
+    fs.chmodSync(dir, 0o777); // umask could otherwise strip the world-write bit
+    const file = path.join(dir, 'token.json');
+    const store = createTokenStore(file, { root });
+    assert.throws(() => store.rotate(), { code: 'GEV_PARENT_WORLD_WRITABLE' });
+    assert.equal(fs.existsSync(file), false);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+test('PAT store rejects a parent directory owned by a different uid (GEV-C-003)', {
+  skip: process.platform === 'win32' && 'POSIX uid only',
+}, (t) => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'advisor-root-'));
+  try {
+    const dir = path.join(root, 'ai-advisor');
+    fs.mkdirSync(dir);
+    const realLstatSync = fs.lstatSync;
+    t.mock.method(fs, 'lstatSync', (target, ...rest) => {
+      const entry = realLstatSync(target, ...rest);
+      if (target === dir)
+        return Object.create(entry, { uid: { value: entry.uid + 1 } });
+      return entry;
+    });
+    const file = path.join(dir, 'token.json');
+    const store = createTokenStore(file, { root });
+    assert.throws(() => store.rotate(), {
+      code: 'GEV_PARENT_UNTRUSTED_OWNER',
+    });
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
 const localReq = (extra = {}) => ({
   method: 'POST',
   socket: { remoteAddress: '127.0.0.1' },

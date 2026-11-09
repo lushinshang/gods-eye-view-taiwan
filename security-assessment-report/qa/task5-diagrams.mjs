@@ -1,0 +1,23 @@
+import { readFile, writeFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import assert from 'node:assert/strict';
+const {Window}=await import(pathToFileURL(resolve('1151104_gods-eye-view/repo/node_modules/happy-dom/lib/index.js')).href);
+const html=await readFile('1151104_gods-eye-view/security-assessment-report/index.html','utf8');
+const w=new Window({url:'https://report.invalid/',settings:{enableJavaScriptEvaluation:false,disableJavaScriptFileLoading:true,disableCSSFileLoading:true}});
+const motion={matches:false,callback:null,addEventListener(type,cb){if(type==='change')this.callback=cb;}};
+w.matchMedia=()=>motion;w.document.write(html);
+const doc=w.document;const code=Array.from(doc.querySelectorAll('script')).find(s=>!s.type).textContent;w.eval(code);
+assert.equal(doc.querySelectorAll('#attack-map-svg, #f001-cause-svg').length,2);assert.equal(doc.querySelectorAll('#attack-map-svg .node, #f001-cause-svg .node').length,15);
+for(const a of doc.querySelectorAll('svg a')){assert.equal(a.getAttribute('tabindex'),'0');assert(doc.getElementById(a.getAttribute('href').slice(1)));assert(a.getAttribute('aria-label'));}
+const buttons=Array.from(doc.querySelectorAll('[data-animation-toggle]'));assert.equal(buttons.length,2);
+assert(buttons.every(b=>b.getAttribute('aria-pressed')==='false'));
+buttons[0].click();assert.equal(doc.getElementById('attack-map').dataset.playing,'true');assert.equal(buttons[0].textContent,'暫停示意動畫');
+buttons[0].click();assert.equal(doc.getElementById('attack-map').dataset.playing,'false');
+buttons[1].click();w.dispatchEvent(new w.Event('beforeprint'));assert(buttons.every(b=>b.getAttribute('aria-pressed')==='false'));w.dispatchEvent(new w.Event('afterprint'));assert.equal(buttons[1].getAttribute('aria-pressed'),'true');
+motion.matches=true;motion.callback();assert(buttons.every(b=>b.disabled && b.getAttribute('aria-pressed')==='false'));buttons[1].click();assert.equal(doc.getElementById('f001-cause').dataset.playing,'false');
+motion.matches=false;motion.callback();assert(buttons.every(b=>!b.disabled && b.getAttribute('aria-pressed')==='false'));
+w.location.hash='#attack-map-detail-upstream';w.dispatchEvent(new w.Event('hashchange'));assert(doc.getElementById('attack-map-detail-upstream').open);
+assert(doc.getElementById('f001-cause-detail-allow').textContent.includes('SRC-008'));
+const result={task:5,status:'PASS',scope:'Synthetic DOM verification of report SVG links and controls; no browser rendering, product execution or new security tests.',checks:['2 accessible SVG groups with titles/descriptions','15 keyboard-focusable nodes with valid detail anchors','node evidence transcripts','animations default paused','play/pause updates state and accessible label','print pauses and restores animations','reduced-motion change disables and stops animation','node deep link opens transcript'],visual_acceptance:'Standalone SVG raster review recorded separately; browser layout and actual keyboard interaction unverified; see task-8-summary.json.'};
+await writeFile('1151104_gods-eye-view/security-assessment-report/qa/task-5-dom-verification.json',JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result,null,2));await w.happyDOM.close();

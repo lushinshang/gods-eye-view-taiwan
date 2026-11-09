@@ -1,0 +1,23 @@
+import {readFile,writeFile} from 'node:fs/promises';
+import {resolve} from 'node:path';import {pathToFileURL} from 'node:url';import assert from 'node:assert/strict';
+const {Window}=await import(pathToFileURL(resolve('1151104_gods-eye-view/repo/node_modules/happy-dom/lib/index.js')).href);
+const html=await readFile('1151104_gods-eye-view/security-assessment-report/index.html','utf8');const data=JSON.parse(await readFile('1151104_gods-eye-view/security-assessment-report/report-data.json','utf8'));
+const w=new Window({url:'https://report.invalid/',settings:{enableJavaScriptEvaluation:false,disableCSSFileLoading:true,disableJavaScriptFileLoading:true}});w.document.write(html);const doc=w.document;
+assert.equal(doc.querySelectorAll('[data-matrix-row]').length,15);assert.equal(doc.querySelectorAll('[data-matrix-table-row]').length,15);
+assert.equal(doc.querySelectorAll('#evidence-timeline-svg .timeline-node').length,7);
+assert.equal(doc.querySelectorAll('#improvement-order-svg .node').length,3);
+assert.equal(doc.querySelectorAll('[data-animation-toggle]').length,2); // New visuals are static.
+w.eval(Array.from(doc.querySelectorAll('script')).find(s=>!s.type).textContent);
+const form=doc.querySelector('[data-filter-for="scenario-list"]');
+const shown=()=>Array.from(doc.querySelectorAll('[data-matrix-row]')).filter(g=>g.getAttribute('data-filter-hidden')==='false').map(g=>g.getAttribute('data-matrix-row'));
+assert.equal(shown().length,15);
+form.querySelector('input').value='GEV-12';form.dispatchEvent(new w.Event('input'));assert.deepEqual(shown(),['GEV-12']);assert.equal(doc.querySelector('[data-matrix-row="GEV-12"]').getAttribute('transform'),'translate(0,90)');assert.equal(doc.getElementById('proof-matrix-svg').getAttribute('viewBox'),'0 0 420 148');
+assert.equal(Array.from(doc.querySelectorAll('[data-matrix-table-row]')).filter(g=>g.getAttribute('data-filter-hidden')==='false').length,1);
+w.dispatchEvent(new w.Event('beforeprint'));assert.equal(shown().length,15);w.dispatchEvent(new w.Event('afterprint'));assert.deepEqual(shown(),['GEV-12']);
+form.querySelector('input').value='none-no-such-case';form.dispatchEvent(new w.Event('input'));assert.equal(shown().length,0);assert.equal(doc.getElementById('proof-matrix-svg').getAttribute('viewBox'),'0 0 420 134');assert.equal(doc.getElementById('scenario-list-empty').hidden,false);
+form.reset();await new Promise(r=>setTimeout(r,10));form.querySelector('select').value='KNOWN_OPEN_FINDING';form.dispatchEvent(new w.Event('change'));assert.deepEqual(shown(),['GEV-07']);
+w.location.hash='#GEV-12';w.dispatchEvent(new w.Event('hashchange'));assert(shown().includes('GEV-12'));
+w.location.hash='#timeline-detail-TL-05';w.dispatchEvent(new w.Event('hashchange'));assert(doc.getElementById('timeline-detail-TL-05').open);
+for (const e of data.evidence_timeline.events)assert(doc.getElementById('timeline-detail-'+e.id));
+const result={task:6,status:'PASS',scope:'Synthetic report DOM only; no product execution or real browser acceptance.',checks:['15 SVG rows plus 15 original-name text rows','matrix search/status filter matches scenario cards','filtered SVG rows compact and viewBox resized','empty state and reset','print shows all 15 then restores filter','deep link reveals scenario and timeline evidence','7 provenance milestones and static 3-stage recommendation','new visuals do not add motion'],browser_visual_qa:'NOT_VERIFIED_BROWSER_UNAVAILABLE'};
+await writeFile('1151104_gods-eye-view/security-assessment-report/qa/task-6-dom-verification.json',JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result,null,2));await w.happyDOM.close();

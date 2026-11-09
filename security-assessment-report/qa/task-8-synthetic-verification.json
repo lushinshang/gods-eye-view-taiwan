@@ -1,0 +1,17 @@
+{
+  "task": 8,
+  "synthetic_status": "PASS",
+  "scope": "Report interface only; native browser unavailable.",
+  "checks": [
+    "Core content and evidence exist with JavaScript disabled",
+    "Skip link target supports programmatic focus",
+    "SVG links declare keyboard focus and evidence targets",
+    "Filter controls have labels",
+    "Reduced-motion enabled at startup prevents animation",
+    "Delivery QA limitations visible in report"
+  ],
+  "native_browser_status": "NOT_VERIFIED_BROWSER_UNAVAILABLE",
+  "native_keyboard_navigation": "NOT_VERIFIED",
+  "layout_at_390px_and_desktop": "NOT_VERIFIED",
+  "native_browser_print_and_csp": "NOT_VERIFIED"
+}

@@ -1,0 +1,28 @@
+{
+  "task": 3,
+  "status": "PASS",
+  "scope": "Report text and safe evidence projection verification only; no product execution.",
+  "source_count": 44,
+  "source_references_checked": 399,
+  "finding_details": 4,
+  "verified_safe_excerpts": 14,
+  "observations": 2,
+  "handover_actions": 7,
+  "checks": {
+    "source_hashes_sizes_and_hrefs_match": true,
+    "all_references_resolve": true,
+    "all_excerpts_match_source_lines_or_json_fields": true,
+    "no_raw_log_bodies_or_absolute_host_paths_embedded": true,
+    "all_excerpt_rendering_plain_text": true,
+    "f001_open_and_candidates_unconfirmed": true,
+    "no_invented_cvss_owner_deadline_or_approval": true,
+    "historical_byte_discrepancy_explicitly_unresolved": true,
+    "no_product_reproduction_executed": true,
+    "whole_report_remains_incomplete": true
+  },
+  "limitations": [
+    "本次未做新漏洞驗證或產品修補。",
+    "HTML跳脫與互動安全需在後續介面及QA任務驗證。",
+    "風險等級與責任／契約資料仍待確認；本稿提供有條件影響與建議順序。"
+  ]
+}

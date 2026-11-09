@@ -1,0 +1,78 @@
+{
+  "report_version": "1.0.0",
+  "scope": "Core report and selected QA deliverables; not original security evidence. Excludes manifest itself and optional raster QA files.",
+  "signature": null,
+  "assessment_status": "INCOMPLETE",
+  "files": [
+    {
+      "path": "index.html",
+      "bytes": 316717,
+      "sha256": "92c484224de0fa98f01a58e622fda18b7feb3fbd88addf6d90a53f8890a28a9b"
+    },
+    {
+      "path": "report-data.json",
+      "bytes": 121619,
+      "sha256": "db18b7850deacc44420d842d8564380a9e4b4a444920e40106fddd206dc732ff"
+    },
+    {
+      "path": "source-index.json",
+      "bytes": 26181,
+      "sha256": "6b0422bca7ed3eeeed209a3502206ece947bef2072c23e49b1271bde19185f61"
+    },
+    {
+      "path": "build_report.py",
+      "bytes": 48462,
+      "sha256": "f6d8b5ab272c583e07c701270909a43d8a72ece0f7dae90afb41c123dfc6547b"
+    },
+    {
+      "path": "README.md",
+      "bytes": 4487,
+      "sha256": "86ede8f2aa03cd1ca7298218d775001559e75c08152439594cfb9719ea9d4885"
+    },
+    {
+      "path": "qa/task-8-summary.json",
+      "bytes": 2046,
+      "sha256": "5e7238e5566ce6a68365aada008df058eb9fd7381adc7ddbfdd4976ebebedf11"
+    },
+    {
+      "path": "qa/task-8-print-render.json",
+      "bytes": 557,
+      "sha256": "fe25ed2c8c8711e8ae00cf1e6e2f957b96821f61f32c498db660caa41e303a6d"
+    },
+    {
+      "path": "qa/task-8-synthetic-verification.json",
+      "bytes": 660,
+      "sha256": "540b74f92e7bcc953a9f7a5a3b10b8d978d6704d2b93b3161ef5a8af0ee29602"
+    },
+    {
+      "path": "qa/task-7-audit.json",
+      "bytes": 1915,
+      "sha256": "9161327e9a96bdc95cbfa27693190688751653e3702745d930a36999087d7a21"
+    },
+    {
+      "path": "qa/task-4-static-verification.json",
+      "bytes": 674,
+      "sha256": "f9fe9a58d72486da54574899b3c0a8d97fd75f3727903437a7e7b2d36d26b922"
+    },
+    {
+      "path": "qa/task-4-dom-verification.json",
+      "bytes": 714,
+      "sha256": "6a0307d8bc100a62750dd324f45f716e462db0c9374311c255e97500a56332e6"
+    },
+    {
+      "path": "qa/task-5-dom-verification.json",
+      "bytes": 729,
+      "sha256": "77b514bcbf7602bdaafa3452c432a75378aac499e9f4aa09eb9f17abae906540"
+    },
+    {
+      "path": "qa/task-6-dom-verification.json",
+      "bytes": 599,
+      "sha256": "3aa3520efa90a7391cf9aab4619e890ca038c4c85d5d24dfed6b99442fbe9123"
+    },
+    {
+      "path": "qa/report-print.pdf",
+      "bytes": 753581,
+      "sha256": "75db3f4c554ab0bcb93112abe7746029e9de0af9e1e226e41c25aecfae35ba54"
+    }
+  ]
+}

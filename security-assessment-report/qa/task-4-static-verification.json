@@ -1,0 +1,20 @@
+{
+  "task": 4,
+  "status": "PASS",
+  "scope": "Static single-file HTML and generator checks, not browser security or visual acceptance.",
+  "html_bytes": 316717,
+  "unique_ids": 156,
+  "source_links": 45,
+  "checks": {
+    "deterministic_output": true,
+    "embedded_data_matches_json_sources": true,
+    "no_external_rendering_resources": true,
+    "all_internal_anchors_resolve": true,
+    "csp_script_hash_matches": true,
+    "source_text_and_json_script_termination_escaped": true,
+    "unsafe_source_href_rejected": true,
+    "all_findings_and_scenarios_rendered_statically": true
+  },
+  "real_browser": "BLOCKED_TARGET_CLOSED",
+  "visual_acceptance": "NOT_VERIFIED"
+}

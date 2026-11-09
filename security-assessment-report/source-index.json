@@ -1,0 +1,619 @@
+{
+  "schema_version": "1.0",
+  "captured_date": "2026-11-09",
+  "path_base": "workspace_root",
+  "href_base": "report-html_directory",
+  "hash_algorithm": "SHA-256",
+  "scope": "Explicitly selected assessment artifacts and non-secret product source; not a claim that all historical files were reviewed.",
+  "embedded_source_bodies": false,
+  "sources": [
+    {
+      "id": "SRC-001",
+      "path": "security-assessment/test-matrix.md",
+      "href": "../../security-assessment/test-matrix.md",
+      "sha256": "2a3ff14e3711f8041655e3a918608713b9281fd46df678ff98cd5f1111dd5073",
+      "size_bytes": 30059,
+      "role": "scenario_identity",
+      "source_run": null,
+      "locator": {
+        "kind": "lines",
+        "start": 24,
+        "end": 24,
+        "anchor_text": "## 3. 情境總表"
+      },
+      "summary": "原15情境名稱、要求與分母；設計時NOT TESTED不作當前狀態",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-002",
+      "path": "security-assessment/rules-of-engagement.md",
+      "href": "../../security-assessment/rules-of-engagement.md",
+      "sha256": "4dd5b723526bc135812407fa18e2785d243deabe363aa78ecf9a62ea321c58fd",
+      "size_bytes": 23822,
+      "role": "authorization",
+      "source_run": null,
+      "locator": null,
+      "summary": "既有ROE與NATIVE-01，報告不新增授權",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-003",
+      "path": "security-assessment/execution/review-agy-20261108-45/review.md",
+      "href": "../../security-assessment/execution/review-agy-20261108-45/review.md",
+      "sha256": "3ee11a32a97b0c149d47e4c915d08a59600a7d02e06c5e1d1208018b38fb21f7",
+      "size_bytes": 4375,
+      "role": "accepted_review",
+      "source_run": null,
+      "locator": {
+        "kind": "lines",
+        "start": 17,
+        "end": 17,
+        "anchor_text": "## RV45-01"
+      },
+      "summary": "採認Guard及出處；Chrome觀測值勘誤",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-004",
+      "path": "security-assessment/execution/review-agy-20261108-45/verification.json",
+      "href": "../../security-assessment/execution/review-agy-20261108-45/verification.json",
+      "sha256": "343d5c67a2596f6f744877da463ddbacc26b6ece0d85d2bd0f73141f6bbce7c4",
+      "size_bytes": 2853,
+      "role": "review_verification",
+      "source_run": null,
+      "locator": null,
+      "summary": "實際V12雙模式與合成Guard控制；未執行產品",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-005",
+      "path": "security-assessment/execution/run-agy-20261108-45/corrected-scenario-index.md",
+      "href": "../../security-assessment/execution/run-agy-20261108-45/corrected-scenario-index.md",
+      "sha256": "378d5fb5842bf6b088b5e5182e68d5741bc4174343273a060b6b4f02a39a81b6",
+      "size_bytes": 2863,
+      "role": "accepted_coverage_index",
+      "source_run": "run-agy-20261108-45",
+      "locator": null,
+      "summary": "各歷史子集保留原控制限制，不升級情境PASS",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-006",
+      "path": "security-assessment/execution/outstanding-requirements-and-inputs.md",
+      "href": "../../security-assessment/execution/outstanding-requirements-and-inputs.md",
+      "sha256": "848fdc8e5124505812168da48d7122b755e85445e7e0b33b01e230c8a15afdea",
+      "size_bytes": 13099,
+      "role": "corrected_handover",
+      "source_run": null,
+      "locator": null,
+      "summary": "Review45後已校正的未完成交接與原15情境",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-007",
+      "path": "security-assessment/execution/findings.md",
+      "href": "../../security-assessment/execution/findings.md",
+      "sha256": "77e15302b9c2a0b25ee69e478cfa8d3e34e91fc5475f470a1dba7988e5708efe",
+      "size_bytes": 5978,
+      "role": "finding_identity",
+      "source_run": null,
+      "locator": {
+        "kind": "lines",
+        "start": 5,
+        "end": 5,
+        "anchor_text": "## GEV-F-001"
+      },
+      "summary": "F001權威身分及候選；早期證據限制仍適用",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-008",
+      "path": "1151104_gods-eye-view/repo/server/providers/ai/ollama-client.js",
+      "href": "../../1151104_gods-eye-view/repo/server/providers/ai/ollama-client.js",
+      "sha256": "5e88663345a3265d877d9839cd7a539e6d291328c41577f13be1b02a9b7e5250",
+      "size_bytes": 6321,
+      "role": "product_source",
+      "source_run": null,
+      "locator": {
+        "kind": "lines",
+        "start": 76,
+        "end": 76,
+        "anchor_text": "  const realCounts ="
+      },
+      "summary": "realCounts.艘允許集合含常數5，僅唯讀取hash與定位",
+      "embed_policy": "selected_safe_excerpt_only"
+    },
+    {
+      "id": "SRC-009",
+      "path": "security-assessment/execution/run-agy-20261107-02/gev-f001-v2-evidence.json",
+      "href": "../../security-assessment/execution/run-agy-20261107-02/gev-f001-v2-evidence.json",
+      "sha256": "4ac212b23d9e1c7073d47e9b493679d4fad8eda2cb272f5cde1e9793d4728b17",
+      "size_bytes": 4535,
+      "role": "historical_observation",
+      "source_run": "run-agy-20261107-02",
+      "locator": null,
+      "summary": "早期單元重現；不能當原BP合規驗收",
+      "embed_policy": "selected_safe_excerpt_only",
+      "qualification_refs": [
+        "SRC-010"
+      ]
+    },
+    {
+      "id": "SRC-010",
+      "path": "security-assessment/execution/review-agy-20261107-02/review.md",
+      "href": "../../security-assessment/execution/review-agy-20261107-02/review.md",
+      "sha256": "0373b0858f48b87946337fd3b3dd5990cd4d91934fce5d9bbcc1ebe4e49b1d7d",
+      "size_bytes": 6550,
+      "role": "historical_review",
+      "source_run": null,
+      "locator": null,
+      "summary": "早期重現的前置／CPU預算限制",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-011",
+      "path": "security-assessment/execution/run-agy-20261108-45/candidate-phase-decisions.md",
+      "href": "../../security-assessment/execution/run-agy-20261108-45/candidate-phase-decisions.md",
+      "sha256": "239877a8cf528e396b2043df319acfc5e7c267dc7f0e532e560a7401d40ee41f",
+      "size_bytes": 3629,
+      "role": "candidate_summary",
+      "source_run": "run-agy-20261108-45",
+      "locator": null,
+      "summary": "候選事實與部署前提，不代表確認漏洞",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-012",
+      "path": "security-assessment/execution/run-agy-20261108-36/errata-run-35.md",
+      "href": "../../security-assessment/execution/run-agy-20261108-36/errata-run-35.md",
+      "sha256": "684bc25d234e30d522e4fa44cdfba2891873fb1ac34011a78fe4ac2ec5df716f",
+      "size_bytes": 2899,
+      "role": "erratum",
+      "source_run": "run-agy-20261108-36",
+      "locator": null,
+      "summary": "C002為response前request error、同fixture恢復；tamper測試本質勘誤",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-013",
+      "path": "security-assessment/execution/review-agy-20261108-43/review.md",
+      "href": "../../security-assessment/execution/review-agy-20261108-43/review.md",
+      "sha256": "14299520bc188107ae131f265c7198b006afb37d4261d399db1a51770cac40ac",
+      "size_bytes": 6384,
+      "role": "erratum",
+      "source_run": null,
+      "locator": null,
+      "summary": "恢復歷史覆蓋與工具假hash撤回",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-014",
+      "path": "security-assessment/execution/run-agy-20261108-13/product-subset-results.json",
+      "href": "../../security-assessment/execution/run-agy-20261108-13/product-subset-results.json",
+      "sha256": "c9fc02782048b96ba8820fdb8cfe95ae8192010469646cdeffd6b4b2fb16a912",
+      "size_bytes": 130599,
+      "role": "historical_observation",
+      "source_run": "run-agy-20261108-13",
+      "locator": null,
+      "summary": "早期19個advisor中間件觀察，適用其歷史控制限制",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-015",
+      "path": "security-assessment/execution/run-agy-20261108-14/product-subset-results.json",
+      "href": "../../security-assessment/execution/run-agy-20261108-14/product-subset-results.json",
+      "sha256": "5f65cacab156ecdddd94300017cfc3dec7bb4b8861074211deaa8ca447c063ee",
+      "size_bytes": 133372,
+      "role": "historical_observation",
+      "source_run": "run-agy-20261108-14",
+      "locator": null,
+      "summary": "保留失敗attempt，不以後續成功覆寫",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-016",
+      "path": "security-assessment/execution/run-agy-20261108-15/product-subset-results.json",
+      "href": "../../security-assessment/execution/run-agy-20261108-15/product-subset-results.json",
+      "sha256": "cfcc1dc4410fb929ec1aee8e99b5d0add342feb605108d0aa414f14f5a01586d",
+      "size_bytes": 133361,
+      "role": "historical_observation",
+      "source_run": "run-agy-20261108-15",
+      "locator": null,
+      "summary": "准入／PAT生命週期／AI邊界子集",
+      "embed_policy": "reference_only",
+      "qualification_refs": [
+        "SRC-021"
+      ]
+    },
+    {
+      "id": "SRC-017",
+      "path": "security-assessment/execution/run-agy-20261108-23/product-subset-results.json",
+      "href": "../../security-assessment/execution/run-agy-20261108-23/product-subset-results.json",
+      "sha256": "cc68cb19079568215eb60564e4cb379491c77fc49a6ed0dfc175200292bd41be",
+      "size_bytes": 134992,
+      "role": "historical_observation",
+      "source_run": "run-agy-20261108-23",
+      "locator": null,
+      "summary": "MCP／Panel／解析／儲存／key歷史子集",
+      "embed_policy": "reference_only",
+      "qualification_refs": [
+        "SRC-022"
+      ]
+    },
+    {
+      "id": "SRC-018",
+      "path": "security-assessment/execution/run-agy-20261108-27/product-subset-results.json",
+      "href": "../../security-assessment/execution/run-agy-20261108-27/product-subset-results.json",
+      "sha256": "5e656fe2142d90e54f2825aaeb867f095c4058299413946a593bd29c591ac5cd",
+      "size_bytes": 355291,
+      "role": "historical_observation",
+      "source_run": "run-agy-20261108-27",
+      "locator": null,
+      "summary": "產品契約與跨行程key歷史子集",
+      "embed_policy": "reference_only",
+      "qualification_refs": [
+        "SRC-023"
+      ]
+    },
+    {
+      "id": "SRC-019",
+      "path": "security-assessment/execution/run-agy-20261108-34/product-subset-results.json",
+      "href": "../../security-assessment/execution/run-agy-20261108-34/product-subset-results.json",
+      "sha256": "a00cb843a2d4c2dcd568351c62f90123961bba9b0d0c700e1bd4e7597da6f677",
+      "size_bytes": 7434,
+      "role": "historical_observation",
+      "source_run": "run-agy-20261108-34",
+      "locator": null,
+      "summary": "候選與取消／快取進階子集",
+      "embed_policy": "reference_only",
+      "qualification_refs": [
+        "SRC-024"
+      ]
+    },
+    {
+      "id": "SRC-020",
+      "path": "security-assessment/execution/run-agy-20261108-35/product-subset-results.json",
+      "href": "../../security-assessment/execution/run-agy-20261108-35/product-subset-results.json",
+      "sha256": "ff8fd7a7cccf181231a016f071bc8ad0e206cf4895fe30cb04be9fea3dcf6587",
+      "size_bytes": 7749,
+      "role": "historical_observation",
+      "source_run": "run-agy-20261108-35",
+      "locator": null,
+      "summary": "五項契約子集，部分宣稱由run36勘誤限定",
+      "embed_policy": "selected_safe_excerpt_only",
+      "qualification_refs": [
+        "SRC-025"
+      ]
+    },
+    {
+      "id": "SRC-021",
+      "path": "security-assessment/execution/review-agy-20261108-15/review.md",
+      "href": "../../security-assessment/execution/review-agy-20261108-15/review.md",
+      "sha256": "41f99519977ac2427946924e8e3af98700a5c99db6ff83366fdc5cb69ae84071",
+      "size_bytes": 4719,
+      "role": "historical_review",
+      "source_run": null,
+      "locator": null,
+      "summary": "對應輪次的採認範圍及替身／控制限制",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-022",
+      "path": "security-assessment/execution/review-agy-20261108-23/review.md",
+      "href": "../../security-assessment/execution/review-agy-20261108-23/review.md",
+      "sha256": "00deb896ed824525f09344e21df73205d81979b92048931e24d0186c7ba430dc",
+      "size_bytes": 4798,
+      "role": "historical_review",
+      "source_run": null,
+      "locator": null,
+      "summary": "對應輪次的採認範圍及替身／控制限制",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-023",
+      "path": "security-assessment/execution/review-agy-20261108-27/review.md",
+      "href": "../../security-assessment/execution/review-agy-20261108-27/review.md",
+      "sha256": "da2f2f358c94c2fb4194ef616222907d13af74cda12b7a906ef069ada2ec00c2",
+      "size_bytes": 5197,
+      "role": "historical_review",
+      "source_run": null,
+      "locator": null,
+      "summary": "對應輪次的採認範圍及替身／控制限制",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-024",
+      "path": "security-assessment/execution/review-agy-20261108-34/review.md",
+      "href": "../../security-assessment/execution/review-agy-20261108-34/review.md",
+      "sha256": "a25e912e418a3a7251421cb1884c4ba8dff05b3805169309d6ae3bc45bd77ac7",
+      "size_bytes": 4970,
+      "role": "historical_review",
+      "source_run": null,
+      "locator": null,
+      "summary": "對應輪次的採認範圍及替身／控制限制",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-025",
+      "path": "security-assessment/execution/review-agy-20261108-35/review.md",
+      "href": "../../security-assessment/execution/review-agy-20261108-35/review.md",
+      "sha256": "9f6f744281927f117fb173bff2c5b8bda2443f13fa33c50011a3eed2ac0e914a",
+      "size_bytes": 4978,
+      "role": "historical_review",
+      "source_run": null,
+      "locator": null,
+      "summary": "對應輪次的採認範圍及替身／控制限制",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-026",
+      "path": "security-assessment/execution/run-agy-20261108-45/controlled-replica-access-audit.json",
+      "href": "../../security-assessment/execution/run-agy-20261108-45/controlled-replica-access-audit.json",
+      "sha256": "97ade20533e0cf4f7fd52a16b8da7020e8f61ef3aef5a3a8e1ebc35e65aebf80",
+      "size_bytes": 3303,
+      "role": "current_observation",
+      "source_run": "run-agy-20261108-45",
+      "locator": null,
+      "summary": "三組合成控制結果；Task1實際執行",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-027",
+      "path": "security-assessment/execution/run-agy-20261108-45/browser-capability-smoke.json",
+      "href": "../../security-assessment/execution/run-agy-20261108-45/browser-capability-smoke.json",
+      "sha256": "0fb546fc0c3de27f8f4ba3aef7e3fabbb5da2a9f74db97386bec0c8773606a45",
+      "size_bytes": 1442,
+      "role": "mixed_current_and_stale_fields",
+      "source_run": "run-agy-20261108-45",
+      "locator": null,
+      "summary": "以supervise_result為本輪值，diagnostic_detail寫死值已撤回",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-028",
+      "path": "security-assessment/execution/run-agy-20261108-45/evidence/redacted/TASK-B-BROWSER-SMOKE/evidence.redacted.log",
+      "href": "../../security-assessment/execution/run-agy-20261108-45/evidence/redacted/TASK-B-BROWSER-SMOKE/evidence.redacted.log",
+      "sha256": "1b654a06474ba4d6b4d3dc5cc478cd58716040088f378b7e73d7089fae4529a5",
+      "size_bytes": 3537,
+      "role": "current_redacted_log",
+      "source_run": "run-agy-20261108-45",
+      "locator": {
+        "kind": "lines",
+        "start": 11,
+        "end": 11,
+        "anchor_text": "=== OBSERVATION_STATUS ==="
+      },
+      "summary": "OBSERVED/CLEAN與Chrome Target closed分層證據",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-029",
+      "path": "security-assessment/execution/run-agy-20261108-45/historical-build-provenance.json",
+      "href": "../../security-assessment/execution/run-agy-20261108-45/historical-build-provenance.json",
+      "sha256": "142eca587506c1ec07353ea7909aaa9dd8583282a4952c2799ecf11f499719b0",
+      "size_bytes": 2619,
+      "role": "provenance_map",
+      "source_run": "run-agy-20261108-45",
+      "locator": null,
+      "summary": "四份run43到run45來源與派生hash",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-030",
+      "path": "security-assessment/execution/run-agy-20261108-43/standalone-build-audit.json",
+      "href": "../../security-assessment/execution/run-agy-20261108-43/standalone-build-audit.json",
+      "sha256": "1ee593bd339c02874de34d9c9fa2e026be879276395500d92064f295eca7a95d",
+      "size_bytes": 937,
+      "role": "historical_observation",
+      "source_run": "run-agy-20261108-43",
+      "locator": null,
+      "summary": "Standalone原預算受阻／Panel保留成品；本輪未重建",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-031",
+      "path": "security-assessment/execution/run-agy-20261108-45/standalone-build-audit.json",
+      "href": "../../security-assessment/execution/run-agy-20261108-45/standalone-build-audit.json",
+      "sha256": "f9596c120533cbf844df9ba569a1db829810beea928ff46b71cf69088989ce20",
+      "size_bytes": 1608,
+      "role": "derived_record",
+      "source_run": "run-agy-20261108-45",
+      "locator": null,
+      "summary": "Standalone原預算受阻／Panel保留成品；本輪未重建",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-032",
+      "path": "security-assessment/execution/run-agy-20261108-43/standalone-artifact-inventory.json",
+      "href": "../../security-assessment/execution/run-agy-20261108-43/standalone-artifact-inventory.json",
+      "sha256": "84bf0be36693aa28b68fa2894ca729222169c8001d2a2316a4d08623f40290a9",
+      "size_bytes": 446,
+      "role": "historical_observation",
+      "source_run": "run-agy-20261108-43",
+      "locator": null,
+      "summary": "Standalone原預算受阻／Panel保留成品；本輪未重建",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-033",
+      "path": "security-assessment/execution/run-agy-20261108-45/standalone-artifact-inventory.json",
+      "href": "../../security-assessment/execution/run-agy-20261108-45/standalone-artifact-inventory.json",
+      "sha256": "3c2cfe06ee2d98427fa9ec4661338c5d8a499cad215594aed21922adf4e9cbed",
+      "size_bytes": 803,
+      "role": "derived_record",
+      "source_run": "run-agy-20261108-45",
+      "locator": null,
+      "summary": "Standalone原預算受阻／Panel保留成品；本輪未重建",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-034",
+      "path": "security-assessment/execution/run-agy-20261108-43/panel-build-audit.json",
+      "href": "../../security-assessment/execution/run-agy-20261108-43/panel-build-audit.json",
+      "sha256": "8011e5a7639e861d94cd1eb3f8bfd0e195a1caacd547d9c8d90b8cf6cec42b7f",
+      "size_bytes": 1610,
+      "role": "historical_observation",
+      "source_run": "run-agy-20261108-43",
+      "locator": null,
+      "summary": "Standalone原預算受阻／Panel保留成品；本輪未重建",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-035",
+      "path": "security-assessment/execution/run-agy-20261108-45/panel-build-audit.json",
+      "href": "../../security-assessment/execution/run-agy-20261108-45/panel-build-audit.json",
+      "sha256": "b3edb2a44fd65d08834f31639c8c7769107f58f392ba6524d45b53a2869d9d3e",
+      "size_bytes": 1974,
+      "role": "derived_record",
+      "source_run": "run-agy-20261108-45",
+      "locator": null,
+      "summary": "Standalone原預算受阻／Panel保留成品；本輪未重建",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-036",
+      "path": "security-assessment/execution/run-agy-20261108-43/panel-artifact-inventory.json",
+      "href": "../../security-assessment/execution/run-agy-20261108-43/panel-artifact-inventory.json",
+      "sha256": "61d8061d746737cc736f684c96dc8bb1f99032f2413b19f9f43a71c8060abb9f",
+      "size_bytes": 134121,
+      "role": "historical_observation",
+      "source_run": "run-agy-20261108-43",
+      "locator": null,
+      "summary": "Standalone原預算受阻／Panel保留成品；本輪未重建",
+      "embed_policy": "selected_safe_excerpt_only"
+    },
+    {
+      "id": "SRC-037",
+      "path": "security-assessment/execution/run-agy-20261108-45/panel-artifact-inventory.json",
+      "href": "../../security-assessment/execution/run-agy-20261108-45/panel-artifact-inventory.json",
+      "sha256": "f4a8bd33272209796afff5d8dd1d78f487ca3d7bbf3f96f35800465568d58c91",
+      "size_bytes": 134414,
+      "role": "derived_record",
+      "source_run": "run-agy-20261108-45",
+      "locator": null,
+      "summary": "Standalone原預算受阻／Panel保留成品；本輪未重建",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-038",
+      "path": "security-assessment/execution/run-agy-20261108-45/panel-evaluation-result.json",
+      "href": "../../security-assessment/execution/run-agy-20261108-45/panel-evaluation-result.json",
+      "sha256": "584af689ef0f73dafa512f87f6f916e0cd579990a44d7809ff5f222f5e5cda9d",
+      "size_bytes": 863,
+      "role": "offline_evaluation",
+      "source_run": "run-agy-20261108-45",
+      "locator": null,
+      "summary": "離線11項檢查，不是重掃成品",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-039",
+      "path": "security-assessment/execution/run-agy-20261108-45/task-budgets-and-limits.json",
+      "href": "../../security-assessment/execution/run-agy-20261108-45/task-budgets-and-limits.json",
+      "sha256": "8b63ab1f7aa03bb552434024f50d036f6102d660110bd279a07b8bc44d9f763c",
+      "size_bytes": 2297,
+      "role": "budget_record",
+      "source_run": "run-agy-20261108-45",
+      "locator": null,
+      "summary": "每task原BP預算；不把3CPU當待決要求",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-040",
+      "path": "security-assessment/execution/run-agy-20261108-45/tool-offline-supply.json",
+      "href": "../../security-assessment/execution/run-agy-20261108-45/tool-offline-supply.json",
+      "sha256": "c5fe2037f41610cb628d9727e68fc174085ddda4c7373d6ed01d319415a6449e",
+      "size_bytes": 2791,
+      "role": "tool_supply",
+      "source_run": "run-agy-20261108-45",
+      "locator": null,
+      "summary": "缺工具／規則DB；未知hash維持null，補充工具不變必要門檻",
+      "embed_policy": "reference_only"
+    },
+    {
+      "id": "SRC-041",
+      "path": "1151104_gods-eye-view/repo/server/providers/ai/ollama-advisor.js",
+      "href": "../../1151104_gods-eye-view/repo/server/providers/ai/ollama-advisor.js",
+      "sha256": "601d4508b1ef2544ac95afee89e968cab1d38f3f49621b153759a8e567f9ea18",
+      "size_bytes": 10772,
+      "role": "product_source",
+      "source_run": null,
+      "locator": {
+        "kind": "lines",
+        "start": 13,
+        "end": 13,
+        "anchor_text": "export function createTokenStore("
+      },
+      "summary": "PAT終端讀取、權限與旋轉流程；僅節錄程式碼",
+      "embed_policy": "selected_safe_excerpt_only"
+    },
+    {
+      "id": "SRC-042",
+      "path": "1151104_gods-eye-view/repo/server/providers/vessels/mpb-taiwan.js",
+      "href": "../../1151104_gods-eye-view/repo/server/providers/vessels/mpb-taiwan.js",
+      "sha256": "b0e5597153cce4160163f374fc9fccdf96a28dca3fff4deca914a50beff51d08",
+      "size_bytes": 10211,
+      "role": "product_source",
+      "source_run": null,
+      "locator": {
+        "kind": "lines",
+        "start": 167,
+        "end": 167,
+        "anchor_text": "      const chunks = [];"
+      },
+      "summary": "上游chunks累積與JSON解析；不連上游",
+      "embed_policy": "selected_safe_excerpt_only"
+    },
+    {
+      "id": "SRC-043",
+      "path": "1151104_gods-eye-view/repo/server/providers/traffic/taiwan-traffic.js",
+      "href": "../../1151104_gods-eye-view/repo/server/providers/traffic/taiwan-traffic.js",
+      "sha256": "2f517c36ea8283ab63b791521dcf4958d697ad766a3c80c19868fb56518ed19a",
+      "size_bytes": 16788,
+      "role": "product_source",
+      "source_run": null,
+      "locator": {
+        "kind": "lines",
+        "start": 72,
+        "end": 72,
+        "anchor_text": "  return response.text();"
+      },
+      "summary": "traffic文字接收；僅靜態程式碼",
+      "embed_policy": "selected_safe_excerpt_only"
+    },
+    {
+      "id": "SRC-044",
+      "path": "1151104_gods-eye-view/repo/src/tools/queries/panelRequest.js",
+      "href": "../../1151104_gods-eye-view/repo/src/tools/queries/panelRequest.js",
+      "sha256": "3504ec0f62edff8fb176f8d7fe23c7e2bf0ab9eddf4abbcdb96cef8fe8ebc0bb",
+      "size_bytes": 11956,
+      "role": "product_source",
+      "source_run": null,
+      "locator": {
+        "kind": "lines",
+        "start": 38,
+        "end": 38,
+        "anchor_text": "const FORWARDED_REQUEST_HEADERS"
+      },
+      "summary": "panelKey設計不是人員認證；拒絕路徑與header白名單",
+      "embed_policy": "selected_safe_excerpt_only"
+    },
+    {
+      "id": "SRC-045",
+      "path": "security-assessment/pilot-threat-model.md",
+      "href": "../../security-assessment/pilot-threat-model.md",
+      "sha256": "cc859c9f1a2e9987f7fdabb0e0553a3f221ab73e58aa08b596b0d69fd55795d9",
+      "size_bytes": 24027,
+      "role": "architecture_source_model",
+      "source_run": null,
+      "locator": {
+        "kind": "lines",
+        "start": 62,
+        "end": 62,
+        "anchor_text": "## 5. 信任邊界"
+      },
+      "summary": "BT01–BT08及資料流來源模型；僅支持架構關係，當前驗證狀態另依採認索引。",
+      "embed_policy": "reference_only"
+    }
+  ]
+}

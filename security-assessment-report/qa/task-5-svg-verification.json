@@ -1,0 +1,31 @@
+{
+  "task": 5,
+  "status": "PASS",
+  "scope": "Report SVG generation, static raster inspection and synthetic interaction only.",
+  "svg_count": 2,
+  "evidence_linked_nodes": 15,
+  "source_count": 45,
+  "checks": {
+    "svg_xml_valid": true,
+    "nodes_inside_viewbox": true,
+    "all_diagram_source_refs_resolve": true,
+    "source_hashes_match": true,
+    "unsafe_node_geometry_rejected": true,
+    "animations_default_static": true
+  },
+  "static_visual_review": {
+    "renderer": "existing rsvg-convert",
+    "artifacts": [
+      "attack-map.png",
+      "f001-cause.png"
+    ],
+    "reviewed": true,
+    "corrections": [
+      "Long DOM text split into three lines.",
+      "Boundary labels placed above background masks to avoid crossing text.",
+      "Explicit light background for standalone review."
+    ]
+  },
+  "browser_visual_qa": "PENDING_TASK_8",
+  "assessment_new_execution": false
+}

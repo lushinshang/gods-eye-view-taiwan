@@ -1,0 +1,3653 @@
+{
+  "metadata": {
+    "data_version": "1.0.0",
+    "implementation_stage": "TASK_8_DELIVERED_WITH_QA_LIMITATIONS",
+    "language": "zh-Hant-TW",
+    "title": "A24 戰情台安全評估報告",
+    "subtitle": "紅隊導向攻擊面分析與原生 macOS 受控驗證",
+    "cutoff_label": "截至 Review 45 與 2026-11-09 後續交接文件勘誤",
+    "prepared_date": "2026-11-09",
+    "timezone": "Asia/Taipei",
+    "product_commit": "e50944f89f99b60d948ede8e4f0a9feee12cd3a7",
+    "working_tree_status": "DIRTY_HISTORICAL_TRACKED_PYC_DELETIONS",
+    "overall_status": "INCOMPLETE",
+    "release_authorization": false,
+    "original_scenario_count": 15,
+    "new_product_execution": false,
+    "core_limit_policy": "OPTION_A_NATIVE_MACOS_2_CPU",
+    "source_index_file": "source-index.json",
+    "complete_report": true
+  },
+  "interpretation_policy": {
+    "identity_authority_refs": [
+      "SRC-001",
+      "SRC-007"
+    ],
+    "current_judgment_refs": [
+      "SRC-003",
+      "SRC-005",
+      "SRC-006"
+    ],
+    "rules": [
+      "已撤回摘要不作當前結論",
+      "實測值追溯結構化結果／遮罩日誌，並套用對應複核限制",
+      "未知資料為null，不用0或陰性表示未知",
+      "未解衝突明列未確認",
+      "不計算全案安全分數或以子集PASS換算完成率",
+      "來源hash是本次讀取的完整性快照，不是數位簽章",
+      "禁止把來源檔全文與絕對主機路徑直接嵌入HTML"
+    ]
+  },
+  "findings": [
+    {
+      "id": "GEV-F-001",
+      "aliases": [],
+      "title": "硬編碼船舶數量使錯誤回答通過 grounding",
+      "category": "CONFIRMED_FINDING",
+      "confirmation_status": "CONFIRMED",
+      "risk_rating": {
+        "value": null,
+        "status": "PENDING_CONTEXT",
+        "cvss": null,
+        "rationale": "缺陷已確認，但實際暴露、模型輸出可控性與業務決策用途不足，不能推導可靠嚴重度或CVSS。"
+      },
+      "remediation_status": "OPEN",
+      "owner": null,
+      "scenario_ids": [
+        "GEV-07",
+        "GEV-08",
+        "GEV-13"
+      ],
+      "source_refs": [
+        "SRC-007",
+        "SRC-008",
+        "SRC-009",
+        "SRC-010",
+        "SRC-016",
+        "SRC-018",
+        "SRC-003"
+      ],
+      "content_state": "DRAFT_CONTENT_COMPLETE",
+      "details": {
+        "summary": "Grounding把固定列舉值與事實數量混在允許集合中，使錯誤船數被接受。",
+        "affected_components": [
+          "server/providers/ai/ollama-client.js：validateGrounding，尤其第76–83行"
+        ],
+        "preconditions": [
+          "AI請求通過local gate或有效PAT。",
+          "候選回答完成且未超出輸出上限；模型可能產生不準確文字。"
+        ],
+        "established_facts": [
+          "realCounts.艘將動態來源數量與固定5一併加入。",
+          "既有合成上下文總數／符合數／樣本長度皆2；2艘回答通過、3艘回答拒絕、5艘錯誤回答仍通過。"
+        ],
+        "reproduction": {
+          "kind": "DOCUMENTED_EXISTING_OBSERVATION",
+          "executed_during_report_preparation": false,
+          "steps": [
+            "使用既有合成上下文，令matched_total.vessels、summary.total_vessels、樣本長度均為2。",
+            "比較「目前共有2艘」、「目前共有3艘」、「目前共有5艘」的validateGrounding結果。",
+            "保留歷史true／false／true觀察及其複核限制；本次只整理，不重跑。"
+          ]
+        },
+        "impact": {
+          "demonstrated": "對事實船數不符的候選回答發生驗證誤判。",
+          "conditional": "若使用者依賴此結果判斷態勢，可能誤信錯誤數量。",
+          "not_demonstrated": [
+            "外部攻擊者可強制模型產生特定答案",
+            "秘密外洩、權限提升、RCE或實際業務損害"
+          ]
+        },
+        "limitations": [
+          "早期單元重現有前置／BP控制缺口，後續產品子集也須套用各輪採認限制。",
+          "未連真模型，沒有已部署成品或實際決策損害證據。",
+          "「前5艘」語法被接受不代表樣本只有2艘時整句語意正確。"
+        ],
+        "recommendations": [
+          "將條列上限、總數與篩選數分開驗證，移除無條件固定5放行。",
+          "依查詢語意使用對應結構化資料；無法確認時採明確fallback。",
+          "取得修改授權後提出patch與回歸案例；目前不修改產品。"
+        ],
+        "acceptance_criteria": [
+          "在真實總數2時，錯誤5與3均觸發拒絕或規定fallback，正確2仍通過。",
+          "使用數個不同真實總數，分別測總數、篩選數與「前N艘」語意。",
+          "核准範圍內驗證runOllama／middleware相依行為，確認修補成品與來源一致，經複核後才可關閉。"
+        ],
+        "evidence_ids": [
+          "EV-F001-CODE",
+          "EV-F001-CONTEXT",
+          "EV-F001-CASE-0",
+          "EV-F001-CASE-1",
+          "EV-F001-CASE-2"
+        ],
+        "source_refs": [
+          "SRC-007",
+          "SRC-008",
+          "SRC-009",
+          "SRC-010",
+          "SRC-003"
+        ],
+        "owner_label": "待指定",
+        "target_date": null,
+        "risk_acceptance": null
+      },
+      "proof_levels": [
+        "SOURCE",
+        "UNIT_DYNAMIC"
+      ],
+      "handling_priority": {
+        "label": "優先取得修補決策",
+        "kind": "REPORT_RECOMMENDATION",
+        "approved": false
+      }
+    },
+    {
+      "id": "GEV-C-002",
+      "aliases": [
+        "C-002"
+      ],
+      "title": "上游回應缺少累積位元組上限",
+      "category": "CANDIDATE",
+      "confirmation_status": "NEEDS_VALIDATION",
+      "risk_rating": {
+        "value": null,
+        "status": "PENDING_CONTEXT",
+        "cvss": null,
+        "rationale": "缺上游可控性、實際超標與業務影響證據；不能把無cap直接評為已確認高風險DoS。"
+      },
+      "remediation_status": "PENDING_VALIDATION",
+      "owner": null,
+      "scenario_ids": [
+        "GEV-09"
+      ],
+      "source_refs": [
+        "SRC-007",
+        "SRC-011",
+        "SRC-020",
+        "SRC-012",
+        "SRC-006",
+        "SRC-042",
+        "SRC-043",
+        "SRC-025"
+      ],
+      "content_state": "DRAFT_CONTENT_COMPLETE",
+      "details": {
+        "summary": "上游MPB與Traffic回應接收未見累積位元組上限，屬待確認的資源防禦邊界。",
+        "affected_components": [
+          "server/providers/vessels/mpb-taiwan.js：fetchRawJson接收流程",
+          "server/providers/traffic/taiwan-traffic.js：response.text()"
+        ],
+        "preconditions": [
+          "產品能連接固定上游來源；上游回應可能異常或受影響。",
+          "能否由攻擊者控制回應或連線、實際部署可用資源均待確認。"
+        ],
+        "established_facts": [
+          "MPB經chunks收集、Buffer.concat、JSON.parse解析GeoJSON；NDJSON是本機航跡儲存格式。",
+          "有限chunks與request error後重抓有既有觀察；Traffic輸入字元不是串流byte計量。"
+        ],
+        "reproduction": {
+          "kind": "DOCUMENTED_EXISTING_OBSERVATION",
+          "executed_during_report_preparation": false,
+          "steps": [
+            "查閱MPB／Traffic接收程式碼，確認現有timeout與累積流程。",
+            "引用run35有限fixture觀察，並依run36勘誤將故障限定為response callback之前request error。",
+            "恢復使用相同25筆fixture，只證明重抓累積解析，不推定新資料更新或無上限串流安全。"
+          ]
+        },
+        "impact": {
+          "demonstrated": "已知接收端未見顯式累積body byte cap；有限資料可解析。",
+          "conditional": "過大回應可能增加記憶體、解析成本或可用性壓力，實際影響需可控來源與資源證據。",
+          "not_demonstrated": [
+            "可利用的DoS或OOM",
+            "無窮／慢速串流實際影響",
+            "部分body已接收後中斷的容錯"
+          ]
+        },
+        "limitations": [
+          "固定官方來源與timeout是既有控制，不能忽略也不能當成容量上限。",
+          "原payload總bytes與摘要2943B／4chunks存在未完全對齊的計量，正式風險判讀不引用總量。",
+          "未壓測至heap崩潰，不要求為確認架構事實而做破壞式測試。"
+        ],
+        "recommendations": [
+          "先由責任人定義合理單次回應上限、timeout與降級契約，不直接採歷史示例容量作需求。",
+          "在實際data接收層累計bytes並於超限終止；涵蓋錯誤傳遞、清理與stale／恢復。",
+          "Traffic的文字／XML接收與解析也應獨立評估其上限。"
+        ],
+        "acceptance_criteria": [
+          "契約上限明定後，以有界fixture驗證低於、等於、超過1byte，並量測拒絕後不持續累積。",
+          "分開驗證response前錯誤、有限body途中錯誤與不同新內容恢復；明記各層bytes。",
+          "不需OOM即可證明上限有效；部署暴露與影響證據具備後再決定候選分類。"
+        ],
+        "evidence_ids": [
+          "EV-C002-MPB",
+          "EV-C002-TRAFFIC",
+          "EV-C002-OBS"
+        ],
+        "source_refs": [
+          "SRC-042",
+          "SRC-043",
+          "SRC-020",
+          "SRC-012",
+          "SRC-025",
+          "SRC-011"
+        ],
+        "owner_label": "待指定",
+        "target_date": null,
+        "risk_acceptance": null
+      },
+      "proof_levels": [
+        "SOURCE",
+        "FINITE_STREAM_STUB"
+      ],
+      "handling_priority": {
+        "label": "先確認負載契約",
+        "kind": "REPORT_RECOMMENDATION",
+        "approved": false
+      }
+    },
+    {
+      "id": "GEV-C-003",
+      "aliases": [
+        "C-003"
+      ],
+      "title": "PAT父目錄鏈與部署信任邊界",
+      "category": "CANDIDATE",
+      "confirmation_status": "NEEDS_VALIDATION",
+      "risk_rating": {
+        "value": null,
+        "status": "PENDING_CONTEXT",
+        "cvss": null,
+        "rationale": "目前只有同UID路徑行為與指定終端防護證據，缺跨權限前提；維持待確認，不能稱已越權。"
+      },
+      "remediation_status": "PENDING_VALIDATION",
+      "owner": null,
+      "scenario_ids": [
+        "GEV-03",
+        "GEV-10",
+        "GEV-15"
+      ],
+      "source_refs": [
+        "SRC-007",
+        "SRC-011",
+        "SRC-016",
+        "SRC-020",
+        "SRC-006",
+        "SRC-041",
+        "SRC-025"
+      ],
+      "content_state": "DRAFT_CONTENT_COMPLETE",
+      "details": {
+        "summary": "PAT終端檔案防護已有證據，父目錄鏈安全仍依賴部署權限與使用者信任。",
+        "affected_components": [
+          "server/providers/ai/ollama-advisor.js：createTokenStore"
+        ],
+        "preconditions": [
+          "可寫入或替換父目錄的主體可能影響路徑解析。",
+          "同UID測試不等於不同UID攻擊者具有相同權限；實際父目錄擁有者與可寫性待確認。"
+        ],
+        "established_facts": [
+          "read以O_NOFOLLOW開啟終端檔，要求一般檔案且mode為0600。",
+          "rotate使用暫存檔與rename；既有測試支持0644及損毀JSON拒絕、旋轉恢復。",
+          "同UID父目錄symlink會被解析，目標0600檔案建立且canary保留。"
+        ],
+        "reproduction": {
+          "kind": "DOCUMENTED_EXISTING_OBSERVATION",
+          "executed_during_report_preparation": false,
+          "steps": [
+            "查閱終端open／fstat／mode檢查及父目錄建立流程。",
+            "引用既有終端symlink、0644、損毀JSON與恢復觀察。",
+            "引用同UID父目錄symlink結果，維持為路徑解析事實，未進行不同使用者越權測試。"
+          ]
+        },
+        "impact": {
+          "demonstrated": "O_NOFOLLOW不構成完整父路徑鏈驗證；同UID父symlink可導向寫入。",
+          "conditional": "若部署讓不受信任主體改動父目錄，可能使權杖存放位置或可用性偏離預期；需權限與競態證據。",
+          "not_demonstrated": [
+            "跨UID讀取或竊取PAT",
+            "終端O_NOFOLLOW繞過",
+            "父目錄canary被覆寫"
+          ]
+        },
+        "limitations": [
+          "未證明跨UID／多租戶利用。",
+          "mkdir的0700參數不代表既有父鏈皆受同樣權限保護。",
+          "0777沒有作為已測變體；本機同UID信任前提不是程式碼強制隔離。"
+        ],
+        "recommendations": [
+          "明定支援單使用者或共享主機的部署模型與PAT路徑擁有者。",
+          "依威脅模型檢查父鏈權限、symlink與身分；若需抗競態，單次lstat不能保證消除TOCTOU。",
+          "保留終端0600、O_NOFOLLOW、輪替撤銷與fail-closed行為。"
+        ],
+        "acceptance_criteria": [
+          "文件記錄支援部署下的父目錄擁有者與可寫權限，對不支援配置有明確拒絕或警示契約。",
+          "若跨UID屬支援範圍，在有權限與授權的環境證明不受信任主體無法導向／讀取權杖。",
+          "若補強父鏈，另驗證檢查與開啟間替換情境及原PAT生命週期不退化；不自動關閉候選。"
+        ],
+        "evidence_ids": [
+          "EV-C003-READ",
+          "EV-C003-OBS"
+        ],
+        "source_refs": [
+          "SRC-041",
+          "SRC-020",
+          "SRC-025",
+          "SRC-011",
+          "SRC-006"
+        ],
+        "owner_label": "待指定",
+        "target_date": null,
+        "risk_acceptance": null
+      },
+      "proof_levels": [
+        "SOURCE",
+        "FILESYSTEM_SAME_UID"
+      ],
+      "handling_priority": {
+        "label": "先確認部署信任",
+        "kind": "REPORT_RECOMMENDATION",
+        "approved": false
+      }
+    },
+    {
+      "id": "GEV-C-004",
+      "aliases": [
+        "C-004"
+      ],
+      "title": "panel_request敏感路由責任與副作用隔離",
+      "category": "CANDIDATE",
+      "confirmation_status": "NEEDS_VALIDATION",
+      "risk_rating": {
+        "value": null,
+        "status": "PENDING_CONTEXT",
+        "cvss": null,
+        "rationale": "已有特定負向防護證據，但合法正控制及完整副作用量測不足；既不能判繞過，也不能判全路由安全。"
+      },
+      "remediation_status": "PENDING_VALIDATION",
+      "owner": null,
+      "scenario_ids": [
+        "GEV-06",
+        "GEV-15"
+      ],
+      "source_refs": [
+        "SRC-007",
+        "SRC-011",
+        "SRC-020",
+        "SRC-003",
+        "SRC-006",
+        "SRC-044",
+        "SRC-041",
+        "SRC-025"
+      ],
+      "content_state": "DRAFT_CONTENT_COMPLETE",
+      "details": {
+        "summary": "panel_request的工具key、標頭白名單及下游gate共同形成邊界，仍欠完整產品契約與正向對照。",
+        "affected_components": [
+          "src/tools/queries/panelRequest.js",
+          "server/providers/ai/ollama-advisor.js及Gemini敏感handler的代理鏈"
+        ],
+        "preconditions": [
+          "MCP client可讀panel頁面及其中key；key本身不是人員認證秘密。",
+          "敏感路由的准入依代理政策與下游各自gate，需逐路由確認預期。"
+        ],
+        "established_facts": [
+          "產品註解明示key不是access control；可讀panel的MCP client可以取得。",
+          "代理僅轉送accept／content-type；指定路由由proxy阻斷或由真handler拒絕。",
+          "既有指定負向案例中，advisor client與token rotate計數為0；Gemini provider未全面計數。"
+        ],
+        "reproduction": {
+          "kind": "DOCUMENTED_EXISTING_OBSERVATION",
+          "executed_during_report_preparation": false,
+          "steps": [
+            "引用真panelRequest串接真敏感handler的PassThrough測試。",
+            "分開讀取proxy拒絕、advisor401、token401與Gemini403，不能用payload頂層200表示所有下游成功。",
+            "保留mock tracks正控制與固定false的token verify限制，不聲稱完整合法敏感轉送已驗證。"
+          ]
+        },
+        "impact": {
+          "demonstrated": "指定負向路徑被拒，部分副作用計數為零；未證明授權繞過。",
+          "conditional": "若代理與下游的路由／方法契約不一致，可能使敏感操作暴露；需合法正控制及所有相關provider觀察。",
+          "not_demonstrated": [
+            "全provider零副作用",
+            "完整人員授權或panelKey保密性",
+            "所有敏感路由與方法均安全"
+          ]
+        },
+        "limitations": [
+          "PassThrough不是獨立socket服務。",
+          "token verify固定false；公開tracks正控制為mock；Gemini實際provider呼叫未全面計數。",
+          "合法PAT在來源呼叫存在，不表示會通過proxy白名單；不得假設Authorization被轉送。"
+        ],
+        "recommendations": [
+          "逐路由明定proxy負責拒絕與下游負責准入的契約；不把取得panelKey本身列成認證繞過。",
+          "設計符合實際header政策的正向／負向對照，必要時分開直連handler與代理路徑。",
+          "針對納入範圍的模型、token管理與其他副作用加入計數；key輪替／撤銷僅在產品契約要求時驗收。"
+        ],
+        "acceptance_criteria": [
+          "每個核准路由／方法明列proxy與下游預期，並有正常對照，不能因mock永遠拒絕就判防護成立。",
+          "指定拒絕案例對所有納入provider及管理操作都具有可信副作用觀察。",
+          "驗證公開合法流程、redirect／header政策、實例與分段隔離；產品責任人判定剩餘候選，不由單例關案。"
+        ],
+        "evidence_ids": [
+          "EV-C004-DESIGN",
+          "EV-C004-HEADERS",
+          "EV-C004-OBS"
+        ],
+        "source_refs": [
+          "SRC-044",
+          "SRC-041",
+          "SRC-020",
+          "SRC-025",
+          "SRC-011",
+          "SRC-006"
+        ],
+        "owner_label": "待指定",
+        "target_date": null,
+        "risk_acceptance": null
+      },
+      "proof_levels": [
+        "SOURCE",
+        "HANDLER_COMPOSITION"
+      ],
+      "handling_priority": {
+        "label": "先確定路由責任",
+        "kind": "REPORT_RECOMMENDATION",
+        "approved": false
+      }
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "GEV-01",
+      "title": "隔離環境與啟動副作用",
+      "requirement_id": "RQ01",
+      "threat_ids": [
+        "TH12"
+      ],
+      "trust_boundary_ids": [
+        "BT01",
+        "BT08"
+      ],
+      "assessment_status": "PARTIALLY_VERIFIED",
+      "source_status_label": "PARTIALLY VERIFIED",
+      "whole_scenario_pass": false,
+      "observed_summary": "run-40/41/42/43控制與來源隔離",
+      "remaining_scope": "完整啟動副作用／配置仍欠；工具缺失不可抹去控制成果",
+      "proof_levels": [
+        "OS_CONTROL"
+      ],
+      "source_refs": [
+        "SRC-001",
+        "SRC-005",
+        "SRC-026",
+        "SRC-003"
+      ],
+      "narrative_state": "DRAFT_CONTENT_COMPLETE",
+      "narrative": {
+        "title": "隔離探針與完整啟動分開",
+        "paragraphs": [
+          "已採認指定 loopback、檔案拒讀及來源副本控制；完整產品啟動、背景工作與所有副作用路徑仍未完成。"
+        ],
+        "source_refs": [
+          "SRC-001",
+          "SRC-005",
+          "SRC-026",
+          "SRC-003"
+        ]
+      }
+    },
+    {
+      "id": "GEV-02",
+      "title": "AI 本機管理准入與來源邊界",
+      "requirement_id": "RQ02",
+      "threat_ids": [
+        "TH01"
+      ],
+      "trust_boundary_ids": [
+        "BT01",
+        "BT02"
+      ],
+      "assessment_status": "PARTIALLY_VERIFIED",
+      "source_status_label": "PARTIALLY VERIFIED",
+      "whole_scenario_pass": false,
+      "observed_summary": "run-15 v8-GEV-02-01..10；其他run指定HTTP觀察",
+      "remaining_scope": "Browser整合受阻，不等於本機准入函式／HTTP未測",
+      "proof_levels": [
+        "HTTP_HANDLER"
+      ],
+      "source_refs": [
+        "SRC-001",
+        "SRC-005",
+        "SRC-016"
+      ],
+      "narrative_state": "DRAFT_CONTENT_COMPLETE",
+      "narrative": {
+        "title": "准入規則有指定動態證據",
+        "paragraphs": [
+          "本機、Host、Origin、代理標頭等准入子集已有觀察；合成 peer 屬性不是實際 LAN 或反向代理拓樸驗證。"
+        ],
+        "source_refs": [
+          "SRC-001",
+          "SRC-005",
+          "SRC-016"
+        ]
+      }
+    },
+    {
+      "id": "GEV-03",
+      "title": "PAT 權限、輪替與撤銷",
+      "requirement_id": "RQ03",
+      "threat_ids": [
+        "TH02"
+      ],
+      "trust_boundary_ids": [
+        "BT02",
+        "BT04"
+      ],
+      "assessment_status": "PARTIALLY_VERIFIED",
+      "source_status_label": "PARTIALLY VERIFIED; C-003 NEEDS VALIDATION",
+      "whole_scenario_pass": false,
+      "observed_summary": "run-15 PAT跨請求生命週期；run-34/35父鏈與檔案",
+      "remaining_scope": "跨UID／部署信任前提與未測變體",
+      "proof_levels": [
+        "CROSS_REQUEST_STATE",
+        "FILESYSTEM"
+      ],
+      "source_refs": [
+        "SRC-001",
+        "SRC-005",
+        "SRC-016",
+        "SRC-019",
+        "SRC-020"
+      ],
+      "narrative_state": "DRAFT_CONTENT_COMPLETE",
+      "narrative": {
+        "title": "PAT生命週期已有跨請求觀察",
+        "paragraphs": [
+          "旋轉、撤銷、畸形憑證及部分檔案邊界已驗；同 UID 父目錄 symlink 觀察不能證明跨 UID 隔離。"
+        ],
+        "source_refs": [
+          "SRC-001",
+          "SRC-005",
+          "SRC-016",
+          "SRC-019",
+          "SRC-020"
+        ]
+      }
+    },
+    {
+      "id": "GEV-04",
+      "title": "AI 路徑、方法與輸入邊界",
+      "requirement_id": "RQ04",
+      "threat_ids": [
+        "TH03",
+        "TH07"
+      ],
+      "trust_boundary_ids": [
+        "BT02",
+        "BT05"
+      ],
+      "assessment_status": "PARTIALLY_VERIFIED",
+      "source_status_label": "PARTIALLY VERIFIED",
+      "whole_scenario_pass": false,
+      "observed_summary": "run-13十九middleware觀察；run-15邊界／429；後續代表重驗",
+      "remaining_scope": "完整服務／Browser等缺項另列，不再要求重建已用stub",
+      "proof_levels": [
+        "HTTP_HANDLER",
+        "SYNTHETIC_CLIENT"
+      ],
+      "source_refs": [
+        "SRC-001",
+        "SRC-005",
+        "SRC-014",
+        "SRC-016",
+        "SRC-018"
+      ],
+      "narrative_state": "DRAFT_CONTENT_COMPLETE",
+      "narrative": {
+        "title": "輸入邊界有明確單位",
+        "paragraphs": [
+          "已有 body UTF-8 bytes、query UTF-16 code units、方法與忙碌等指定契約觀察；不能外推完整服務與所有 client。"
+        ],
+        "source_refs": [
+          "SRC-001",
+          "SRC-005",
+          "SRC-014",
+          "SRC-016",
+          "SRC-018"
+        ]
+      }
+    },
+    {
+      "id": "GEV-05",
+      "title": "MCP HTTP 與 stdio 的不同權限邊界",
+      "requirement_id": "RQ05",
+      "threat_ids": [
+        "TH01",
+        "TH03"
+      ],
+      "trust_boundary_ids": [
+        "BT01",
+        "BT02",
+        "BT07",
+        "BT08"
+      ],
+      "assessment_status": "PARTIALLY_VERIFIED",
+      "source_status_label": "PARTIALLY VERIFIED",
+      "whole_scenario_pass": false,
+      "observed_summary": "run-23/27 v9-GEV-05-01..05：產品HTTP gate/transport、PassThrough serveStdio",
+      "remaining_scope": "完整plugin／獨立CLI transport與工具能力分母尚欠",
+      "proof_levels": [
+        "HTTP_HELPER",
+        "SYNTHETIC_STDIO"
+      ],
+      "source_refs": [
+        "SRC-001",
+        "SRC-005",
+        "SRC-017",
+        "SRC-018"
+      ],
+      "narrative_state": "DRAFT_CONTENT_COMPLETE",
+      "narrative": {
+        "title": "HTTP與stdio證明層級分開",
+        "paragraphs": [
+          "已測 HTTP 准入／傳輸 helper 及 PassThrough serveStdio；完整 plugin、獨立 CLI transport 與全部工具能力仍欠驗證。"
+        ],
+        "source_refs": [
+          "SRC-001",
+          "SRC-005",
+          "SRC-017",
+          "SRC-018"
+        ]
+      }
+    },
+    {
+      "id": "GEV-06",
+      "title": "panel_request 路由、目的地與分段隔離",
+      "requirement_id": "RQ06",
+      "threat_ids": [
+        "TH03",
+        "TH04",
+        "TH09"
+      ],
+      "trust_boundary_ids": [
+        "BT02",
+        "BT06",
+        "BT07"
+      ],
+      "assessment_status": "PARTIALLY_VERIFIED",
+      "source_status_label": "PARTIALLY VERIFIED; C-004 NEEDS VALIDATION",
+      "whole_scenario_pass": false,
+      "observed_summary": "run-23/27代理路由／headers／WeakMap；run-34/35真handler拒絕",
+      "remaining_scope": "正控制／未測路由與分段逾期等子條件",
+      "proof_levels": [
+        "HANDLER_COMPOSITION",
+        "SYNTHETIC_BACKEND"
+      ],
+      "source_refs": [
+        "SRC-001",
+        "SRC-005",
+        "SRC-017",
+        "SRC-018",
+        "SRC-019",
+        "SRC-020"
+      ],
+      "narrative_state": "DRAFT_CONTENT_COMPLETE",
+      "narrative": {
+        "title": "代理責任仍需產品契約",
+        "paragraphs": [
+          "指定路徑、標頭、實例隔離與敏感 handler 拒絕有證據；合法敏感正控制、未測路由與分段過期未完成。"
+        ],
+        "source_refs": [
+          "SRC-001",
+          "SRC-005",
+          "SRC-017",
+          "SRC-018",
+          "SRC-019",
+          "SRC-020"
+        ]
+      }
+    },
+    {
+      "id": "GEV-07",
+      "title": "query、selected 與上游文字的資料完整性",
+      "requirement_id": "RQ07",
+      "threat_ids": [
+        "TH05"
+      ],
+      "trust_boundary_ids": [
+        "BT03",
+        "BT05"
+      ],
+      "assessment_status": "KNOWN_OPEN_FINDING",
+      "source_status_label": "KNOWN OPEN FINDING; INCOMPLETE",
+      "whole_scenario_pass": false,
+      "observed_summary": "GEV-F-001 grounding數量5重現與其他已列對照",
+      "remaining_scope": "缺陷未修；其他資料完整性分母不能由單缺陷代替",
+      "proof_levels": [
+        "SOURCE",
+        "UNIT_DYNAMIC"
+      ],
+      "source_refs": [
+        "SRC-001",
+        "SRC-005",
+        "SRC-016",
+        "SRC-018",
+        "SRC-007",
+        "SRC-008",
+        "SRC-009",
+        "SRC-010"
+      ],
+      "narrative_state": "DRAFT_CONTENT_COMPLETE",
+      "narrative": {
+        "title": "已知缺陷未關閉",
+        "paragraphs": [
+          "F-001 的錯誤船數接受已有重現，維持 OPEN；其他 query／selected／上游文字完整性不能由此單一發現代表。"
+        ],
+        "source_refs": [
+          "SRC-001",
+          "SRC-005",
+          "SRC-016",
+          "SRC-018",
+          "SRC-007",
+          "SRC-008",
+          "SRC-009",
+          "SRC-010"
+        ]
+      }
+    },
+    {
+      "id": "GEV-08",
+      "title": "AI 面板、來源引用與權杖呈現",
+      "requirement_id": "RQ08",
+      "threat_ids": [
+        "TH06",
+        "TH09"
+      ],
+      "trust_boundary_ids": [
+        "BT06"
+      ],
+      "assessment_status": "PARTIALLY_VERIFIED",
+      "source_status_label": "STATIC/OBSERVATIONS PARTIAL; BROWSER BLOCKED",
+      "whole_scenario_pass": false,
+      "observed_summary": "run-36/37來源；run-38/39指定DOM觀察但控制有限",
+      "remaining_scope": "目前受控Browser／UI未測，不移植舊DOM為合規PASS",
+      "proof_levels": [
+        "SOURCE",
+        "HISTORICAL_BROWSER_OBSERVATION"
+      ],
+      "source_refs": [
+        "SRC-001",
+        "SRC-005",
+        "SRC-027",
+        "SRC-028",
+        "SRC-003"
+      ],
+      "narrative_state": "DRAFT_CONTENT_COMPLETE",
+      "narrative": {
+        "title": "歷史DOM觀察保留限制",
+        "paragraphs": [
+          "保留來源審查與較早指定元件 DOM 觀察，適用其控制缺口；目前 outer Seatbelt 下 Chrome 受阻，不能標整體 UI 通過。"
+        ],
+        "source_refs": [
+          "SRC-001",
+          "SRC-005",
+          "SRC-027",
+          "SRC-028",
+          "SRC-003"
+        ]
+      }
+    },
+    {
+      "id": "GEV-09",
+      "title": "上游解析與回應資源界線",
+      "requirement_id": "RQ09",
+      "threat_ids": [
+        "TH07"
+      ],
+      "trust_boundary_ids": [
+        "BT03",
+        "BT05"
+      ],
+      "assessment_status": "PARTIALLY_VERIFIED",
+      "source_status_label": "PARTIALLY VERIFIED; C-002 NEEDS VALIDATION",
+      "whole_scenario_pass": false,
+      "observed_summary": "run-23/27 parser/ollama；run-35真MPB有限chunks與request error",
+      "remaining_scope": "無body cap的風險判讀／中途body失效等未測",
+      "proof_levels": [
+        "FINITE_STREAM_STUB",
+        "PARSER"
+      ],
+      "source_refs": [
+        "SRC-001",
+        "SRC-005",
+        "SRC-017",
+        "SRC-018",
+        "SRC-020",
+        "SRC-012"
+      ],
+      "narrative_state": "DRAFT_CONTENT_COMPLETE",
+      "narrative": {
+        "title": "正常有限資料不代表資源防護",
+        "paragraphs": [
+          "已有 parser、有限 MPB chunks 及回應前 request error 觀察；無 body cap 的利用影響、中途 body 異常與其他資源變體仍未確認。"
+        ],
+        "source_refs": [
+          "SRC-001",
+          "SRC-005",
+          "SRC-017",
+          "SRC-018",
+          "SRC-020",
+          "SRC-012"
+        ]
+      }
+    },
+    {
+      "id": "GEV-10",
+      "title": "航跡檔案、參數與保留邊界",
+      "requirement_id": "RQ10",
+      "threat_ids": [
+        "TH03",
+        "TH08"
+      ],
+      "trust_boundary_ids": [
+        "BT02",
+        "BT04"
+      ],
+      "assessment_status": "PARTIALLY_VERIFIED",
+      "source_status_label": "PARTIALLY VERIFIED",
+      "whole_scenario_pass": false,
+      "observed_summary": "run-23/27 v9-GEV-10-01..03：store／fake-clock過期／NDJSON／proxy",
+      "remaining_scope": "未測檔案邊界與容量，不要求168小時真流量作全部前提",
+      "proof_levels": [
+        "FILESYSTEM",
+        "VIRTUAL_CLOCK"
+      ],
+      "source_refs": [
+        "SRC-001",
+        "SRC-005",
+        "SRC-017",
+        "SRC-018"
+      ],
+      "narrative_state": "DRAFT_CONTENT_COMPLETE",
+      "narrative": {
+        "title": "虛擬時間與容量分開",
+        "paragraphs": [
+          "檔案權限、部分參數、NDJSON 容錯及保留清理已有觀察；fake clock 不證明七天實際吞吐或磁碟容量安全。"
+        ],
+        "source_refs": [
+          "SRC-001",
+          "SRC-005",
+          "SRC-017",
+          "SRC-018"
+        ]
+      }
+    },
+    {
+      "id": "GEV-11",
+      "title": "靜態服務、成品與 bundled file 的秘密邊界",
+      "requirement_id": "RQ11",
+      "threat_ids": [
+        "TH09"
+      ],
+      "trust_boundary_ids": [
+        "BT04",
+        "BT06",
+        "BT07"
+      ],
+      "assessment_status": "PARTIALLY_VERIFIED",
+      "source_status_label": "PARTIALLY VERIFIED; STANDALONE BLOCKED",
+      "whole_scenario_pass": false,
+      "observed_summary": "run-42 inline成品；run-43 panel工廠／前導步驟成品",
+      "remaining_scope": "Standalone CPU受阻、完整秘密／公開服務／發布對照仍欠",
+      "proof_levels": [
+        "BUILD_SUBSET",
+        "RETAINED_AUDIT"
+      ],
+      "source_refs": [
+        "SRC-001",
+        "SRC-005",
+        "SRC-029",
+        "SRC-038",
+        "SRC-034",
+        "SRC-030"
+      ],
+      "narrative_state": "DRAFT_CONTENT_COMPLETE",
+      "narrative": {
+        "title": "Panel與主App各自判讀",
+        "paragraphs": [
+          "Panel 保留建置子集有證據，離線重評支持原審計；Standalone CPU 超限無成品，完整公開服務及秘密邊界仍未完成。"
+        ],
+        "source_refs": [
+          "SRC-001",
+          "SRC-005",
+          "SRC-029",
+          "SRC-038",
+          "SRC-034",
+          "SRC-030"
+        ]
+      }
+    },
+    {
+      "id": "GEV-12",
+      "title": "取消、忙碌、排隊與失敗恢復",
+      "requirement_id": "RQ12",
+      "threat_ids": [
+        "TH10"
+      ],
+      "trust_boundary_ids": [
+        "BT02",
+        "BT03",
+        "BT05",
+        "BT07"
+      ],
+      "assessment_status": "PARTIALLY_VERIFIED",
+      "source_status_label": "PARTIALLY VERIFIED",
+      "whole_scenario_pass": false,
+      "observed_summary": "run-15忙碌／恢復；run-34/35真runOllama＋barrier取消／finally",
+      "remaining_scope": "未測queue／其他timeout／端到端層級，不稱只做靜態",
+      "proof_levels": [
+        "UNIT_DYNAMIC",
+        "ASYNC_BARRIER"
+      ],
+      "source_refs": [
+        "SRC-001",
+        "SRC-005",
+        "SRC-016",
+        "SRC-019",
+        "SRC-020"
+      ],
+      "narrative_state": "DRAFT_CONTENT_COMPLETE",
+      "narrative": {
+        "title": "取消與恢復已有單元動態證據",
+        "paragraphs": [
+          "Async Barrier 確認進行中請求後取消、finally 與忙碌鎖恢復；其他排隊、真計時及端到端取消仍欠驗證。"
+        ],
+        "source_refs": [
+          "SRC-001",
+          "SRC-005",
+          "SRC-016",
+          "SRC-019",
+          "SRC-020"
+        ]
+      }
+    },
+    {
+      "id": "GEV-13",
+      "title": "來源健康、快取及回答的時間一致性",
+      "requirement_id": "RQ13",
+      "threat_ids": [
+        "TH05",
+        "TH11"
+      ],
+      "trust_boundary_ids": [
+        "BT03",
+        "BT05",
+        "BT06"
+      ],
+      "assessment_status": "PARTIALLY_VERIFIED",
+      "source_status_label": "PARTIALLY VERIFIED",
+      "whole_scenario_pass": false,
+      "observed_summary": "run-34/35真getTaiwanVessels快取40s／stale／恢復",
+      "remaining_scope": "UI／回答時間一致性及未測變體",
+      "proof_levels": [
+        "VIRTUAL_CLOCK",
+        "UPSTREAM_STUB"
+      ],
+      "source_refs": [
+        "SRC-001",
+        "SRC-005",
+        "SRC-019",
+        "SRC-020"
+      ],
+      "narrative_state": "DRAFT_CONTENT_COMPLETE",
+      "narrative": {
+        "title": "TTL觀察不等於全系統時間一致",
+        "paragraphs": [
+          "真實快取入口與虛擬時鐘支持 TTL、stale 及恢復行為；UI、回答與來源的時間一致性尚有缺項。"
+        ],
+        "source_refs": [
+          "SRC-001",
+          "SRC-005",
+          "SRC-019",
+          "SRC-020"
+        ]
+      }
+    },
+    {
+      "id": "GEV-14",
+      "title": "原生、Docker、dev/preview 與分享配置差異",
+      "requirement_id": "RQ14",
+      "threat_ids": [
+        "TH01",
+        "TH03",
+        "TH12"
+      ],
+      "trust_boundary_ids": [
+        "BT01",
+        "BT02",
+        "BT08"
+      ],
+      "assessment_status": "PARTIALLY_VERIFIED",
+      "source_status_label": "PARTIALLY VERIFIED; DOCKER NOT TESTED",
+      "whole_scenario_pass": false,
+      "observed_summary": "run-37 docker-start十二純函式／collector；run-41/42 HTTP子集",
+      "remaining_scope": "Docker／真dev-preview完整生命週期與配置差異",
+      "proof_levels": [
+        "PURE_FUNCTION",
+        "MIDDLEWARE_COLLECTOR"
+      ],
+      "source_refs": [
+        "SRC-001",
+        "SRC-005"
+      ],
+      "narrative_state": "DRAFT_CONTENT_COMPLETE",
+      "narrative": {
+        "title": "配置算法不等於容器部署",
+        "paragraphs": [
+          "保留 docker-start 純函式及指定 HTTP 管線結果；不宣稱實體 Docker 網路、完整 dev-preview 或其他 launcher 均已通過。"
+        ],
+        "source_refs": [
+          "SRC-001",
+          "SRC-005"
+        ]
+      }
+    },
+    {
+      "id": "GEV-15",
+      "title": "PAT 與 panel key 檔案安全和生命週期",
+      "requirement_id": "RQ15",
+      "threat_ids": [
+        "TH02",
+        "TH08",
+        "TH09"
+      ],
+      "trust_boundary_ids": [
+        "BT04",
+        "BT06",
+        "BT07"
+      ],
+      "assessment_status": "PARTIALLY_VERIFIED",
+      "source_status_label": "PARTIALLY VERIFIED; C-003/C-004 NEEDS VALIDATION",
+      "whole_scenario_pass": false,
+      "observed_summary": "run-23同程序key；run-27兩Node子程序key一致／0600；PAT觀察",
+      "remaining_scope": "崩潰／鎖競態分支與部署契約尚欠，不當跨程序全未測",
+      "proof_levels": [
+        "MULTIPROCESS",
+        "FILESYSTEM"
+      ],
+      "source_refs": [
+        "SRC-001",
+        "SRC-005",
+        "SRC-017",
+        "SRC-018"
+      ],
+      "narrative_state": "DRAFT_CONTENT_COMPLETE",
+      "narrative": {
+        "title": "跨行程key觀察不代表所有競態",
+        "paragraphs": [
+          "已有兩個 Node 子行程 key 一致性、部分權限與 PAT 觀察；崩潰、修復鎖競態與部署契約仍未完成。"
+        ],
+        "source_refs": [
+          "SRC-001",
+          "SRC-005",
+          "SRC-017",
+          "SRC-018"
+        ]
+      }
+    }
+  ],
+  "evidence_provenance": [
+    {
+      "task_id": "TASK-1",
+      "execution_kind": "EXECUTED",
+      "origin_run": "run-agy-20261108-45",
+      "refs": [
+        "SRC-026",
+        "SRC-003"
+      ]
+    },
+    {
+      "task_id": "TASK-2",
+      "execution_kind": "EXECUTED",
+      "origin_run": "run-agy-20261108-45",
+      "supervisor_status": "OBSERVED",
+      "browser_status": "BLOCKED_BROWSER_LAUNCH_TARGET_CLOSED",
+      "refs": [
+        "SRC-027",
+        "SRC-028",
+        "SRC-003"
+      ]
+    },
+    {
+      "task_id": "TASK-3",
+      "execution_kind": "INHERITED_OBSERVATION",
+      "origin_run": "run-agy-20261108-43",
+      "artifact_assessment": "NOT_ASSESSED",
+      "refs": [
+        "SRC-029",
+        "SRC-030",
+        "SRC-031"
+      ]
+    },
+    {
+      "task_id": "TASK-4",
+      "execution_kind": "OFFLINE_REEVALUATION",
+      "origin_run": "run-agy-20261108-43",
+      "judgment": "SUPPORTED_BY_RETAINED_AUDIT",
+      "refs": [
+        "SRC-029",
+        "SRC-038",
+        "SRC-034",
+        "SRC-035"
+      ]
+    }
+  ],
+  "conflict_decisions": [
+    {
+      "id": "D01",
+      "topic": "F001誤名",
+      "resolution": "F001僅指grounding固定允許5；撤回TLS／Host／KeySetup誤名。",
+      "refs": [
+        "SRC-007",
+        "SRC-008",
+        "SRC-003"
+      ]
+    },
+    {
+      "id": "D02",
+      "topic": "原情境與舊NOT TESTED",
+      "resolution": "原矩陣只決定身分與分母，當前狀態依最新採認索引，保留歷史局部證據。",
+      "refs": [
+        "SRC-001",
+        "SRC-005",
+        "SRC-006"
+      ]
+    },
+    {
+      "id": "D03",
+      "topic": "Chrome觀測衝突",
+      "resolution": "本輪supervise_result與日誌OBSERVED/CLEAN/rc0；寫死NATIVE_OBSERVATION_FAILED不採。Chrome Target closed仍受阻，原因未證實。",
+      "refs": [
+        "SRC-027",
+        "SRC-028",
+        "SRC-003"
+      ]
+    },
+    {
+      "id": "D04",
+      "topic": "建置出處",
+      "resolution": "Standalone沿用run43，Panel為離線重評，不當成run45新建置。",
+      "refs": [
+        "SRC-029",
+        "SRC-038"
+      ]
+    },
+    {
+      "id": "D05",
+      "topic": "C002中斷與恢復",
+      "resolution": "run35為回應前request error、同fixture重抓，不宣稱body途中中斷或新內容更新。",
+      "refs": [
+        "SRC-012",
+        "SRC-020"
+      ]
+    },
+    {
+      "id": "D06",
+      "topic": "驗收門檻與預算",
+      "resolution": "維持2CPU；不要求3CPU/3GiB、特定授權書、補充工具或容器逃逸測試。",
+      "refs": [
+        "SRC-003",
+        "SRC-006",
+        "SRC-039"
+      ]
+    },
+    {
+      "id": "D07",
+      "topic": "工具完整性",
+      "resolution": "未知工具hash為null，SHA256不是簽章；缺供給不冒充掃描通過。",
+      "refs": [
+        "SRC-013",
+        "SRC-006"
+      ]
+    },
+    {
+      "id": "D08",
+      "topic": "重跑／失敗保留",
+      "resolution": "run14失敗保留，run15成功不覆寫；重跑數不增加覆蓋或漏洞數。",
+      "refs": [
+        "SRC-015",
+        "SRC-016",
+        "SRC-005"
+      ]
+    }
+  ],
+  "unresolved_questions": [
+    {
+      "id": "U01",
+      "topic": "風險分級與業務影響",
+      "status": "UNCONFIRMED",
+      "note": "尚無充分實際暴露與業務用途資料，不填CVSS或實際損害。",
+      "refs": [
+        "SRC-007"
+      ]
+    },
+    {
+      "id": "U02",
+      "topic": "部署及產品契約",
+      "status": "PENDING_OWNER",
+      "note": "候選責任人、上游負載上限、UID信任與代理契約待定。",
+      "refs": [
+        "SRC-011",
+        "SRC-006"
+      ]
+    },
+    {
+      "id": "U03",
+      "topic": "瀏覽器受阻根因",
+      "status": "UNPROVEN",
+      "note": "Target closed不能證明核心巢狀沙箱錯誤。",
+      "refs": [
+        "SRC-003",
+        "SRC-028"
+      ]
+    },
+    {
+      "id": "U04",
+      "topic": "C002歷史傳輸byte總量",
+      "status": "UNRESOLVED_MEASUREMENT",
+      "note": "run35 payload mpb_stream_bytes_emitted=7342，而後續勘誤列2943B／4chunks；總量未完全對齊，不作容量或更新內容證明。",
+      "refs": [
+        "SRC-020",
+        "SRC-012",
+        "SRC-025"
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "id": "executive-summary",
+      "title": "管理摘要",
+      "content": {
+        "blocks": [
+          {
+            "title": "目前判斷",
+            "paragraphs": [
+              "本次評估已確認一項 Grounding 邏輯缺陷，並取得部分本機准入、PAT 生命週期、代理隔離、取消恢復及受控建置的驗證證據。三項候選風險仍需釐清部署前提與產品契約。完整主 App、目前受控瀏覽器流程及必要自動化掃描尚未完成，現有證據不足以支持整體安全驗收或發布放行。"
+            ],
+            "source_refs": [
+              "SRC-003",
+              "SRC-005",
+              "SRC-006",
+              "SRC-007"
+            ]
+          },
+          {
+            "title": "已確認問題",
+            "paragraphs": [
+              "GEV-F-001 的船舶數量驗證允許集合包含固定值 5。當合成資料中實際只有 2 艘船舶時，回答「目前共有 5 艘」仍能通過檢查。此問題削弱回答可信度保護，可能誤導態勢判讀；目前沒有證據支持秘密外洩、權限提升或實際業務損害。缺陷維持 CONFIRMED / OPEN，風險等級與 CVSS 待評，未套用修補。"
+            ],
+            "source_refs": [
+              "SRC-007",
+              "SRC-008",
+              "SRC-009",
+              "SRC-010"
+            ]
+          },
+          {
+            "title": "有效的防禦證據",
+            "paragraphs": [
+              "指定測試已觀察到不合格請求遭拒、PAT 輪替及撤銷後舊權杖失效、部分代理請求受限制，以及取消後的鎖釋放與恢復。這些結果適用於各自的真實入口、合成替身與控制條件，不代表所有路由、部署方式或真模型均通過。"
+            ],
+            "source_refs": [
+              "SRC-005",
+              "SRC-016",
+              "SRC-018",
+              "SRC-020",
+              "SRC-021",
+              "SRC-023",
+              "SRC-025"
+            ]
+          },
+          {
+            "title": "仍待確認的風險",
+            "paragraphs": [
+              "C-002 關注上游回應缺少累積位元組上限；C-003 關注 PAT 父目錄鏈與本機使用者信任；C-004 關注代理敏感路由的責任及副作用邊界。已知程式行為不足以直接證明可利用的阻斷服務、跨使用者越權或完整授權繞過，因此三者維持 NEEDS VALIDATION。"
+            ],
+            "source_refs": [
+              "SRC-007",
+              "SRC-011",
+              "SRC-012",
+              "SRC-006"
+            ]
+          },
+          {
+            "title": "主要限制",
+            "paragraphs": [
+              "Standalone 在原 2 CPU 預算下超限終止，沒有可驗收成品；Panel 的保留成品與離線評估只支持該建置子集。Chrome 診斷治具正常收尾，但瀏覽器本身 Target closed。Semgrep、Gitleaks、OSV-Scanner 的必要離線供給未備妥，Docker 實體容器與真實模型、上游仍未完成驗證。"
+            ],
+            "source_refs": [
+              "SRC-003",
+              "SRC-006",
+              "SRC-028",
+              "SRC-029",
+              "SRC-030",
+              "SRC-034",
+              "SRC-038"
+            ]
+          },
+          {
+            "title": "需要的決策",
+            "paragraphs": [
+              "後續需由有權維護者決定 F-001 修補與回歸工作、指定候選議題的責任人並確認部署契約，以及補齊可核實的離線工具。選項 A 已定，維持 2 CPU、原生 macOS；不再要求 3 CPU、另一 OS VM 或重跑相同結果。報告不代替風險接受或發布決策。"
+            ],
+            "source_refs": [
+              "SRC-003",
+              "SRC-006"
+            ]
+          }
+        ]
+      },
+      "state": "DRAFT_CONTENT_COMPLETE"
+    },
+    {
+      "id": "scope-method",
+      "title": "範圍與方法",
+      "content": {
+        "blocks": [
+          {
+            "title": "受評對象與資料截止",
+            "paragraphs": [
+              "對象為 A24 戰情台（1151104_gods-eye-view）。受評 commit 為 e50944f89f99b60d948ede8e4f0a9feee12cd3a7；保留三份歷史受追蹤 pyc 刪除，因此工作樹為 dirty，不描述成 clean。報告整理範圍截至 Review 45 與 2026-11-09 後續交接文件勘誤，不把報告產製日期當成新測試時間。"
+            ],
+            "source_refs": [
+              "SRC-003",
+              "SRC-006"
+            ]
+          },
+          {
+            "title": "任務定位",
+            "paragraphs": [
+              "本次採紅隊導向檢視攻擊面與信任邊界，方法以程式碼審查、合成輸入、單元／處理常式測試、部分真實 HTTP、作業系統隔離與建置子集為主。未形成完整初始入侵、權限提升、橫向移動及偵測回應演練，不能據此評估企業整體攻防能力。"
+            ],
+            "source_refs": [
+              "SRC-001",
+              "SRC-002",
+              "SRC-005"
+            ]
+          },
+          {
+            "title": "授權與執行界線",
+            "paragraphs": [
+              "沿用原 ROE 與 NATIVE-01，在原生 macOS、受控來源副本及合成資料下執行；不得擅改產品、依賴、設定或 F-001。不得讀取真憑證、真 .env、Keychain 或既有瀏覽器 Profile，不連真模型及外部上游。本報告製作只整理既有檔案，不新增產品執行或安全測試輪次。"
+            ],
+            "source_refs": [
+              "SRC-002",
+              "SRC-003",
+              "SRC-006"
+            ]
+          },
+          {
+            "title": "資源控制的精確語意",
+            "paragraphs": [
+              "NATIVE-01 採反應式觀測及超限停止：名義 50 ms 取樣、500 ms 程序群平均 CPU 視窗，搭配已觀測 CPU 工作量、RSS、工作容量與 wall time。2 CPU 是觀測目標，不是核心排程器硬性配額。短命行程、排程延遲、停止前超額與資料下界仍有限制，不宣稱固定最壞停止上界；工作容量也不等於累積 SSD 寫入量。"
+            ],
+            "source_refs": [
+              "SRC-002",
+              "SRC-003",
+              "SRC-039"
+            ]
+          },
+          {
+            "title": "測試層級與替身",
+            "paragraphs": [
+              "每筆結果依真實產品入口、被替換的 client／retriever／上游、傳輸方式及觀測範圍判讀。處理常式上合成 remoteAddress 僅證明准入邏輯，不證明真實 LAN 拓樸；PassThrough 串接不等於獨立網路服務；虛擬時鐘不等於經過相同長度的真實流量。"
+            ],
+            "source_refs": [
+              "SRC-001",
+              "SRC-005",
+              "SRC-021",
+              "SRC-023",
+              "SRC-025"
+            ]
+          },
+          {
+            "title": "來源優先與衝突處理",
+            "paragraphs": [
+              "原 test-matrix.md 決定情境身分與分母；最新採認及勘誤決定當前判讀；原始結構化結果與遮罩日誌提供觀測值。已撤回摘要不作新結論，歷史失敗不被後續成功覆寫。來源 hash 是本次檔案完整性快照，不是數位簽章，也不能反向證明所有歷史執行狀態。"
+            ],
+            "source_refs": [
+              "SRC-001",
+              "SRC-003",
+              "SRC-005",
+              "SRC-012",
+              "SRC-013",
+              "SRC-015",
+              "SRC-016"
+            ]
+          },
+          {
+            "title": "判讀與交付限制",
+            "paragraphs": [
+              "缺陷確認程度、風險等級、處置狀態、測試結果與證明層級分開呈現。Ledger CLEAN 只表示所報帳本完整性，SDD 結案只表示工作完成，兩者均不代表產品安全。單檔報告將保留必要安全節錄與來源索引；完整原始證據需在原資料夾結構下查閱，不會把 raw 日誌全文嵌入。"
+            ],
+            "source_refs": [
+              "SRC-001",
+              "SRC-003",
+              "SRC-006"
+            ]
+          }
+        ]
+      },
+      "state": "DRAFT_CONTENT_COMPLETE"
+    },
+    {
+      "id": "attack-surface",
+      "title": "攻擊面與信任邊界",
+      "content": {
+        "blocks": [
+          {
+            "title": "圖解閱讀方式",
+            "paragraphs": [
+              "圖中的BT編號沿用原威脅模型；線條表示產品架構或指定子集的呼叫關係，不是攻擊成功路線。虛線外部關係的動態測試使用替身，沒有真上游或模型連線。檔案、發布與DOM另列為相鄰邊界。",
+              "點選節點可查產品入口、證據與限制。圖下文字對照保留完整說明，動畫預設停止；減少動態設定與列印時維持靜態。"
+            ],
+            "source_refs": [
+              "SRC-045",
+              "SRC-005",
+              "SRC-003"
+            ]
+          }
+        ],
+        "diagram_ids": [
+          "attack-map"
+        ]
+      },
+      "state": "DRAFT_CONTENT_COMPLETE"
+    },
+    {
+      "id": "defense-validation",
+      "title": "防禦驗證",
+      "content": {
+        "blocks": [
+          {
+            "title": "來源隔離與本輪控制",
+            "paragraphs": [
+              "run-45 的三組合成對照支持：允許的 loopback 與 scratch 存取成功，未授權網路及寫入遭 EPERM，來源副本可讀而原 repo package.json 與交付 Canary 被拒讀。這證明指定 profile 與探針的隔離行為，不證明完整產品所有檔案及網路路徑均已測。"
+            ],
+            "source_refs": [
+              "SRC-026",
+              "SRC-003"
+            ]
+          },
+          {
+            "title": "基線與驗證器",
+            "paragraphs": [
+              "Review 45 對實際 V12 的 verify_all_sources=False／True 驗證均通過，canonical 來源集合與 1,452 份 snapshot 項目一致；四項合成 Guard 控制符合預期。此採認針對基線檢查與已測分支，不能當成驗證器所有分支、所有歷史輪次或產品本身的安全證明。"
+            ],
+            "source_refs": [
+              "SRC-003",
+              "SRC-004"
+            ]
+          },
+          {
+            "title": "准入、權杖與代理",
+            "paragraphs": [
+              "歷史子集包含本機准入、跨來源拒絕、PAT 建立／旋轉／撤銷、檔案權限及代理路由／標頭／實例隔離觀察。真實敏感 handler 的指定負向案例回傳 401／403，特定模型 client 與 token 旋轉計數為零；尚未量測的 provider、正向管理路徑或多使用者部署不可承襲此結論。"
+            ],
+            "source_refs": [
+              "SRC-005",
+              "SRC-016",
+              "SRC-018",
+              "SRC-020",
+              "SRC-021",
+              "SRC-023",
+              "SRC-025"
+            ]
+          },
+          {
+            "title": "取消恢復與快取",
+            "paragraphs": [
+              "真實 runOllama 的合成串流案例，以 Async Barrier 確認進行中請求，再驗證忙碌拒絕、取消清理及後續恢復。真實快取入口搭配虛擬時鐘驗證 40 秒 TTL、失敗舊值保留與恢復。這些結果不等於真 Ollama 串流中斷、所有佇列條件或真實上游長期穩定性通過。"
+            ],
+            "source_refs": [
+              "SRC-005",
+              "SRC-019",
+              "SRC-020",
+              "SRC-024",
+              "SRC-025"
+            ]
+          },
+          {
+            "title": "有限串流與檔案儲存",
+            "paragraphs": [
+              "既有案例支持有限 GeoJSON chunks 的累積解析、部分 request error 容忍及 NDJSON 航跡維護。run-35 的錯誤在 response callback 前發生，恢復使用相同 fixture，不能宣稱證明部分 body 中斷或不同資料增量更新；也沒有壓測到記憶體耗盡。"
+            ],
+            "source_refs": [
+              "SRC-005",
+              "SRC-012",
+              "SRC-018",
+              "SRC-020",
+              "SRC-023",
+              "SRC-025"
+            ]
+          },
+          {
+            "title": "Panel 成品與 Standalone 分開",
+            "paragraphs": [
+              "run-43 Panel 保留清冊為 722 檔、76,696,458 bytes；原審計記錄未見 sourcemap 與指定合成私密 Canary，且有陽性校準。run-45 離線 11 項檢查符合 SUPPORTED_BY_RETAINED_AUDIT，僅支持保留審計一致性，未重新掃描成品。Standalone 保留 CPU_RATE_EXCEEDED、rc=-15、0 產物，成品秘密與 sourcemap 檢查為 NOT_ASSESSED。"
+            ],
+            "source_refs": [
+              "SRC-029",
+              "SRC-030",
+              "SRC-031",
+              "SRC-034",
+              "SRC-035",
+              "SRC-036",
+              "SRC-038"
+            ]
+          },
+          {
+            "title": "瀏覽器失敗與治具成功並存",
+            "paragraphs": [
+              "run-45 Supervisor 記錄 COMPLETED、OBSERVED、CLEAN、rc=0、lingering_pids=[]，表示該診斷治具完成觀測與收尾。Chrome 的 Target.setDiscoverTargets 仍回報 Target closed，元件 DOM 相依受阻。寫死的 NATIVE_OBSERVATION_FAILED 不作本輪實測，巢狀沙箱根因未證實；不以關閉 Chrome 原生沙箱取得通過。"
+            ],
+            "source_refs": [
+              "SRC-027",
+              "SRC-028",
+              "SRC-003"
+            ]
+          }
+        ]
+      },
+      "state": "DRAFT_CONTENT_COMPLETE"
+    },
+    {
+      "id": "coverage",
+      "title": "情境覆蓋與未完成範圍",
+      "content": {
+        "blocks": [
+          {
+            "title": "覆蓋基準",
+            "paragraphs": [
+              "覆蓋以原 GEV-01..15 為固定分母，保留每列原始身分及必要變體。歷史結果的有效子集仍可採用，但各輪控制、替身與複核限制繼續適用；目前未將任何一列宣稱為全部必要變體通過。"
+            ],
+            "source_refs": [
+              "SRC-001",
+              "SRC-005"
+            ]
+          },
+          {
+            "title": "如何閱讀狀態",
+            "paragraphs": [
+              "PARTIALLY VERIFIED 代表有指定層級的有效觀察，並非全情境 PASS；NEEDS VALIDATION 是候選議題仍待確認；BLOCKED 是執行或觀測前提受阻；NOT TESTED 是尚未執行。GEV-07 另含已知 OPEN 缺陷。來源設計文件中的早期 NOT TESTED 不取代後來證據，工具缺失也不抹除既有產品觀察。"
+            ],
+            "source_refs": [
+              "SRC-001",
+              "SRC-003",
+              "SRC-005"
+            ]
+          },
+          {
+            "title": "不可外推的範圍",
+            "paragraphs": [
+              "目前完整 Vite 主 App／實際 dev-preview 生命週期、受控 Chrome DOM、Docker 拓樸、真模型及真上游仍有缺口。GEV-11 的 Panel 子集不能替代 Standalone 或全產品秘密掃描；Gitleaks、Semgrep、OSV-Scanner 供給不足不能寫成零告警或已通過。"
+            ],
+            "source_refs": [
+              "SRC-003",
+              "SRC-005",
+              "SRC-006"
+            ]
+          },
+          {
+            "title": "不提供整案通過率",
+            "paragraphs": [
+              "run 數量、重跑成功、PASS 變體數及 Ledger CLEAN 均不作全案完成率或安全分數。下列各情境保留「已驗證什麼、在哪一層、還缺什麼」；缺資料時保留未知，避免把局部成功或環境失敗誤寫成整體結論。"
+            ],
+            "source_refs": [
+              "SRC-001",
+              "SRC-003",
+              "SRC-005"
+            ]
+          }
+        ],
+        "scenario_ids": [
+          "GEV-01",
+          "GEV-02",
+          "GEV-03",
+          "GEV-04",
+          "GEV-05",
+          "GEV-06",
+          "GEV-07",
+          "GEV-08",
+          "GEV-09",
+          "GEV-10",
+          "GEV-11",
+          "GEV-12",
+          "GEV-13",
+          "GEV-14",
+          "GEV-15"
+        ]
+      },
+      "state": "DRAFT_CONTENT_COMPLETE"
+    },
+    {
+      "id": "remediation",
+      "title": "改善與交接",
+      "content": {
+        "blocks": [
+          {
+            "title": "建議處理順序",
+            "paragraphs": [
+              "先就已確認F-001取得修補與回歸決策，同時指定候選責任人並確認負載、UID與代理契約；其次補齊可核實工具供給及尚欠驗收前提。這是報告建議順序，不是已核准時程、嚴重度分級或風險接受。"
+            ],
+            "source_refs": [
+              "SRC-007",
+              "SRC-003",
+              "SRC-006"
+            ]
+          },
+          {
+            "title": "保持現有決策",
+            "paragraphs": [
+              "2CPU原生macOS選項A已定。Standalone超限、Chrome受阻與Docker未測保留原狀，不以重新要求3CPU、關閉沙箱或建VM解除。只有新方案、新證據或相應授權才安排不同目的的後續工作。"
+            ],
+            "source_refs": [
+              "SRC-003",
+              "SRC-006"
+            ]
+          },
+          {
+            "title": "關案與驗收分開",
+            "paragraphs": [
+              "修補候選、改文件、供給工具與安全驗收是不同工作。F-001須有修補、對照回歸與來源／成品一致性複核；候選須依已定契約與影響證據分類；部分工具或局部PASS都不構成整案放行。"
+            ],
+            "source_refs": [
+              "SRC-001",
+              "SRC-003",
+              "SRC-006",
+              "SRC-007"
+            ]
+          }
+        ],
+        "action_ids": [
+          "ACT-01",
+          "ACT-02",
+          "ACT-03",
+          "ACT-04",
+          "ACT-05",
+          "ACT-06",
+          "ACT-07"
+        ]
+      },
+      "state": "DRAFT_CONTENT_COMPLETE"
+    },
+    {
+      "id": "appendix",
+      "title": "證據附錄",
+      "content": {
+        "blocks": [
+          {
+            "title": "附錄判讀原則",
+            "paragraphs": [
+              "來源索引與術語供複核使用；單檔內只有經選取的安全節錄，完整原始證據需要原資料夾結構。歷史檔案中已撤回的表述，以本報告採認與勘誤欄為準。"
+            ],
+            "source_refs": [
+              "SRC-003",
+              "SRC-005",
+              "SRC-006"
+            ]
+          }
+        ]
+      },
+      "state": "DRAFT_CONTENT_COMPLETE"
+    }
+  ],
+  "document_control": {
+    "report_version": "1.0.0",
+    "document_status": "DELIVERABLE_WITH_QA_LIMITATIONS",
+    "data_cutoff": "2026-11-09 Asia/Taipei；至Review45及其後交接文件勘誤",
+    "assessment_execution_dates": "2026-11-07至2026-11-09既有證據；不表示連續演練或完整執行窗口",
+    "report_author_role": "工作區使用者授權之報告整理；Codex協助",
+    "endorsement": null,
+    "assessment_operators": "歷史記錄為AGY執行、Codex來源及交付複核；具名人員未填定",
+    "named_risk_owner": null,
+    "named_independent_signatory": null,
+    "release_authorization": false,
+    "source_refs": [
+      "SRC-002",
+      "SRC-003",
+      "SRC-006",
+      "SRC-007"
+    ]
+  },
+  "evidence_excerpts": [
+    {
+      "id": "EV-F001-CODE",
+      "source_ref": "SRC-008",
+      "label": "船舶數量允許集合包含固定值5",
+      "locator": {
+        "kind": "lines",
+        "start": 76,
+        "end": 83
+      },
+      "format": "text",
+      "text": "  const realCounts = {\n    艘: new Set(\n      [\n        matched_total.vessels,\n        summary.total_vessels,\n        Math.min(vessels.length, 10),\n        5,\n      ].map(String),",
+      "qualification": "靜態程式碼；不能單憑這段推定實際業務損害。",
+      "contains_only": "non_secret_product_code",
+      "render_as": "plain_text"
+    },
+    {
+      "id": "EV-F001-CONTEXT",
+      "source_ref": "SRC-009",
+      "label": "合成船舶數量均為2",
+      "locator": {
+        "kind": "json_projection",
+        "pointer": "/dynamic_report/vessel_context",
+        "fields": [
+          "matched_total_vessels",
+          "summary_total_vessels",
+          "vessels_slice_len"
+        ]
+      },
+      "format": "json",
+      "value": {
+        "matched_total_vessels": 2,
+        "summary_total_vessels": 2,
+        "vessels_slice_len": 2
+      },
+      "qualification": "早期Attempt02，適用SRC-010的前置／BP複核限制。",
+      "contains_only": "allowlisted_synthetic_test_results",
+      "render_as": "plain_text"
+    },
+    {
+      "id": "EV-F001-CASE-0",
+      "source_ref": "SRC-009",
+      "label": "既有單元重現與對照",
+      "locator": {
+        "kind": "json_projection",
+        "pointer": "/dynamic_report/results/0",
+        "fields": [
+          "id",
+          "content",
+          "function_actual_output",
+          "defect_reproduced"
+        ]
+      },
+      "format": "json",
+      "value": {
+        "id": "CONTROL-REAL-TOTAL-2",
+        "content": "目前共有 2 艘。",
+        "function_actual_output": true,
+        "defect_reproduced": false
+      },
+      "qualification": "引用歷史結果，本次未執行函式；不能當原BP合規驗收。",
+      "contains_only": "allowlisted_synthetic_test_results",
+      "render_as": "plain_text"
+    },
+    {
+      "id": "EV-F001-CASE-1",
+      "source_ref": "SRC-009",
+      "label": "既有單元重現與對照",
+      "locator": {
+        "kind": "json_projection",
+        "pointer": "/dynamic_report/results/1",
+        "fields": [
+          "id",
+          "content",
+          "function_actual_output",
+          "defect_reproduced"
+        ]
+      },
+      "format": "json",
+      "value": {
+        "id": "COUNTER-WRONG-TOTAL-3",
+        "content": "目前共有 3 艘。",
+        "function_actual_output": false,
+        "defect_reproduced": false
+      },
+      "qualification": "引用歷史結果，本次未執行函式；不能當原BP合規驗收。",
+      "contains_only": "allowlisted_synthetic_test_results",
+      "render_as": "plain_text"
+    },
+    {
+      "id": "EV-F001-CASE-2",
+      "source_ref": "SRC-009",
+      "label": "既有單元重現與對照",
+      "locator": {
+        "kind": "json_projection",
+        "pointer": "/dynamic_report/results/2",
+        "fields": [
+          "id",
+          "content",
+          "function_actual_output",
+          "defect_reproduced"
+        ]
+      },
+      "format": "json",
+      "value": {
+        "id": "COUNTER-WRONG-TOTAL-5-DEFECT",
+        "content": "目前共有 5 艘。",
+        "function_actual_output": true,
+        "defect_reproduced": true
+      },
+      "qualification": "引用歷史結果，本次未執行函式；不能當原BP合規驗收。",
+      "contains_only": "allowlisted_synthetic_test_results",
+      "render_as": "plain_text"
+    },
+    {
+      "id": "EV-C002-MPB",
+      "source_ref": "SRC-042",
+      "label": "MPB接收端累積chunks並解析JSON",
+      "locator": {
+        "kind": "lines",
+        "start": 167,
+        "end": 173
+      },
+      "format": "text",
+      "text": "      const chunks = [];\n      res.on('data', (chunk) => chunks.push(chunk));\n      res.on('end', () => {\n        try {\n          const body = Buffer.concat(chunks).toString('utf-8');\n          const json = JSON.parse(body);\n          resolve(json);",
+      "qualification": "此段未見累積byte cap；完整影響仍取決於上游可控性、timeout及部署資源。",
+      "contains_only": "non_secret_product_code",
+      "render_as": "plain_text"
+    },
+    {
+      "id": "EV-C002-TRAFFIC",
+      "source_ref": "SRC-043",
+      "label": "Traffic接收文字",
+      "locator": {
+        "kind": "lines",
+        "start": 72,
+        "end": 72
+      },
+      "format": "text",
+      "text": "  return response.text();",
+      "qualification": "文字接收與傳輸chunks計量是不同層級。",
+      "contains_only": "non_secret_product_code",
+      "render_as": "plain_text"
+    },
+    {
+      "id": "EV-C002-OBS",
+      "source_ref": "SRC-020",
+      "label": "有限串流／文字觀察",
+      "locator": {
+        "kind": "json_projection",
+        "pointer": "/results/2/payload",
+        "fields": [
+          "mpb_real_receiving_stream_chunks_ok",
+          "traffic_input_text_chars",
+          "traffic_stream_chunks_measured",
+          "product_byte_cap_observation",
+          "contract_status"
+        ]
+      },
+      "format": "json",
+      "value": {
+        "mpb_real_receiving_stream_chunks_ok": true,
+        "traffic_input_text_chars": 1408,
+        "traffic_stream_chunks_measured": null,
+        "product_byte_cap_observation": "NO_HARD_BYTE_CAP_IN_PRODUCT_UPSTREAM_CONSUMPTION (BUFFER_CONCAT_AND_TEXT_UNBOUNDED)",
+        "contract_status": "NEEDS_VALIDATION"
+      },
+      "qualification": "配合SRC-012勘誤：request error發生於response之前，恢復是相同fixture；不引用相互衝突的bytes總數。",
+      "contains_only": "allowlisted_synthetic_test_results",
+      "render_as": "plain_text"
+    },
+    {
+      "id": "EV-C003-READ",
+      "source_ref": "SRC-041",
+      "label": "終端O_NOFOLLOW與0600檢查",
+      "locator": {
+        "kind": "lines",
+        "start": 17,
+        "end": 23
+      },
+      "format": "text",
+      "text": "    let fd;\n    try {\n      fd = fs.openSync(file, fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW);\n      const stat = fs.fstatSync(fd);\n      if (!stat.isFile() || (stat.mode & 0o777) !== 0o600) return null;\n      const value = JSON.parse(fs.readFileSync(fd, 'utf8'));\n      return /^[a-f0-9]{64}$/.test(value.sha256) ? value : null;",
+      "qualification": "只作用於終端元件；不證明父目錄鏈或跨UID隔離。",
+      "contains_only": "non_secret_product_code",
+      "render_as": "plain_text"
+    },
+    {
+      "id": "EV-C003-OBS",
+      "source_ref": "SRC-020",
+      "label": "同UID測試觀察",
+      "locator": {
+        "kind": "json_projection",
+        "pointer": "/results/3/payload",
+        "fields": [
+          "terminal_rotate_0600_ok",
+          "terminal_symlink_rejected_ok",
+          "insecure_0644_denied_ok",
+          "corrupt_json_denied_ok",
+          "recovery_rotate_ok",
+          "parent_directory_symlink_observed",
+          "canary_content_preserved",
+          "target_resolved_mode_0600",
+          "contract_status"
+        ]
+      },
+      "format": "json",
+      "value": {
+        "terminal_rotate_0600_ok": true,
+        "terminal_symlink_rejected_ok": true,
+        "insecure_0644_denied_ok": true,
+        "corrupt_json_denied_ok": true,
+        "recovery_rotate_ok": true,
+        "parent_directory_symlink_observed": true,
+        "canary_content_preserved": true,
+        "target_resolved_mode_0600": true,
+        "contract_status": "NEEDS_VALIDATION"
+      },
+      "qualification": "0777未作已測宣稱；canary未變與0600寫入不等於跨使用者安全。",
+      "contains_only": "allowlisted_synthetic_test_results",
+      "render_as": "plain_text"
+    },
+    {
+      "id": "EV-C004-DESIGN",
+      "source_ref": "SRC-044",
+      "label": "產品註解說明panelKey的設計用途",
+      "locator": {
+        "kind": "lines",
+        "start": 8,
+        "end": 14
+      },
+      "format": "text",
+      "text": " * It is meant for the panel. `visibility: ['app']` asks hosts to keep it\n * from the model, and every call must also carry the key in the panel's page\n * (`services.app.panelKey`), so a client that lists the tool to the model\n * without loading the panel cannot use it. The key is not access control:\n * any MCP client can read the panel's page, key included. What protects\n * sensitive routes is that those the panel never needs are refused to every\n * caller.",
+      "qualification": "設計文字非完整安全證明；key可由讀取panel頁面的MCP client取得。",
+      "contains_only": "non_secret_product_code",
+      "render_as": "plain_text"
+    },
+    {
+      "id": "EV-C004-HEADERS",
+      "source_ref": "SRC-044",
+      "label": "請求header白名單",
+      "locator": {
+        "kind": "lines",
+        "start": 38,
+        "end": 38
+      },
+      "format": "text",
+      "text": "const FORWARDED_REQUEST_HEADERS = ['accept', 'content-type'];",
+      "qualification": "白名單不等同下游敏感路由全部已驗證。",
+      "contains_only": "non_secret_product_code",
+      "render_as": "plain_text"
+    },
+    {
+      "id": "EV-C004-OBS",
+      "source_ref": "SRC-020",
+      "label": "真handler指定負向案例",
+      "locator": {
+        "kind": "json_projection",
+        "pointer": "/results/0/payload",
+        "fields": [
+          "refused_paths_blocked_at_proxy",
+          "taiwan_ai_advisor_downstream_401_zero_model_calls",
+          "taiwan_ai_token_downstream_401_zero_rotate_calls",
+          "gemini_chat_downstream_403_origin_enforced",
+          "downstream_calls_observed",
+          "model_client_calls_observed",
+          "token_rotate_calls_observed",
+          "contract_status"
+        ]
+      },
+      "format": "json",
+      "value": {
+        "refused_paths_blocked_at_proxy": true,
+        "taiwan_ai_advisor_downstream_401_zero_model_calls": true,
+        "taiwan_ai_token_downstream_401_zero_rotate_calls": true,
+        "gemini_chat_downstream_403_origin_enforced": true,
+        "downstream_calls_observed": 3,
+        "model_client_calls_observed": 0,
+        "token_rotate_calls_observed": 0,
+        "contract_status": "NEEDS_VALIDATION"
+      },
+      "qualification": "PassThrough串接；Token verify固定false，tracks正控制為mock，Gemini provider未全面計數；不以頂層actual_status=200表示各路由皆200。",
+      "contains_only": "allowlisted_synthetic_test_results",
+      "render_as": "plain_text"
+    },
+    {
+      "id": "EV-OBS-BAK",
+      "source_ref": "SRC-036",
+      "label": "Panel保留清冊中的備份檔",
+      "locator": {
+        "kind": "json_projection",
+        "pointer": "/files/699",
+        "fields": [
+          "relative_path",
+          "size_bytes",
+          "sha256"
+        ]
+      },
+      "format": "json",
+      "value": {
+        "relative_path": "icons/taiwan-vessels/spec.html.bak",
+        "size_bytes": 5238,
+        "sha256": "5c2149b8536ab0dd9b4422c793a5457b5969d77874491b70c7704e484c99bb24"
+      },
+      "qualification": "僅支持保留成品清冊列有此項；本次未重新建置或公開部署。",
+      "contains_only": "allowlisted_synthetic_test_results",
+      "render_as": "plain_text"
+    }
+  ],
+  "observations": [
+    {
+      "id": "OBS-001",
+      "title": "備份檔被列入Panel成品清冊",
+      "category": "RELEASE_HYGIENE",
+      "confirmation_status": "RETAINED_INVENTORY_OBSERVATION",
+      "risk_rating": {
+        "value": null,
+        "status": "CONTEXT_REQUIRED",
+        "cvss": null
+      },
+      "remediation_status": "PENDING_OWNER_DECISION",
+      "owner": null,
+      "summary": "保留Panel成品清冊含icons/taiwan-vessels/spec.html.bak，大小5238bytes。這支持指定建置包含備份檔，不支持真秘密外洩或已公開部署。",
+      "recommendations": [
+        "確認此檔是否需要發布；不需要時在來源／打包流程明確排除。",
+        "對備份、暫存與其他非發布檔建立成品檢查，不僅依賴gitignore。"
+      ],
+      "acceptance_criteria": [
+        "經授權的後續成品清冊不含非必要備份檔，必要公開文件有明確用途。"
+      ],
+      "limitations": [
+        "本次只讀保留清冊，不重新掃描檔案內容；不能用5238bytes推定內容相同。"
+      ],
+      "evidence_ids": [
+        "EV-OBS-BAK"
+      ],
+      "source_refs": [
+        "SRC-036",
+        "SRC-003"
+      ]
+    },
+    {
+      "id": "OBS-002",
+      "title": "Docker預設閘道信任需部署拓樸確認",
+      "category": "DEPLOYMENT_TRUST_QUESTION",
+      "confirmation_status": "NEEDS_VALIDATION",
+      "risk_rating": {
+        "value": null,
+        "status": "NOT_ASSESSED",
+        "cvss": null
+      },
+      "remediation_status": "PENDING_CONTRACT",
+      "owner": null,
+      "summary": "既有來源與純函式觀察指出預設閘道可加入trusted peers；尚無實體容器網路驗證，不能推定同bridge容器已可冒充宿主。",
+      "recommendations": [
+        "確認閘道所代表主體及支援部署模型，再決定是否需明確認證或不同傳輸。"
+      ],
+      "acceptance_criteria": [
+        "如未來核准Docker測試，針對實際拓樸區分宿主／其他容器／代理主體並驗證預期准入；未測前保留PENDING。"
+      ],
+      "limitations": [
+        "未啟動Docker，不新增容器逃逸或另一OS VM要求。"
+      ],
+      "evidence_ids": [],
+      "source_refs": [
+        "SRC-005",
+        "SRC-011",
+        "SRC-006"
+      ]
+    }
+  ],
+  "remediation_actions": [
+    {
+      "id": "ACT-01",
+      "title": "F-001修補與回歸決策",
+      "status": "DECISION_REQUIRED",
+      "finding_ids": [
+        "GEV-F-001"
+      ],
+      "required_input": "有權維護者明確授權及修補方案，不要求特定格式授權書。",
+      "completion_condition": "修補後依F-001驗收條件完成既有重現、正常及邊界對照，複核後才可關閉。",
+      "owner": null,
+      "due_date": null,
+      "approved": false,
+      "source_refs": [
+        "SRC-007",
+        "SRC-006"
+      ]
+    },
+    {
+      "id": "ACT-02",
+      "title": "候選負載／部署／代理契約",
+      "status": "CONTRACT_REQUIRED",
+      "finding_ids": [
+        "GEV-C-002",
+        "GEV-C-003",
+        "GEV-C-004"
+      ],
+      "required_input": "指定責任人並明定上游容量、UID信任、代理路由與副作用責任。",
+      "completion_condition": "每個候選依自己的契約、正常對照與影響證據判定，不重做相同負向測試。",
+      "owner": null,
+      "due_date": null,
+      "approved": false,
+      "source_refs": [
+        "SRC-011",
+        "SRC-006"
+      ]
+    },
+    {
+      "id": "ACT-03",
+      "title": "必要工具離線供給",
+      "status": "BLOCKED_MISSING_TOOL_BINARY",
+      "finding_ids": [],
+      "required_input": "可追溯固定版本Semgrep、Gitleaks、OSV與其所需規則／資料庫；未知hash保持null。",
+      "completion_condition": "依原BP校準並完成核准範圍掃描；保存版本、資料日期、範圍與告警判讀，未掃描不作零發現。",
+      "owner": null,
+      "due_date": null,
+      "approved": false,
+      "source_refs": [
+        "SRC-006",
+        "SRC-013",
+        "SRC-040"
+      ]
+    },
+    {
+      "id": "ACT-04",
+      "title": "Standalone保留受阻",
+      "status": "BLOCKED",
+      "finding_ids": [],
+      "required_input": "有可審查的新原預算優化方案時再評估，當前不重提3CPU。",
+      "completion_condition": "有成品才進行對應秘密／sourcemap與內容驗收；0產物維持NOT_ASSESSED。",
+      "owner": null,
+      "due_date": null,
+      "approved": false,
+      "source_refs": [
+        "SRC-003",
+        "SRC-029",
+        "SRC-030"
+      ]
+    },
+    {
+      "id": "ACT-05",
+      "title": "Chrome與相依DOM",
+      "status": "BLOCKED",
+      "finding_ids": [],
+      "required_input": "新的macOS相容性假說及可驗證證據，保留原生沙箱。",
+      "completion_condition": "真瀏覽器與實際元件觀察成立才評定該層；jsdom不能替代瀏覽器安全驗收。",
+      "owner": null,
+      "due_date": null,
+      "approved": false,
+      "source_refs": [
+        "SRC-003",
+        "SRC-028",
+        "SRC-006"
+      ]
+    },
+    {
+      "id": "ACT-06",
+      "title": "Docker部署範圍",
+      "status": "NOT_TESTED",
+      "finding_ids": [],
+      "required_input": "如未來提供受控容器環境與相應範圍授權，再依原矩陣設計。",
+      "completion_condition": "取得實體配置、網路及准入證據前保留PENDING；不追加容器逃逸要求。",
+      "owner": null,
+      "due_date": null,
+      "approved": false,
+      "source_refs": [
+        "SRC-001",
+        "SRC-006"
+      ]
+    },
+    {
+      "id": "ACT-07",
+      "title": "發布衛生確認",
+      "status": "OWNER_DECISION_REQUIRED",
+      "finding_ids": [
+        "OBS-001"
+      ],
+      "required_input": "確認備份檔發布用途與後續成品檢查規則。",
+      "completion_condition": "清冊與內容符合核定發布用途，不能由檔案存在直接推論秘密外洩。",
+      "owner": null,
+      "due_date": null,
+      "approved": false,
+      "source_refs": [
+        "SRC-036"
+      ]
+    }
+  ],
+  "assessment_limitations": [
+    {
+      "id": "LIMIT-01",
+      "title": "風險與業務影響未知",
+      "description": "實際部署暴露與決策用途不足，不捏造CVSS、具名風險接受或實際損失。",
+      "source_refs": [
+        "SRC-007",
+        "SRC-006"
+      ]
+    },
+    {
+      "id": "LIMIT-02",
+      "title": "反應式資源控制",
+      "description": "監測有取樣遺漏與停止前超額，不是核心硬配額，沒有固定最壞停止上界。",
+      "source_refs": [
+        "SRC-002"
+      ]
+    },
+    {
+      "id": "LIMIT-03",
+      "title": "真服務與環境未測",
+      "description": "真模型／上游、完整Vite生命週期、目前受控DOM與實體Docker仍有未完成項。",
+      "source_refs": [
+        "SRC-005",
+        "SRC-006"
+      ]
+    },
+    {
+      "id": "LIMIT-04",
+      "title": "工具供給未備妥",
+      "description": "無完整SAST／SCA／秘密工具輸出，不能將人工清冊或陰性關鍵字掃描代替工具驗收。",
+      "source_refs": [
+        "SRC-006",
+        "SRC-013"
+      ]
+    },
+    {
+      "id": "LIMIT-05",
+      "title": "歷史證據受各輪限制",
+      "description": "正常fixture、合成peer、PassThrough與虛擬時鐘不能外推實際拓樸／長期容量；沿用結果不是新執行。",
+      "source_refs": [
+        "SRC-003",
+        "SRC-005",
+        "SRC-012",
+        "SRC-029"
+      ]
+    },
+    {
+      "id": "LIMIT-06",
+      "title": "證據一致性殘餘",
+      "description": "C002歷史bytes總量不完全對齊，排除作為容量證明；以程式碼、限定字段及勘誤支持候選判讀。",
+      "source_refs": [
+        "SRC-012",
+        "SRC-020",
+        "SRC-025"
+      ]
+    }
+  ],
+  "diagrams": [
+    {
+      "id": "attack-map",
+      "title": "攻擊面與信任邊界",
+      "description": "來源模型與指定測試的關係圖。箭頭表示資料或呼叫方向，不表示成功入侵。底部檔案、發布及呈現區是相鄰邊界，並非順序攻擊鏈。",
+      "width": 420,
+      "height": 1200,
+      "nodes": [
+        {
+          "id": "ui",
+          "x": 16,
+          "y": 52,
+          "width": 184,
+          "height": 102,
+          "title": "UI／PAT 呼叫者",
+          "lines": [
+            "准入不等於人員認證",
+            "目前真瀏覽器仍受阻"
+          ],
+          "status": "入口／局部觀察",
+          "detail": "本機UI及PAT請求會到AI入口；Host、Origin及local gate的指定案例已有觀察，不能據此宣稱所有瀏覽器／部署通過。",
+          "source_refs": [
+            "SRC-045",
+            "SRC-016",
+            "SRC-003"
+          ],
+          "target": null,
+          "tone": "partial",
+          "entries": [
+            "/api/taiwan-ai-advisor",
+            "/api/taiwan-ai-status"
+          ]
+        },
+        {
+          "id": "mcp-client",
+          "x": 220,
+          "y": 52,
+          "width": 184,
+          "height": 102,
+          "title": "MCP 客戶端",
+          "lines": [
+            "HTTP 與 stdio 分開",
+            "非通用 PAT 認證"
+          ],
+          "status": "來源模型＋部分契約",
+          "detail": "HTTP MCP使用自身local gate；stdio啟動及apiBase屬操作者信任邊界。不能把兩者視為同一認證或讓模型直接派發工具。",
+          "source_refs": [
+            "SRC-045",
+            "SRC-005",
+            "SRC-018"
+          ],
+          "target": null,
+          "tone": "partial",
+          "entries": [
+            "/mcp",
+            "serveStdio"
+          ]
+        },
+        {
+          "id": "api",
+          "x": 16,
+          "y": 224,
+          "width": 184,
+          "height": 108,
+          "title": "AI 准入與輸入",
+          "lines": [
+            "local gate／有效 PAT",
+            "方法與 body 邊界"
+          ],
+          "status": "指定 handler 子集",
+          "detail": "AI的本機管理准入與PAT推論／status權限不同；Token管理需本機准入。具指定負向與生命週期結果，不代表全部路由。",
+          "source_refs": [
+            "SRC-045",
+            "SRC-016",
+            "SRC-021"
+          ],
+          "target": null,
+          "tone": "partial",
+          "entries": [
+            "/api/taiwan-ai-token",
+            "isLocalBrowser"
+          ]
+        },
+        {
+          "id": "mcp",
+          "x": 220,
+          "y": 224,
+          "width": 184,
+          "height": 108,
+          "title": "MCP 傳輸與工具",
+          "lines": [
+            "HTTP gate／JSON-RPC",
+            "stdio 為合成管線"
+          ],
+          "status": "helper／合成傳輸",
+          "detail": "既有HTTP helper與PassThrough serveStdio驗證適用其替身與觀測限制；獨立CLI、完整catalog與實際拓樸尚欠。",
+          "source_refs": [
+            "SRC-045",
+            "SRC-018",
+            "SRC-023"
+          ],
+          "target": null,
+          "tone": "partial",
+          "entries": []
+        },
+        {
+          "id": "advisor",
+          "x": 16,
+          "y": 404,
+          "width": 184,
+          "height": 108,
+          "title": "Advisor 與檢索",
+          "lines": [
+            "白名單 context／prompt",
+            "F-001：數量誤判"
+          ],
+          "status": "已確認缺陷仍 OPEN",
+          "detail": "真實runOllama／合成client等子集證明特定契約，grounding允許固定5導致2艘上下文的錯誤5艘回答被接受；未連真模型。",
+          "source_refs": [
+            "SRC-007",
+            "SRC-008",
+            "SRC-005"
+          ],
+          "target": "GEV-F-001",
+          "tone": "confirmed",
+          "entries": [
+            "buildPrompt",
+            "validateGrounding"
+          ]
+        },
+        {
+          "id": "panel",
+          "x": 220,
+          "y": 404,
+          "width": 184,
+          "height": 108,
+          "title": "panel_request",
+          "lines": [
+            "key 不是人員認證",
+            "代理政策＋下游 gate"
+          ],
+          "status": "C-004 待確認",
+          "detail": "Panel key可由讀panel resource的MCP client取得；代理只轉送白名單headers並受下游gate。指定負向防護不是全路由授權證明。",
+          "source_refs": [
+            "SRC-044",
+            "SRC-020",
+            "SRC-025"
+          ],
+          "target": "GEV-C-004",
+          "tone": "partial",
+          "entries": [
+            "src/tools/queries/panelRequest.js"
+          ]
+        },
+        {
+          "id": "upstream",
+          "x": 16,
+          "y": 630,
+          "width": 184,
+          "height": 108,
+          "title": "MPB／Traffic 上游",
+          "lines": [
+            "有限 chunks／文字替身",
+            "真上游未連線"
+          ],
+          "status": "C-002 待確認",
+          "detail": "固定來源資料經接收、解析、快取與檢索。缺body cap的架構事實不等於已利用DoS；圖中上游關係來自來源模型，動態觀察只用合成替身。",
+          "source_refs": [
+            "SRC-045",
+            "SRC-042",
+            "SRC-043",
+            "SRC-012"
+          ],
+          "target": "GEV-C-002",
+          "tone": "unverified",
+          "entries": []
+        },
+        {
+          "id": "model",
+          "x": 220,
+          "y": 630,
+          "width": 184,
+          "height": 108,
+          "title": "Ollama 模型邊界",
+          "lines": [
+            "合成回應／取消對照",
+            "真守護行程未驗證"
+          ],
+          "status": "實體模型未測",
+          "detail": "Prompt與模型回覆有來源資料流；既有測試使用合成fetch／client或串流替身。箭頭不表示已連線真模型，更不表示模型取得工具執行權。",
+          "source_refs": [
+            "SRC-045",
+            "SRC-005",
+            "SRC-020"
+          ],
+          "target": null,
+          "tone": "unverified",
+          "entries": []
+        },
+        {
+          "id": "files",
+          "x": 16,
+          "y": 852,
+          "width": 184,
+          "height": 108,
+          "title": "PAT／航跡檔案",
+          "lines": [
+            "終端檔案與父鏈分開",
+            "同 UID 不等於跨 UID"
+          ],
+          "status": "C-003 待確認",
+          "detail": "PAT終端O_NOFOLLOW／0600與航跡檔案行為分別已有指定觀察；父目錄symlink及跨UID信任仍須部署契約，未讀真權杖。",
+          "source_refs": [
+            "SRC-045",
+            "SRC-041",
+            "SRC-020"
+          ],
+          "target": "GEV-C-003",
+          "tone": "partial",
+          "entries": []
+        },
+        {
+          "id": "build",
+          "x": 220,
+          "y": 852,
+          "width": 184,
+          "height": 108,
+          "title": "建置／發布資產",
+          "lines": [
+            "Panel 為保留審計",
+            "Standalone 超限受阻"
+          ],
+          "status": "成品子集／未完成",
+          "detail": "Panel保留722檔成品與離線評估，不能替代Standalone或全產品秘密掃描；此區為相鄰發布攻擊面，不代表資料依序流入建置。",
+          "source_refs": [
+            "SRC-029",
+            "SRC-034",
+            "SRC-038"
+          ],
+          "target": "OBS-001",
+          "tone": "partial",
+          "entries": []
+        },
+        {
+          "id": "render",
+          "x": 16,
+          "y": 1040,
+          "width": 388,
+          "height": 130,
+          "title": "DOM／來源引用／剪貼簿",
+          "lines": [
+            "歷史指定元件觀察保留限制",
+            "目前受控 Chrome 受阻；文字繫結不等於全端零 XSS",
+            "剪貼簿替身不是 OS 剪貼簿"
+          ],
+          "status": "BT06：資料到瀏覽器",
+          "detail": "呈現層接收API與模型文字；真瀏覽器、全域其他sink與OS剪貼簿安全不能由單元資料推定。此框獨立列出，不暗示前述建置或檔案依序流入DOM。",
+          "source_refs": [
+            "SRC-045",
+            "SRC-005",
+            "SRC-003"
+          ],
+          "target": null,
+          "tone": "partial",
+          "entries": []
+        }
+      ],
+      "edges": [
+        {
+          "id": "ui-api",
+          "path": "M108 154 V216",
+          "kind": "observed_subset",
+          "label": "AI請求入口",
+          "source_refs": [
+            "SRC-016",
+            "SRC-045"
+          ]
+        },
+        {
+          "id": "client-mcp",
+          "path": "M312 154 V216",
+          "kind": "observed_subset",
+          "label": "HTTP／stdio契約",
+          "source_refs": [
+            "SRC-018",
+            "SRC-045"
+          ]
+        },
+        {
+          "id": "api-advisor",
+          "path": "M108 332 V396",
+          "kind": "observed_subset",
+          "label": "通過指定准入後處理",
+          "source_refs": [
+            "SRC-016",
+            "SRC-045"
+          ]
+        },
+        {
+          "id": "mcp-panel",
+          "path": "M312 332 V396",
+          "kind": "architecture",
+          "label": "工具與Panel代理",
+          "source_refs": [
+            "SRC-045",
+            "SRC-044"
+          ]
+        },
+        {
+          "id": "panel-api",
+          "path": "M220 458 H210 V278 H204",
+          "kind": "architecture",
+          "label": "同origin代理；仍須下游准入",
+          "source_refs": [
+            "SRC-045",
+            "SRC-044",
+            "SRC-020"
+          ]
+        },
+        {
+          "id": "upstream-advisor",
+          "path": "M108 630 V520",
+          "kind": "unverified_external",
+          "label": "上游接收，測試用替身",
+          "source_refs": [
+            "SRC-045",
+            "SRC-042",
+            "SRC-043"
+          ]
+        },
+        {
+          "id": "advisor-model",
+          "path": "M200 488 L312 622",
+          "kind": "unverified_external",
+          "label": "模型請求／回覆，測試用替身",
+          "bidirectional": true,
+          "source_refs": [
+            "SRC-045",
+            "SRC-007"
+          ]
+        }
+      ],
+      "boundaries": [
+        {
+          "y": 190,
+          "label": "BT01／BT02：來源與 HTTP 准入"
+        },
+        {
+          "y": 370,
+          "label": "BT07／BT05：代理、檢索與模型"
+        },
+        {
+          "y": 576,
+          "label": "BT03／BT05：外部資料與模型"
+        },
+        {
+          "y": 800,
+          "label": "相鄰邊界：BT04 檔案／BT08 建置設定"
+        },
+        {
+          "y": 1008,
+          "label": "BT06：資料進入呈現層"
+        }
+      ],
+      "source_refs": [
+        "SRC-045",
+        "SRC-005",
+        "SRC-003"
+      ],
+      "animation_caption": "動畫僅示意指定入口的請求方向；不是即時流量或新的測試。"
+    },
+    {
+      "id": "f001-cause",
+      "title": "F-001：錯誤船數如何通過驗證",
+      "description": "既有證據重建，不是本次新測試或真模型實況；下圖將合成上下文、錯誤候選、程式條件與函式結果分開。",
+      "width": 420,
+      "height": 710,
+      "nodes": [
+        {
+          "id": "context",
+          "x": 24,
+          "y": 48,
+          "width": 372,
+          "height": 96,
+          "title": "01　合成上下文：實際 2 艘",
+          "lines": [
+            "符合數、總數與樣本長度均為 2"
+          ],
+          "status": "既有合成 fixture",
+          "detail": "Context來自既有單元重現，不是真實即時船位。",
+          "source_refs": [
+            "SRC-009"
+          ],
+          "target": "EV-F001-CONTEXT",
+          "tone": "partial",
+          "entries": []
+        },
+        {
+          "id": "answer",
+          "x": 24,
+          "y": 210,
+          "width": 372,
+          "height": 96,
+          "title": "02　候選回答：目前共有 5 艘",
+          "lines": [
+            "與上下文不符；不是外部攻擊可控性證明"
+          ],
+          "status": "錯誤候選輸入",
+          "detail": "既有重現以錯誤5艘候選測試函式，未證明遠端主體能強制真模型輸出。",
+          "source_refs": [
+            "SRC-009",
+            "SRC-007"
+          ],
+          "target": "EV-F001-CASE-2",
+          "tone": "partial",
+          "entries": []
+        },
+        {
+          "id": "allow",
+          "x": 24,
+          "y": 380,
+          "width": 372,
+          "height": 110,
+          "title": "03　realCounts.艘 固定允許 5",
+          "lines": [
+            "動態總數之外，集合無條件包含 5",
+            "條列用數值與事實數量未充分分離"
+          ],
+          "status": "來源程式碼可見",
+          "detail": "程式碼第76–83行固定值5出現在允許集合中。",
+          "source_refs": [
+            "SRC-008"
+          ],
+          "target": "EV-F001-CODE",
+          "tone": "confirmed",
+          "entries": []
+        },
+        {
+          "id": "result",
+          "x": 24,
+          "y": 568,
+          "width": 372,
+          "height": 106,
+          "title": "04　錯誤回答仍回傳 true",
+          "lines": [
+            "已確認邏輯缺陷；F-001 維持 OPEN",
+            "不推定秘密外洩、提權或業務損害"
+          ],
+          "status": "單元動態重現",
+          "detail": "早期Attempt02結果true，適用該輪控制限制；後續子集觀察不取代未測部署。",
+          "source_refs": [
+            "SRC-009",
+            "SRC-010",
+            "SRC-007"
+          ],
+          "target": "GEV-F-001",
+          "tone": "confirmed",
+          "entries": []
+        }
+      ],
+      "edges": [
+        {
+          "id": "context-answer",
+          "path": "M210 144 V202",
+          "kind": "explanation",
+          "label": "比較回答與上下文，不表示模型必然產生此句"
+        },
+        {
+          "id": "answer-allow",
+          "path": "M210 306 V372",
+          "kind": "explanation",
+          "label": "交由Grounding檢查"
+        },
+        {
+          "id": "allow-result",
+          "path": "M210 490 V560",
+          "kind": "explanation",
+          "label": "固定5未被拒絕"
+        }
+      ],
+      "boundaries": [],
+      "source_refs": [
+        "SRC-007",
+        "SRC-008",
+        "SRC-009",
+        "SRC-010"
+      ],
+      "animation_caption": "動畫僅輔助解釋既有誤判因果，不表示即時執行。"
+    },
+    {
+      "id": "improvement-order",
+      "title": "改善工作的建議順序",
+      "description": "這是報告建議的處理順序，不是已核准時程、CVSS排序或風險接受。各階段可並行準備；後續驗收須先具備對應輸入。",
+      "width": 420,
+      "height": 570,
+      "nodes": [
+        {
+          "id": "decide",
+          "x": 24,
+          "y": 48,
+          "width": 372,
+          "height": 118,
+          "title": "01　先釐清責任與修補決策",
+          "lines": [
+            "F-001 修補決策／候選契約",
+            "責任人與期限仍待指定"
+          ],
+          "status": "建議先處理，不代表已授權",
+          "detail": "先處理已確認問題的修補決策，同時釐清上游容量、UID信任與代理責任。",
+          "source_refs": [
+            "SRC-007",
+            "SRC-006"
+          ],
+          "target": "ACT-01",
+          "tone": "partial",
+          "entries": []
+        },
+        {
+          "id": "prepare",
+          "x": 24,
+          "y": 230,
+          "width": 372,
+          "height": 118,
+          "title": "02　補齊所需輸入與新方案",
+          "lines": [
+            "可核實工具／規則／資料庫",
+            "受阻項有新證據才評估"
+          ],
+          "status": "原生 macOS／2 CPU 維持",
+          "detail": "工具供給可與契約釐清並行；Standalone、Chrome與Docker不因交接而自動獲准新測試。",
+          "source_refs": [
+            "SRC-006",
+            "SRC-003"
+          ],
+          "target": "ACT-03",
+          "tone": "partial",
+          "entries": []
+        },
+        {
+          "id": "verify",
+          "x": 24,
+          "y": 412,
+          "width": 372,
+          "height": 118,
+          "title": "03　依契約回歸與獨立複核",
+          "lines": [
+            "正常對照／修補成品／必要變體",
+            "未完成項仍需保留"
+          ],
+          "status": "完成條件，不是目前已完成",
+          "detail": "取得修補或必要輸入後，依明定驗收條件驗證；局部結果不直接換成全案放行。",
+          "source_refs": [
+            "SRC-001",
+            "SRC-003",
+            "SRC-007"
+          ],
+          "target": "remediation",
+          "tone": "partial",
+          "entries": []
+        }
+      ],
+      "edges": [
+        {
+          "id": "decide-prepare",
+          "path": "M210 166 V222",
+          "kind": "architecture",
+          "label": "建議處理先後，可並行準備"
+        },
+        {
+          "id": "prepare-verify",
+          "path": "M210 348 V404",
+          "kind": "architecture",
+          "label": "驗收須具備對應輸入"
+        }
+      ],
+      "boundaries": [],
+      "source_refs": [
+        "SRC-003",
+        "SRC-006",
+        "SRC-007"
+      ],
+      "animation_caption": "本圖保持靜態；箭頭是建議先後，不是新增授權或固定排程。",
+      "animated": false
+    }
+  ],
+  "coverage_matrix": {
+    "id": "proof-matrix",
+    "title": "15 情境證明層級矩陣",
+    "description": "以已採認索引的主要證明層級分組，並非完整測試清冊。符號表示證據種類及限制，不表示情境通過。搜尋與狀態篩選同時套用於矩陣及下方情境說明。",
+    "columns": [
+      {
+        "id": "source",
+        "title": "來源"
+      },
+      {
+        "id": "synthetic",
+        "title": "合成"
+      },
+      {
+        "id": "interface",
+        "title": "介面"
+      },
+      {
+        "id": "filesystem",
+        "title": "OS／檔案"
+      },
+      {
+        "id": "artifact",
+        "title": "成品"
+      },
+      {
+        "id": "browser",
+        "title": "瀏覽器"
+      }
+    ],
+    "legend": [
+      {
+        "id": "partial",
+        "symbol": "●",
+        "label": "指定子集有觀察，仍非全列通過"
+      },
+      {
+        "id": "limited",
+        "symbol": "△",
+        "label": "替身／helper等限制性觀察"
+      },
+      {
+        "id": "defect",
+        "symbol": "×",
+        "label": "該層支持已知 OPEN 缺陷"
+      },
+      {
+        "id": "historical_blocked",
+        "symbol": "△!",
+        "label": "歷史觀察保留；目前瀏覽器受阻"
+      },
+      {
+        "id": "subset_blocked",
+        "symbol": "●!",
+        "label": "Panel子集；Standalone受阻"
+      },
+      {
+        "id": "not_indexed",
+        "symbol": "—",
+        "label": "本矩陣未單列，不能解讀為未測或安全"
+      }
+    ],
+    "rows": [
+      {
+        "scenario_id": "GEV-01",
+        "title": "隔離環境與啟動副作用",
+        "cells": {
+          "source": "not_indexed",
+          "synthetic": "not_indexed",
+          "interface": "not_indexed",
+          "filesystem": "partial",
+          "artifact": "not_indexed",
+          "browser": "not_indexed"
+        },
+        "note": "完整啟動副作用／配置仍欠；工具缺失不可抹去控制成果",
+        "source_refs": [
+          "SRC-001",
+          "SRC-005",
+          "SRC-026",
+          "SRC-003"
+        ]
+      },
+      {
+        "scenario_id": "GEV-02",
+        "title": "AI 本機管理准入與來源邊界",
+        "cells": {
+          "source": "not_indexed",
+          "synthetic": "not_indexed",
+          "interface": "partial",
+          "filesystem": "not_indexed",
+          "artifact": "not_indexed",
+          "browser": "not_indexed"
+        },
+        "note": "Browser整合受阻，不等於本機准入函式／HTTP未測",
+        "source_refs": [
+          "SRC-001",
+          "SRC-005",
+          "SRC-016"
+        ]
+      },
+      {
+        "scenario_id": "GEV-03",
+        "title": "PAT 權限、輪替與撤銷",
+        "cells": {
+          "source": "not_indexed",
+          "synthetic": "partial",
+          "interface": "not_indexed",
+          "filesystem": "partial",
+          "artifact": "not_indexed",
+          "browser": "not_indexed"
+        },
+        "note": "跨UID／部署信任前提與未測變體",
+        "source_refs": [
+          "SRC-001",
+          "SRC-005",
+          "SRC-016",
+          "SRC-019",
+          "SRC-020"
+        ]
+      },
+      {
+        "scenario_id": "GEV-04",
+        "title": "AI 路徑、方法與輸入邊界",
+        "cells": {
+          "source": "not_indexed",
+          "synthetic": "partial",
+          "interface": "partial",
+          "filesystem": "not_indexed",
+          "artifact": "not_indexed",
+          "browser": "not_indexed"
+        },
+        "note": "完整服務／Browser等缺項另列，不再要求重建已用stub",
+        "source_refs": [
+          "SRC-001",
+          "SRC-005",
+          "SRC-014",
+          "SRC-016",
+          "SRC-018"
+        ]
+      },
+      {
+        "scenario_id": "GEV-05",
+        "title": "MCP HTTP 與 stdio 的不同權限邊界",
+        "cells": {
+          "source": "not_indexed",
+          "synthetic": "not_indexed",
+          "interface": "limited",
+          "filesystem": "not_indexed",
+          "artifact": "not_indexed",
+          "browser": "not_indexed"
+        },
+        "note": "完整plugin／獨立CLI transport與工具能力分母尚欠",
+        "source_refs": [
+          "SRC-001",
+          "SRC-005",
+          "SRC-017",
+          "SRC-018"
+        ]
+      },
+      {
+        "scenario_id": "GEV-06",
+        "title": "panel_request 路由、目的地與分段隔離",
+        "cells": {
+          "source": "not_indexed",
+          "synthetic": "limited",
+          "interface": "limited",
+          "filesystem": "not_indexed",
+          "artifact": "not_indexed",
+          "browser": "not_indexed"
+        },
+        "note": "正控制／未測路由與分段逾期等子條件",
+        "source_refs": [
+          "SRC-001",
+          "SRC-005",
+          "SRC-017",
+          "SRC-018",
+          "SRC-019",
+          "SRC-020"
+        ]
+      },
+      {
+        "scenario_id": "GEV-07",
+        "title": "query、selected 與上游文字的資料完整性",
+        "cells": {
+          "source": "defect",
+          "synthetic": "defect",
+          "interface": "not_indexed",
+          "filesystem": "not_indexed",
+          "artifact": "not_indexed",
+          "browser": "not_indexed"
+        },
+        "note": "缺陷未修；其他資料完整性分母不能由單缺陷代替",
+        "source_refs": [
+          "SRC-001",
+          "SRC-005",
+          "SRC-016",
+          "SRC-018",
+          "SRC-007",
+          "SRC-008",
+          "SRC-009",
+          "SRC-010"
+        ]
+      },
+      {
+        "scenario_id": "GEV-08",
+        "title": "AI 面板、來源引用與權杖呈現",
+        "cells": {
+          "source": "partial",
+          "synthetic": "not_indexed",
+          "interface": "not_indexed",
+          "filesystem": "not_indexed",
+          "artifact": "not_indexed",
+          "browser": "historical_blocked"
+        },
+        "note": "目前受控Browser／UI未測，不移植舊DOM為合規PASS",
+        "source_refs": [
+          "SRC-001",
+          "SRC-005",
+          "SRC-027",
+          "SRC-028",
+          "SRC-003"
+        ]
+      },
+      {
+        "scenario_id": "GEV-09",
+        "title": "上游解析與回應資源界線",
+        "cells": {
+          "source": "not_indexed",
+          "synthetic": "limited",
+          "interface": "not_indexed",
+          "filesystem": "not_indexed",
+          "artifact": "not_indexed",
+          "browser": "not_indexed"
+        },
+        "note": "無body cap的風險判讀／中途body失效等未測",
+        "source_refs": [
+          "SRC-001",
+          "SRC-005",
+          "SRC-017",
+          "SRC-018",
+          "SRC-020",
+          "SRC-012"
+        ]
+      },
+      {
+        "scenario_id": "GEV-10",
+        "title": "航跡檔案、參數與保留邊界",
+        "cells": {
+          "source": "not_indexed",
+          "synthetic": "partial",
+          "interface": "not_indexed",
+          "filesystem": "partial",
+          "artifact": "not_indexed",
+          "browser": "not_indexed"
+        },
+        "note": "未測檔案邊界與容量，不要求168小時真流量作全部前提",
+        "source_refs": [
+          "SRC-001",
+          "SRC-005",
+          "SRC-017",
+          "SRC-018"
+        ]
+      },
+      {
+        "scenario_id": "GEV-11",
+        "title": "靜態服務、成品與 bundled file 的秘密邊界",
+        "cells": {
+          "source": "not_indexed",
+          "synthetic": "not_indexed",
+          "interface": "not_indexed",
+          "filesystem": "not_indexed",
+          "artifact": "subset_blocked",
+          "browser": "not_indexed"
+        },
+        "note": "Standalone CPU受阻、完整秘密／公開服務／發布對照仍欠",
+        "source_refs": [
+          "SRC-001",
+          "SRC-005",
+          "SRC-029",
+          "SRC-038",
+          "SRC-034",
+          "SRC-030"
+        ]
+      },
+      {
+        "scenario_id": "GEV-12",
+        "title": "取消、忙碌、排隊與失敗恢復",
+        "cells": {
+          "source": "not_indexed",
+          "synthetic": "partial",
+          "interface": "not_indexed",
+          "filesystem": "not_indexed",
+          "artifact": "not_indexed",
+          "browser": "not_indexed"
+        },
+        "note": "未測queue／其他timeout／端到端層級，不稱只做靜態",
+        "source_refs": [
+          "SRC-001",
+          "SRC-005",
+          "SRC-016",
+          "SRC-019",
+          "SRC-020"
+        ]
+      },
+      {
+        "scenario_id": "GEV-13",
+        "title": "來源健康、快取及回答的時間一致性",
+        "cells": {
+          "source": "not_indexed",
+          "synthetic": "partial",
+          "interface": "not_indexed",
+          "filesystem": "not_indexed",
+          "artifact": "not_indexed",
+          "browser": "not_indexed"
+        },
+        "note": "UI／回答時間一致性及未測變體",
+        "source_refs": [
+          "SRC-001",
+          "SRC-005",
+          "SRC-019",
+          "SRC-020"
+        ]
+      },
+      {
+        "scenario_id": "GEV-14",
+        "title": "原生、Docker、dev/preview 與分享配置差異",
+        "cells": {
+          "source": "not_indexed",
+          "synthetic": "partial",
+          "interface": "limited",
+          "filesystem": "not_indexed",
+          "artifact": "not_indexed",
+          "browser": "not_indexed"
+        },
+        "note": "Docker／真dev-preview完整生命週期與配置差異",
+        "source_refs": [
+          "SRC-001",
+          "SRC-005"
+        ]
+      },
+      {
+        "scenario_id": "GEV-15",
+        "title": "PAT 與 panel key 檔案安全和生命週期",
+        "cells": {
+          "source": "not_indexed",
+          "synthetic": "not_indexed",
+          "interface": "not_indexed",
+          "filesystem": "partial",
+          "artifact": "not_indexed",
+          "browser": "not_indexed"
+        },
+        "note": "崩潰／鎖競態分支與部署契約尚欠，不當跨程序全未測",
+        "source_refs": [
+          "SRC-001",
+          "SRC-005",
+          "SRC-017",
+          "SRC-018"
+        ]
+      }
+    ],
+    "source_refs": [
+      "SRC-001",
+      "SRC-005",
+      "SRC-003"
+    ]
+  },
+  "evidence_timeline": {
+    "id": "evidence-timeline",
+    "title": "證據如何沿用與校正",
+    "description": "依相關事件的日期與採認關係整理，不按run數量計算覆蓋。來源執行與目前引用方式分開記錄；箭頭僅表示時間／判讀先後。 日期以Asia/Taipei表示；run ID不是執行日期證明。缺時戳時僅列輪次，不推造時間。",
+    "events": [
+      {
+        "id": "TL-01",
+        "date_label": "11/07｜2026",
+        "title": "F-001 取得單元重現",
+        "kind": "HISTORICAL_EXECUTION",
+        "summary": "實際2艘，錯誤5艘仍被接受。",
+        "qualification": "早期前置／BP有缺口；不回填為合規驗收。",
+        "source_refs": [
+          "SRC-007",
+          "SRC-009",
+          "SRC-010"
+        ],
+        "time_basis": {
+          "timezone": "Asia/Taipei",
+          "source_timestamp": "2026-11-07T23:20:40+08:00",
+          "source_ref": "SRC-009",
+          "json_pointer": "/timestamp",
+          "precision": "TIMESTAMP"
+        }
+      },
+      {
+        "id": "TL-02",
+        "date_label": "11/08｜2026",
+        "title": "失敗與修正後結果並存",
+        "kind": "HISTORICAL_EXECUTION",
+        "summary": "run-14失敗，run-15另建新attempt。",
+        "qualification": "保留失敗；後來PASS不覆寫原證據。",
+        "source_refs": [
+          "SRC-015",
+          "SRC-016",
+          "SRC-021"
+        ],
+        "time_basis": {
+          "timezone": "Asia/Taipei",
+          "source_timestamp": "2026-11-08T03:44:35.634572+00:00",
+          "source_ref": "SRC-016",
+          "json_pointer": "/timestamp_utc",
+          "precision": "TIMESTAMP"
+        }
+      },
+      {
+        "id": "TL-03",
+        "date_label": "run-27 → 35｜輪次順序",
+        "title": "契約測試逐步補齊",
+        "kind": "HISTORICAL_EXECUTION",
+        "summary": "MCP／代理、取消／快取等指定子集。",
+        "qualification": "run-27到35適用各輪替身與複核限制。",
+        "source_refs": [
+          "SRC-018",
+          "SRC-020",
+          "SRC-023",
+          "SRC-025"
+        ],
+        "time_basis": {
+          "timezone": "Asia/Taipei",
+          "source_timestamp": null,
+          "source_ref": null,
+          "json_pointer": null,
+          "precision": "RUN_ORDER_ONLY"
+        }
+      },
+      {
+        "id": "TL-04",
+        "date_label": "11/09｜原始觀察 → 沿用",
+        "title": "Standalone 保留受阻觀察",
+        "kind": "INHERITED_OBSERVATION",
+        "summary": "原始run-43：CPU_RATE_EXCEEDED。",
+        "qualification": "run-45沒有重建；0成品為NOT_ASSESSED。",
+        "source_refs": [
+          "SRC-029",
+          "SRC-030",
+          "SRC-031"
+        ],
+        "time_basis": {
+          "timezone": "Asia/Taipei",
+          "source_timestamp": "2026-11-08T16:22:42.916164+00:00",
+          "source_ref": "SRC-030",
+          "json_pointer": "/timestamp",
+          "precision": "TIMESTAMP"
+        }
+      },
+      {
+        "id": "TL-05",
+        "date_label": "11/09｜原始成品 → 離線重評",
+        "title": "Panel 成品審計離線重評",
+        "kind": "OFFLINE_REEVALUATION",
+        "summary": "run-43的722檔清冊，離線11項符合。",
+        "qualification": "SUPPORTED_BY_RETAINED_AUDIT，不是重掃。",
+        "source_refs": [
+          "SRC-029",
+          "SRC-034",
+          "SRC-038"
+        ],
+        "time_basis": {
+          "timezone": "Asia/Taipei",
+          "source_timestamp": "2026-11-08T16:22:51.038062+00:00",
+          "source_ref": "SRC-034",
+          "json_pointer": "/timestamp",
+          "precision": "TIMESTAMP"
+        }
+      },
+      {
+        "id": "TL-06",
+        "date_label": "11/09｜07:47 臺灣時間",
+        "title": "run-45 探針與診斷實際執行",
+        "kind": "EXECUTED",
+        "summary": "Task1隔離對照；Task2治具正常收尾。",
+        "qualification": "Chrome仍Target closed，不能稱DOM通過。",
+        "source_refs": [
+          "SRC-026",
+          "SRC-027",
+          "SRC-028",
+          "SRC-003"
+        ],
+        "time_basis": {
+          "timezone": "Asia/Taipei",
+          "source_timestamp": "2026-11-08T23:47:01.685422+00:00",
+          "source_ref": "SRC-027",
+          "json_pointer": "/timestamp",
+          "precision": "TIMESTAMP"
+        }
+      },
+      {
+        "id": "TL-07",
+        "date_label": "11/09｜文件日期",
+        "title": "Review45 採認與文件勘誤",
+        "kind": "REVIEW_AND_ERRATUM",
+        "summary": "Guard／出處採認，撤回寫死舊觀測值。",
+        "qualification": "保留原15情境、2CPU與全案未放行。",
+        "source_refs": [
+          "SRC-003",
+          "SRC-004",
+          "SRC-006"
+        ],
+        "time_basis": {
+          "timezone": "Asia/Taipei",
+          "source_timestamp": null,
+          "source_ref": "SRC-003",
+          "json_pointer": null,
+          "precision": "DOCUMENT_DATE"
+        }
+      }
+    ],
+    "source_refs": [
+      "SRC-003",
+      "SRC-005",
+      "SRC-029",
+      "SRC-006"
+    ]
+  },
+  "proof_level_definitions": [
+    {
+      "code": "OS_CONTROL",
+      "definition": "指定作業系統控制探針；不等於完整產品行為。",
+      "source_refs": [
+        "SRC-001",
+        "SRC-005"
+      ]
+    },
+    {
+      "code": "HTTP_HANDLER",
+      "definition": "指定產品處理常式／HTTP契約；依各輪實際傳輸與替身判讀。",
+      "source_refs": [
+        "SRC-001",
+        "SRC-005"
+      ]
+    },
+    {
+      "code": "CROSS_REQUEST_STATE",
+      "definition": "連續請求間的狀態變化；不等於所有部署生命週期。",
+      "source_refs": [
+        "SRC-001",
+        "SRC-005"
+      ]
+    },
+    {
+      "code": "FILESYSTEM",
+      "definition": "測試目錄中的檔案行為；保留UID、父鏈與平台限制。",
+      "source_refs": [
+        "SRC-001",
+        "SRC-005"
+      ]
+    },
+    {
+      "code": "SYNTHETIC_CLIENT",
+      "definition": "模型client由合成替身提供，不是真模型。",
+      "source_refs": [
+        "SRC-001",
+        "SRC-005"
+      ]
+    },
+    {
+      "code": "HTTP_HELPER",
+      "definition": "指定HTTP helper或局部管線，不是完整服務。",
+      "source_refs": [
+        "SRC-001",
+        "SRC-005"
+      ]
+    },
+    {
+      "code": "SYNTHETIC_STDIO",
+      "definition": "PassThrough等合成stdio管線，不是獨立CLI完整驗收。",
+      "source_refs": [
+        "SRC-001",
+        "SRC-005"
+      ]
+    },
+    {
+      "code": "HANDLER_COMPOSITION",
+      "definition": "真實處理常式串接，可能使用合成req/res。",
+      "source_refs": [
+        "SRC-001",
+        "SRC-005"
+      ]
+    },
+    {
+      "code": "SYNTHETIC_BACKEND",
+      "definition": "後端／公開正控制為替身，不可外推真provider。",
+      "source_refs": [
+        "SRC-001",
+        "SRC-005"
+      ]
+    },
+    {
+      "code": "SOURCE",
+      "definition": "靜態程式碼或來源追溯，不證明部署時生效。",
+      "source_refs": [
+        "SRC-001",
+        "SRC-005"
+      ]
+    },
+    {
+      "code": "UNIT_DYNAMIC",
+      "definition": "指定單元入口的動態觀察，適用該輪控制限制。",
+      "source_refs": [
+        "SRC-001",
+        "SRC-005"
+      ]
+    },
+    {
+      "code": "HISTORICAL_BROWSER_OBSERVATION",
+      "definition": "保留較早指定元件觀察及控制限制；不是目前受控瀏覽器通過。",
+      "source_refs": [
+        "SRC-001",
+        "SRC-005"
+      ]
+    },
+    {
+      "code": "FINITE_STREAM_STUB",
+      "definition": "固定有界chunks替身；不證明無限串流或實際上游。",
+      "source_refs": [
+        "SRC-001",
+        "SRC-005"
+      ]
+    },
+    {
+      "code": "PARSER",
+      "definition": "指定資料解析行為，不等於傳輸與整體資源防護。",
+      "source_refs": [
+        "SRC-001",
+        "SRC-005"
+      ]
+    },
+    {
+      "code": "VIRTUAL_CLOCK",
+      "definition": "注入虛擬時間，不代表相同長度真流量。",
+      "source_refs": [
+        "SRC-001",
+        "SRC-005"
+      ]
+    },
+    {
+      "code": "BUILD_SUBSET",
+      "definition": "特定配置／目標的成品子集，不是所有建置目標。",
+      "source_refs": [
+        "SRC-001",
+        "SRC-005"
+      ]
+    },
+    {
+      "code": "RETAINED_AUDIT",
+      "definition": "依保留清冊與審計判讀，不是重新掃描原成品。",
+      "source_refs": [
+        "SRC-001",
+        "SRC-005"
+      ]
+    },
+    {
+      "code": "ASYNC_BARRIER",
+      "definition": "以同步屏障確認進行中操作後再測取消等行為。",
+      "source_refs": [
+        "SRC-001",
+        "SRC-005"
+      ]
+    },
+    {
+      "code": "UPSTREAM_STUB",
+      "definition": "上游使用合成替身，不連真外部服務。",
+      "source_refs": [
+        "SRC-001",
+        "SRC-005"
+      ]
+    },
+    {
+      "code": "PURE_FUNCTION",
+      "definition": "純函式算法驗證，不啟動其代表的部署環境。",
+      "source_refs": [
+        "SRC-001",
+        "SRC-005"
+      ]
+    },
+    {
+      "code": "MIDDLEWARE_COLLECTOR",
+      "definition": "合成server收集器或局部中介管線，不等於全Vite生命週期。",
+      "source_refs": [
+        "SRC-001",
+        "SRC-005"
+      ]
+    },
+    {
+      "code": "MULTIPROCESS",
+      "definition": "指定多行程對照，不等於長期壓力或全部競態。",
+      "source_refs": [
+        "SRC-001",
+        "SRC-005"
+      ]
+    }
+  ],
+  "glossary": [
+    {
+      "term": "CONFIRMED／OPEN",
+      "definition": "缺陷已有支持證據，但仍未修補／關閉；不代表已完成風險分級。",
+      "source_refs": [
+        "SRC-007",
+        "SRC-003"
+      ]
+    },
+    {
+      "term": "NEEDS VALIDATION",
+      "definition": "候選問題的暴露、契約或影響仍欠證據；既不是已確認漏洞，也不是安全通過。",
+      "source_refs": [
+        "SRC-007",
+        "SRC-006"
+      ]
+    },
+    {
+      "term": "PARTIALLY VERIFIED",
+      "definition": "有指定層級的子集觀察；原情境尚有必要變體未完成。",
+      "source_refs": [
+        "SRC-001",
+        "SRC-005"
+      ]
+    },
+    {
+      "term": "BLOCKED／NOT TESTED",
+      "definition": "前提或能力受阻／尚未執行；不能改成PASS或N/A。",
+      "source_refs": [
+        "SRC-001",
+        "SRC-003"
+      ]
+    },
+    {
+      "term": "EXECUTED／INHERITED／OFFLINE",
+      "definition": "分別為本輪實際執行、沿用歷史觀察、重新判讀保留資料；離線重評不等於重掃或重建。",
+      "source_refs": [
+        "SRC-003",
+        "SRC-029"
+      ]
+    },
+    {
+      "term": "SHA-256／簽章",
+      "definition": "本報告hash用於檔案完整性對照，不是具名簽署或所有歷史行為的證明。",
+      "source_refs": [
+        "SRC-006"
+      ]
+    },
+    {
+      "term": "反應式控制／硬配額",
+      "definition": "本案NATIVE-01依取樣與超限停止控制，有遺漏與停止延遲；不能稱核心硬配額或固定最壞上界。",
+      "source_refs": [
+        "SRC-002"
+      ]
+    },
+    {
+      "term": "風險等級／處理順序",
+      "definition": "嚴重度需暴露與影響證據；報告建議先做的工作，不等於CVSS排名、核准時程或風險接受。",
+      "source_refs": [
+        "SRC-007",
+        "SRC-006"
+      ]
+    }
+  ],
+  "delivery_qa": {
+    "status": "COMPLETE_WITH_LIMITATIONS",
+    "notice": "報告內容整理、來源核對、合成互動及靜態圖像檢查已完成。瀏覽器管道不可用，桌機／手機實際排版、原生鍵盤操作、真瀏覽器CSP與列印仍未驗證；A4輸出僅以獨立排版工具檢視，不代替瀏覽器驗收。",
+    "checks": [
+      {
+        "name": "來源／節錄與原15情境",
+        "status": "PASS",
+        "basis": "45份來源、644處來源引用、14段節錄及15情境核對。"
+      },
+      {
+        "name": "篩選、證據、深連結與列印事件",
+        "status": "SYNTHETIC_DOM_PASS",
+        "basis": "使用既有happy-dom檢查，不代表真瀏覽器。"
+      },
+      {
+        "name": "SVG圖像",
+        "status": "STATIC_REVIEWED",
+        "basis": "既有rsvg-convert輸出；列印引擎中已檢查並修正SVG樣式。"
+      },
+      {
+        "name": "A4列印預覽",
+        "status": "PRINT_ENGINE_REVIEWED",
+        "basis": "WeasyPrint獨立排版預覽；不等於Chrome列印。"
+      },
+      {
+        "name": "桌機／390px手機實際排版",
+        "status": "NOT_VERIFIED_BROWSER_UNAVAILABLE",
+        "basis": "Browser列舉為空；既有Chrome最小啟動Target closed，不重試或關沙箱。"
+      },
+      {
+        "name": "原生鍵盤／CSP／OS減少動態",
+        "status": "NOT_VERIFIED_BROWSER_UNAVAILABLE",
+        "basis": "只完成語意結構、焦點宣告及減少動態的合成狀態檢查。"
+      }
+    ],
+    "assessment_release_authorization": false
+  }
+}

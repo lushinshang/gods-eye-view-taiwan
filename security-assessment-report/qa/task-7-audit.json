@@ -1,0 +1,44 @@
+{
+  "task": 7,
+  "status": "PASS",
+  "scope": "Selected-source reconciliation and report rendering audit only; no product tests, installation or external requests.",
+  "sources_verified": 45,
+  "product_sources_matching_snapshot": 5,
+  "references_checked": 644,
+  "safe_excerpts_verified": 14,
+  "scenario_identities_verified": 15,
+  "provenance_mappings_verified": 4,
+  "timezone_timestamps_verified": 5,
+  "injection_mutations_verified": 7,
+  "checks": {
+    "all_hashes_sizes_hrefs_locators_match": true,
+    "original_15_scenario_names_and_matrix_preserved": true,
+    "finding_candidate_and_release_statuses_consistent": true,
+    "all_proof_level_codes_have_definitions": true,
+    "browser_fixture_status_not_browser_success": true,
+    "all_safety_excerpts_traceable_and_plain_text": true,
+    "no_external_rendering_resource_or_network_sink": true,
+    "no_absolute_host_paths_embedded": true,
+    "unsafe_svg_ids_rejected": true,
+    "no_fabricated_owners_dates_ratings_or_approvals": true
+  },
+  "limited_secret_pattern_counts": {
+    "private_key_block": 0,
+    "aws_access_key": 0,
+    "google_api_key": 0,
+    "openai_token_shape": 0,
+    "bearer_literal": 0
+  },
+  "manual_review_notes": [
+    "F-001仍指realCounts.艘中的固定5，不改名。",
+    "C002傳輸bytes總量矛盾明列未解，不作容量證明。",
+    "Panel離線重評不當重掃，Standalone無成品不宣稱零洩漏。",
+    "報告未內嵌raw日誌全文，安全節錄取自非秘密程式碼或白名單合成結果。",
+    "三個候選仍NEEDS VALIDATION；改善順序不代表CVSS或風險接受。"
+  ],
+  "limitations": [
+    "有限格式比對與人工選取節錄不等於完整秘密掃描，未安裝或執行外部掃描器。",
+    "未讀真env、憑證、Keychain或宿主Profile。",
+    "真瀏覽器CSP與桌機／手機／鍵盤／瀏覽器列印未驗證；詳見第8項交付紀錄。"
+  ]
+}

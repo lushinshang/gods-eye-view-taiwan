@@ -1,0 +1,20 @@
+{
+  "task": 1,
+  "scope": "Report data structural and source-integrity checks; no product execution or new assessment run.",
+  "status": "PASS",
+  "source_count": 40,
+  "references_checked": 136,
+  "scenario_count": 15,
+  "finding_count": 4,
+  "checks": {
+    "all_source_hashes_and_sizes_match": true,
+    "all_relative_hrefs_resolve": true,
+    "all_line_locators_match": true,
+    "all_source_references_resolve": true,
+    "original_15_identities_match": true,
+    "no_absolute_host_paths_in_generated_data": true,
+    "no_full_source_or_raw_log_bodies_embedded": true,
+    "report_marked_incomplete": true
+  },
+  "errors": []
+}

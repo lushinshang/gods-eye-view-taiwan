@@ -1,0 +1,28 @@
+{
+  "task": 6,
+  "status": "PASS",
+  "scope": "Report visual models, retained source timestamps and static SVG only; no product execution.",
+  "checks": {
+    "original_15_ids_titles_preserved": true,
+    "symbols_not_used_as_whole_scenario_pass": true,
+    "svg_xml_valid": true,
+    "source_hashes_unchanged": true,
+    "timestamp_conversions_checked": 5,
+    "missing_timestamp_not_invented": true,
+    "inherited_offline_executed_classifications_distinct": true,
+    "recommended_order_not_approved_schedule": true
+  },
+  "static_visual_review": {
+    "renderer": "existing rsvg-convert",
+    "reviewed": [
+      "proof-matrix.png",
+      "evidence-timeline.png",
+      "improvement-order.png"
+    ],
+    "adjustments": [
+      "OS/files header split into two lines to avoid adjacent header crowding.",
+      "run43 UTC execution dates corrected to 11/09 Asia/Taipei; run35 lacking timestamp marked by run order only."
+    ]
+  },
+  "browser_visual_acceptance": "PENDING_TASK_8"
+}

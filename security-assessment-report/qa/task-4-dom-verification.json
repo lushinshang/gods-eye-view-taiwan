@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "scope": "Synthetic DOM checks of report controls only. Does not verify browser sandbox, CSP enforcement, layout or printing.",
+  "checks": [
+    "static content available before script",
+    "finding status filter",
+    "scenario search",
+    "empty state",
+    "reset",
+    "expand/collapse",
+    "deep-link reveal",
+    "print expansion and state restoration",
+    "no external rendering resources"
+  ],
+  "real_browser_status": "BLOCKED_TARGET_CLOSED",
+  "limitations": [
+    "真Chrome最小啟動受阻，未執行視覺、CSP核心或真列印驗證。",
+    "完整桌機／手機／瀏覽器列印未驗證；詳見task-8-summary.json，合成DOM不代替瀏覽器驗收。"
+  ]
+}

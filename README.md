@@ -24,6 +24,13 @@
 | **📡 全維度數據源與時效特性報告** | [點此線上開啟](https://lushinshang.github.io/gods-eye-view-taiwan/data-sources.html) | `data-sources.html`<br>[`DATA_SOURCES.md`](DATA_SOURCES.md) | 盤點 9 大領域 20+ 類數據源；剖析三層時效性（不可變動/不用變動/動態頻率），具備 Awwwards/FWA 得獎級戰術 HUD 互動 SVG 大盤與環境感知彈窗。 |
 | **🎨 微光學圖標設計展示書** | [點此線上開啟](https://lushinshang.github.io/gods-eye-view-taiwan/repo/public/icons/taiwan-vessels/spec.html) | `repo/public/icons/taiwan-vessels/spec.html` | Awwwards / FWA 規格 16 款（8 normal + 8 白金選取態）48×48 Texture Atlas 微光學船舶點陣圖標設計展示。 |
 
+
+## 安全評估報告
+
+[開啟 A24 安全評估 HTML 報告](security-assessment-report/index.html) · [交付與 QA 說明](security-assessment-report/README.md)
+
+報告可離線閱讀，包含安全發現、原 15 情境、SVG 圖解與證據索引。此報告的桌機／手機真瀏覽器 QA 尚未驗證，不適用上方既有文件的雙端驗證敘述；全案安全評估仍未完成，無發布放行。
+
 ---
 
 ## ⚡ 系統六大突破性工程架構

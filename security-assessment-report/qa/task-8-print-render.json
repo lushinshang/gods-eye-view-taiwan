@@ -1,0 +1,19 @@
+{
+  "renderer": "WeasyPrint62.3 + installed pydyf0.12.1",
+  "process_only_compatibility_aliases": {
+    "transform": "set_matrix",
+    "text_matrix": "set_text_matrix",
+    "color_space": "set_color_space",
+    "shading": "paint_shading"
+  },
+  "browser_equivalent": false,
+  "total_pages": 67,
+  "management_summary_pages": [
+    1,
+    2
+  ],
+  "external_fetch_policy": "DENY_ALL",
+  "source": "index.html",
+  "evidence_file_links_disabled_for_preview": true,
+  "purpose": "A4 print layout QA only; not primary deliverable or browser print acceptance."
+}

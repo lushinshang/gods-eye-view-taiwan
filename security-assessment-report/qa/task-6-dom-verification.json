@@ -1,0 +1,16 @@
+{
+  "task": 6,
+  "status": "PASS",
+  "scope": "Synthetic report DOM only; no product execution or real browser acceptance.",
+  "checks": [
+    "15 SVG rows plus 15 original-name text rows",
+    "matrix search/status filter matches scenario cards",
+    "filtered SVG rows compact and viewBox resized",
+    "empty state and reset",
+    "print shows all 15 then restores filter",
+    "deep link reveals scenario and timeline evidence",
+    "7 provenance milestones and static 3-stage recommendation",
+    "new visuals do not add motion"
+  ],
+  "browser_visual_qa": "NOT_VERIFIED_BROWSER_UNAVAILABLE"
+}

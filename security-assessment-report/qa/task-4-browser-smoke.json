@@ -1,0 +1,6 @@
+{
+  "scope": "Report interface smoke only; not product security testing.",
+  "nativeSandboxDisabled": false,
+  "status": "BLOCKED",
+  "reason": "Protocol error (Target.setDiscoverTargets): Target closed"
+}

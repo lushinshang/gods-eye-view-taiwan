@@ -1,0 +1,57 @@
+{
+  "task": 8,
+  "status": "COMPLETE_WITH_LIMITATIONS",
+  "scope": "HTML report delivery, not completion of product security assessment.",
+  "native_browser": {
+    "status": "NOT_VERIFIED_BROWSER_UNAVAILABLE",
+    "discovery_result": [],
+    "initial_error": "No browser is available",
+    "prior_standalone_smoke": "BLOCKED_TARGET_CLOSED",
+    "repeated_chrome_launches_this_task": 0,
+    "sandbox_disabled": false
+  },
+  "checks": {
+    "source_and_safe_rendering": "PASS",
+    "synthetic_dom_and_reduced_motion": "PASS",
+    "svg_static_review": "PASS",
+    "a4_independent_print_engine": "REVIEWED",
+    "native_desktop_and_390px_mobile_layout": "NOT_VERIFIED",
+    "native_keyboard_navigation": "NOT_VERIFIED",
+    "native_browser_csp_and_print": "NOT_VERIFIED"
+  },
+  "print_preview": {
+    "renderer": "WeasyPrint62.3 + installed pydyf0.12.1",
+    "page_count": 67,
+    "management_summary_pages": [
+      1,
+      2
+    ],
+    "reviewed_contact_sheets": [
+      "print-contact-1.png",
+      "print-contact-2.png",
+      "print-contact-3.png"
+    ],
+    "summary_pages_reviewed": [
+      "summary-page-01.png",
+      "summary-page-02.png"
+    ],
+    "svg_style_fallback_fixed": true,
+    "evidence_file_links_disabled_for_preview": true,
+    "browser_equivalent": false
+  },
+  "report_html_sha256": "92c484224de0fa98f01a58e622fda18b7feb3fbd88addf6d90a53f8890a28a9b",
+  "qa_pdf_sha256": "75db3f4c554ab0bcb93112abe7746029e9de0af9e1e226e41c25aecfae35ba54",
+  "safety": {
+    "new_product_execution": false,
+    "product_patch": false,
+    "dependency_file_modification": false,
+    "installation": false,
+    "external_upload": false
+  },
+  "product_assessment_status": "INCOMPLETE",
+  "release_authorization": false,
+  "archive_status": "ARCHIVED_BY_USER_REQUEST",
+  "sdd_archive": "sdd/archive/2026-11-09-a24-security-html-report",
+  "report_directory": "1151104_gods-eye-view/security-assessment-report",
+  "relocation_note": "Moved next to project documents by user instruction; report HTML content and assessment evidence unchanged."
+}

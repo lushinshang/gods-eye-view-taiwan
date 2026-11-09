@@ -1,0 +1,333 @@
+{
+  "total_mounted_routes": 54,
+  "refused_by_panel_request": 9,
+  "allowed_to_panel": 45,
+  "allowed_with_own_auth_gate": 5,
+  "allowed_without_own_auth_gate": 40,
+  "rows": [
+    {
+      "route": "/api",
+      "file": "server/standalone/api-not-found.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/adsbdb",
+      "file": "server/providers/aircraft/enrichment.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/cctv",
+      "file": "server/providers/cctv.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/celestrak",
+      "file": "server/providers/space/celestrak.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/cyclones",
+      "file": "server/providers/cyclones.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/drone-airspace",
+      "file": "server/providers/droneAirspace.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/fire-perimeters",
+      "file": "server/providers/firePerimeters.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/firms",
+      "file": "server/providers/firms.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/flights",
+      "file": "server/providers/aircraft/opensky.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/flights/track",
+      "file": "server/providers/aircraft/tracks.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/gbfs",
+      "file": "server/providers/gbfs.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/gemini/chat",
+      "file": "server/providers/gemini.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/gemini/token",
+      "file": "server/providers/gemini.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/geocode",
+      "file": "server/providers/regional/place.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/ghostmaps",
+      "file": "server/providers/ghostMaps.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/gnss-integrity",
+      "file": "server/providers/gnssIntegrity.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/google/geocode",
+      "file": "server/providers/places/google.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/google/nearby-places",
+      "file": "server/providers/places/google.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/google/reverse-geocode",
+      "file": "server/providers/places/google.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/google/text-search",
+      "file": "server/providers/places/google.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/launches",
+      "file": "server/providers/space/launch-library.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/local-receivers/aircraft",
+      "file": "server/providers/local-receivers.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/mapillary/status",
+      "file": "server/providers/mapillary.js",
+      "panel_refused": false,
+      "has_own_auth_gate": true
+    },
+    {
+      "route": "/api/mapillary/tiles",
+      "file": "server/providers/mapillary.js",
+      "panel_refused": false,
+      "has_own_auth_gate": true
+    },
+    {
+      "route": "/api/military",
+      "file": "server/providers/aircraft/adsb-lol.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/military-installations",
+      "file": "server/providers/military-installations.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/military/track",
+      "file": "server/providers/aircraft/tracks.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/openai/chat",
+      "file": "server/providers/openai.js",
+      "panel_refused": true,
+      "has_own_auth_gate": true
+    },
+    {
+      "route": "/api/openai/hud-summary",
+      "file": "server/providers/openai.js",
+      "panel_refused": true,
+      "has_own_auth_gate": true
+    },
+    {
+      "route": "/api/osm/features",
+      "file": "server/providers/overpass/osmFeaturesRoute.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/overpass",
+      "file": "server/providers/overpass.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/radio",
+      "file": "server/providers/radio.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/realtime/debug-log",
+      "file": "server/providers/openai.js",
+      "panel_refused": true,
+      "has_own_auth_gate": true
+    },
+    {
+      "route": "/api/realtime/oauth-login",
+      "file": "server/providers/openai.js",
+      "panel_refused": true,
+      "has_own_auth_gate": true
+    },
+    {
+      "route": "/api/realtime/oauth-status",
+      "file": "server/providers/openai.js",
+      "panel_refused": true,
+      "has_own_auth_gate": true
+    },
+    {
+      "route": "/api/realtime/token",
+      "file": "server/providers/openai.js",
+      "panel_refused": true,
+      "has_own_auth_gate": true
+    },
+    {
+      "route": "/api/regional-brief",
+      "file": "server/providers/regional/briefing.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/route",
+      "file": "server/providers/places/routes.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/setup/keys",
+      "file": "server/standalone/key-setup.js",
+      "panel_refused": true,
+      "has_own_auth_gate": true
+    },
+    {
+      "route": "/api/setup/status",
+      "file": "server/standalone/key-setup.js",
+      "panel_refused": true,
+      "has_own_auth_gate": true
+    },
+    {
+      "route": "/api/taiwan-ai-advisor",
+      "file": "server/providers/ai/ollama-advisor.js",
+      "panel_refused": false,
+      "has_own_auth_gate": true
+    },
+    {
+      "route": "/api/taiwan-ai-status",
+      "file": "server/providers/ai/ollama-advisor.js",
+      "panel_refused": false,
+      "has_own_auth_gate": true
+    },
+    {
+      "route": "/api/taiwan-ai-token",
+      "file": "server/providers/ai/ollama-advisor.js",
+      "panel_refused": false,
+      "has_own_auth_gate": true
+    },
+    {
+      "route": "/api/taiwan-traffic",
+      "file": "server/providers/traffic/taiwan-traffic.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/taiwan-vessel-tracks",
+      "file": "server/providers/vessels/taiwan-tracks.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/taiwan-vessels",
+      "file": "server/providers/vessels/mpb-taiwan.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/terrain/heights",
+      "file": "server/providers/terrain.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/tomtom",
+      "file": "server/providers/traffic.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/transit",
+      "file": "server/providers/transit.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/vessels",
+      "file": "server/providers/vessels/ais-live.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/weather",
+      "file": "server/providers/weather.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/weather-effects",
+      "file": "server/providers/regional/weather-effects.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/api/wind",
+      "file": "server/providers/wind.js",
+      "panel_refused": false,
+      "has_own_auth_gate": false
+    },
+    {
+      "route": "/mcp",
+      "file": "server/mcp/plugin.js",
+      "panel_refused": true,
+      "has_own_auth_gate": false
+    }
+  ]
+}

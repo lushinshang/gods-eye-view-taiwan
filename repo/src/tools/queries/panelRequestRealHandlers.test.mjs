@@ -91,6 +91,23 @@ test('positive control: panel_request succeeds end to end against the real cctv/
   assert.ok(body.sources.some((source) => source.id === 'fixture-cam'));
 });
 
+test('GEV-C-004: sameSiteGated on /api/mapillary/status does not block panel_request (loopback tool call, not a cross-site browser)', async (t) => {
+  // mapillary.js wraps its status handler in sameSiteGated, a DIFFERENT gate
+  // from isLocalBrowser/PAT: it refuses cross-site BROWSER requests (foreign
+  // Origin, Sec-Fetch-Site) but explicitly passes loopback non-browser
+  // callers through. panelRequest's own fetch to the app's server is such a
+  // caller, so this route has NO independent defense against the panel
+  // path specifically — only against a malicious webpage calling it directly.
+  const catalog = await startRealServer(t);
+  const { data } = await catalog.call('panel_request', {
+    key: KEY,
+    path: '/api/mapillary/status',
+  });
+  assert.equal(data.status, 200);
+  const body = JSON.parse(new TextDecoder().decode(fromBase64(data.body)));
+  assert.equal(body.configured, false);
+});
+
 test('negative control: the real taiwan-ai-status handler itself refuses an uncredentialed call (not panelRequest\'s own REFUSED_PATHS)', async (t) => {
   const catalog = await startRealServer(t);
   // /api/taiwan-ai-status is not in panelRequest.js's REFUSED_PATHS list —

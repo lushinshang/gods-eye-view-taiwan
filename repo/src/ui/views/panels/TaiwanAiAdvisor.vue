@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { copyNewToken } from './tokenReveal.js';
 
 const props = defineProps({
   // 目前選取的船隻 / 路況事件，只送識別碼與座標，後端不採信其遙測欄位
@@ -16,6 +17,7 @@ const showCitations = ref(false);
 const showToken = ref(false);
 const tokenInfo = ref({ configured: false, fingerprint: null });
 const newToken = ref('');
+const copiedNotice = ref(false);
 
 const quickQuestions = [
   { label: '📊 海陸態勢總結', q: '請總結目前臺灣海域與國道的整體態勢' },
@@ -89,8 +91,13 @@ async function generateToken() {
   });
   const data = await r.json();
   if (r.ok) {
-    newToken.value = data.token; // 僅顯示一次
     tokenInfo.value = { configured: data.configured, fingerprint: data.fingerprint };
+    const { copied, revealed } = await copyNewToken(data.token);
+    copiedNotice.value = copied;
+    // Only ever assigned to this (rendered) ref when the clipboard write
+    // failed — otherwise the raw token never enters a value the template
+    // can display.
+    newToken.value = revealed ? data.token : '';
   } else errorMsg.value = data.error || '產生權杖失敗';
 }
 
@@ -99,6 +106,7 @@ async function revokeToken() {
   if (r.ok) {
     tokenInfo.value = await r.json();
     newToken.value = '';
+    copiedNotice.value = false;
   }
 }
 
@@ -113,7 +121,10 @@ async function copyToken() {
 function toggleToken() {
   showToken.value = !showToken.value;
   if (showToken.value) refreshToken();
-  else newToken.value = '';
+  else {
+    newToken.value = '';
+    copiedNotice.value = false;
+  }
 }
 
 const citationCount = computed(() => {
@@ -210,8 +221,11 @@ onUnmounted(() => {
         狀態：{{ tokenInfo.configured ? '已設定' : '未設定' }}
         <template v-if="tokenInfo.fingerprint">・指紋 <code>{{ tokenInfo.fingerprint }}</code></template>
       </div>
-      <div v-if="newToken" class="ai-newtoken">
-        <div class="warn">新權杖僅顯示這一次，請立即複製保存：</div>
+      <div v-if="copiedNotice" class="ai-newtoken">
+        <div class="warn">已複製到剪貼簿，請立即貼到你要用的地方（畫面不會顯示明文）。</div>
+      </div>
+      <div v-else-if="newToken" class="ai-newtoken">
+        <div class="warn">自動複製失敗，新權杖僅顯示這一次，請立即複製保存：</div>
         <code class="tok">{{ newToken }}</code>
         <button type="button" class="ai-chip" @click="copyToken">複製</button>
       </div>

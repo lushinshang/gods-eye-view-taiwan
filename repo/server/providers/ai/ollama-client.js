@@ -79,7 +79,7 @@ export function validateGrounding(content, prompt) {
         matched_total.vessels,
         summary.total_vessels,
         Math.min(vessels.length, 10),
-        5,
+        Math.min(vessels.length, 5),
       ].map(String),
     ),
     件: new Set([matched_total.events, summary.total_events].map(String)),

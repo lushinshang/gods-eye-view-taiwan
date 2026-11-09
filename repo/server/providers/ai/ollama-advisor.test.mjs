@@ -832,3 +832,14 @@ test('natural top-5 vessel list with knots passes grounding', () => {
   assert.equal(validateGrounding(text, p), true);
   assert.equal(validateGrounding('代表性 5 艘貨輪如下', p), true);
 });
+test('vessel count 5 is rejected when the context holds only 2 vessels (GEV-F-001)', () => {
+  const q = '基隆港 貨輪 >15kt';
+  const fx = fixtures();
+  fx.vessels.rows = [vessel(), vessel(1)];
+  const p = buildPrompt(retrieve({ ...fx, query: q }), q);
+  assert.equal(p.context.vessels.length, 2);
+  assert.equal(p.context.summary.total_vessels, 2);
+  assert.equal(validateGrounding('目前共有 2 艘。', p), true);
+  assert.equal(validateGrounding('目前共有 3 艘。', p), false);
+  assert.equal(validateGrounding('目前共有 5 艘。', p), false);
+});

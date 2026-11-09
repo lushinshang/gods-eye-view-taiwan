@@ -1,6 +1,6 @@
 {
  "metadata": {
-  "data_version": "1.9.0",
+  "data_version": "1.9.1",
   "implementation_stage": "TASK_8_DELIVERED_WITH_QA_LIMITATIONS",
   "language": "zh-Hant-TW",
   "title": "A24 戰情台安全評估報告",
@@ -345,7 +345,8 @@
      "新增的assertNoSymlinkAncestors只是單次lstat，檢查完到實際open/write之間理論上仍有極小的競態窗口（TOCTOU），不構成完整防護；報告自身acceptance_criteria已承認補強父鏈不自動關閉候選。",
      "只覆蓋ollama-advisor.js的createTokenStore，不包含server/mcp/panelKey.js（MCP panel key）或server/standalone/key-setup.js（.env store）等其他也寫入檔案系統的程式碼路徑——那些不在C-003的finding範圍內，風險判斷各自獨立。",
      "owner檢查無法在這個sandbox實測：環境只有單一真實UID，沒有第二個真實使用者帳號可以模擬跨使用者攻擊；owner不符的拒絕邏輯只用mock lstatSync驗證過，不是真實跨UID的端到端證據。acceptance_criteria裡「若跨UID屬支援範圍需在有授權環境證明」這條因此仍未達成——我們改成「宣告不支援多使用者」來迴避這個要求，但這代表confirmation_status仍不能說「已確認安全」。",
-     "2026-11-09實測確認（qa/environment-capability-2026-11-09.md）：這個環境沒有passwordless sudo、沒有第二個真實OS使用者帳號，無法做真正的跨使用者攻擊測試。這是路徑一（技術驗證）在此環境下的終點狀態，不是尚未完成的任務；confirmation_status繼續維持NEEDS_VALIDATION，誠實反映技術上未確認安全。"
+     "2026-11-09實測確認（qa/environment-capability-2026-11-09.md）：這個環境沒有passwordless sudo、沒有第二個真實OS使用者帳號，無法做真正的跨使用者攻擊測試。這是路徑一（技術驗證）在此環境下的終點狀態，不是尚未完成的任務；confirmation_status繼續維持NEEDS_VALIDATION，誠實反映技術上未確認安全。",
+     "2026-11-09使用者已明確確認：保留acceptance_criteria第3條「不自動關閉候選」的規則，接受C-003在這份報告的設計下永不會僅憑技術緩解自動關閉——這是內容層面的刻意決定，不是技術工作量不足或疏漏。confirmation_status因此長期維持NEEDS_VALIDATION，是報告本身治理規則的直接結果。"
     ],
     "recommendations": [
      "明定支援單使用者或共享主機的部署模型與PAT路徑擁有者。",
@@ -466,7 +467,8 @@
      "token verify固定false；公開tracks正控制為mock；Gemini實際provider呼叫未全面計數。",
      "合法PAT在來源呼叫存在，不表示會通過proxy白名單；不得假設Authorization被轉送。",
      "40條無獨立門控的路由已全部逐一實測reachability(確認沒有被任何auth gate或panelRequest denylist擋下)，但只有/api/cctv/sources這1條有「真實資料」的完整正向對照——其餘39條因為這個環境沒有設定對應的外部API金鑰，無法在不依賴真實第三方憑證的情況下證明「回傳真實正確資料」，只能證明「沒有被擋」。這是環境限制(缺金鑰)，不是測試範圍的縮小；仍缺「每個核准路由的下游資料契約」驗證，C-004不能因此關閉。",
-     "2026-11-09實測確認（qa/environment-capability-2026-11-09.md）：Google Places、TomTom、OpenSky、FIRMS等路由所需的API金鑰在這個環境完全沒有設定，無法進一步證明「拿到正確下游資料」。這是路徑一在此環境下的終點狀態，不是測試範圍縮小；confirmation_status繼續維持NEEDS_VALIDATION。"
+     "2026-11-09實測確認（qa/environment-capability-2026-11-09.md）：Google Places、TomTom、OpenSky、FIRMS等路由所需的API金鑰在這個環境完全沒有設定，無法進一步證明「拿到正確下游資料」。這是路徑一在此環境下的終點狀態，不是測試範圍縮小；confirmation_status繼續維持NEEDS_VALIDATION。",
+     "與C-003相同的治理原則：acceptance_criteria要求「每個核准路由都有正常對照」，不是「每個路由都沒被擋住」；在缺少對應第三方API金鑰的情況下，這條標準同樣無法僅憑reachability測試自動達成。使用者已確認保留此標準，接受這部分C-004同樣長期維持NEEDS_VALIDATION。"
     ],
     "recommendations": [
      "逐路由明定proxy負責拒絕與下游負責准入的契約；不把取得panelKey本身列成認證繞過。",
@@ -2004,7 +2006,7 @@
   }
  ],
  "document_control": {
-  "report_version": "1.9.0",
+  "report_version": "1.9.1",
   "document_status": "DELIVERABLE_WITH_QA_LIMITATIONS",
   "data_cutoff": "2026-11-09 Asia/Taipei；至Review45、交接文件勘誤，以及同日後續十輪session",
   "assessment_execution_dates": "2026-11-07至2026-11-09既有證據，以及2026-11-09同日三輪後續session的實際執行（EXECUTED）；不表示連續演練或完整執行窗口",

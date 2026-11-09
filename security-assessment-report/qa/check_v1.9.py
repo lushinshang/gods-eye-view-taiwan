@@ -19,6 +19,13 @@ in THIS environment, not outstanding tasks — confirmation_status for
 GEV-C-003 and GEV-C-004 stays NEEDS_VALIDATION; this update documents why
 further validation here is not possible, it does not claim either risk is
 resolved. product_commit is unchanged from v1.8.0 (848a856).
+
+UPDATE (v1.9.1, same day): section 6's data_version assertion ('1.9.0') is
+now PINNED and EXPECTED TO FAIL from v1.9.1 onward — a one-line governance
+note was added to GEV-C-003/GEV-C-004 (the user explicitly confirmed
+keeping the "no auto-close" acceptance_criteria rule rather than relaxing
+it), no other fact in this file's assertions changed. See
+qa/check_v1.9.1.py.
 """
 from pathlib import Path
 import hashlib

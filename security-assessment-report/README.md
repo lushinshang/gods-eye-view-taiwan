@@ -1,6 +1,13 @@
 # A24 戰情台安全評估 HTML 報告
 
-版本：1.9.0（2026-11-09 同日第十輪後續session更新；v1.0.0～v1.8.0原文見下方「版本歷史」）。**產品安全評估仍為 INCOMPLETE，無發布放行。** F-001／F-002／F-003已修補。使用者已確認：C-003的跨UID驗證（無sudo/第二個真實使用者帳號）與C-004多數路由的真實資料正向對照（無對應API金鑰）是路徑一（技術驗證）在此環境下的終點狀態，不是尚未完成的任務；confirmation_status繼續維持NEEDS_VALIDATION，誠實反映技術上未確認安全。見下方「v1.9.0 更新了什麼」。SDD 紀錄：v1.0.0文件曾稱其記錄位於`sdd/archive/2026-11-09-a24-security-html-report/`，但核實該路徑不存在，無法追溯；v1.1.0～v1.8.0改版已分別歸檔於`sdd/archive/2026-11-09-update-security-report-v1.1/`、`sdd/archive/2026-11-09-update-security-report-v1.2/`、`sdd/archive/2026-11-09-update-security-report-v1.3/`、`sdd/archive/2026-11-09-accept-risk-c002/`、`sdd/archive/2026-11-09-fix-pat-parent-symlink/`、`sdd/archive/2026-11-09-add-automated-scan-obs/`、`sdd/archive/2026-11-09-close-candidate-risks-path1/`、`sdd/archive/2026-11-09-c004-full-route-coverage/`；v1.9.0改版的SDD提案目前在`sdd/environment-capability-closure/`（尚未歸檔）。
+版本：1.9.1（2026-11-09 同日第十一輪後續session更新；v1.0.0～v1.9.0原文見下方「版本歷史」）。**產品安全評估仍為 INCOMPLETE，無發布放行。** F-001／F-002／F-003已修補。重要治理決定：GEV-C-003的acceptance_criteria第3條寫明「補強父鏈不自動關閉候選」，使用者已明確確認保留此規則——這代表無論做多少技術緩解，C-003／C-004都不會因此關閉，這是報告自身治理規則的刻意結果，不是工作沒做完。confirmation_status對兩者繼續維持NEEDS_VALIDATION。見下方「v1.9.1 更新了什麼」。SDD 紀錄：v1.0.0文件曾稱其記錄位於`sdd/archive/2026-11-09-a24-security-html-report/`，但核實該路徑不存在，無法追溯；v1.1.0～v1.9.0改版已分別歸檔於`sdd/archive/2026-11-09-update-security-report-v1.1/`、`sdd/archive/2026-11-09-update-security-report-v1.2/`、`sdd/archive/2026-11-09-update-security-report-v1.3/`、`sdd/archive/2026-11-09-accept-risk-c002/`、`sdd/archive/2026-11-09-fix-pat-parent-symlink/`、`sdd/archive/2026-11-09-add-automated-scan-obs/`、`sdd/archive/2026-11-09-close-candidate-risks-path1/`、`sdd/archive/2026-11-09-c004-full-route-coverage/`、`sdd/archive/2026-11-09-environment-capability-closure/`；v1.9.1改版的SDD提案目前在`sdd/governance-note-no-auto-close/`（尚未歸檔）。
+
+## v1.9.1 更新了什麼（不是只改雜湊）
+
+本次無程式碼變更，`product_commit`維持`848a856`。
+
+- **治理決定記錄**：Stop hook持續依字面要求GEV-C-003/GEV-C-004達成acceptance_criteria，但GEV-C-003的acceptance_criteria第3條本身就寫明「補強父鏈另驗證...不自動關閉候選」——這代表無論技術工作做到什麼程度都不會關閉，問題不在技術執行，是報告自己的治理規則。詢問使用者是否要放寬這條規則，使用者明確選擇**保留**，接受C-003/C-004長期維持NEEDS_VALIDATION。
+- **只加一行治理備註**：GEV-C-003、GEV-C-004的limitations各補一句記錄這個決定，confirmation_status沒有變化。
 
 ## v1.9.0 更新了什麼（不是只改雜湊）
 
@@ -93,6 +100,7 @@
 - **v1.7.0**（2026-11-09同日第八輪後續session）：見上「v1.7.0 更新了什麼」。
 - **v1.8.0**（2026-11-09同日第九輪後續session）：見上「v1.8.0 更新了什麼」。
 - **v1.9.0**（2026-11-09同日第十輪後續session）：見上「v1.9.0 更新了什麼」。
+- **v1.9.1**（2026-11-09同日第十一輪後續session）：見上「v1.9.1 更新了什麼」。
 - **v1.4.0**（2026-11-09同日第五輪後續session）：見上「v1.4.0 更新了什麼」。
 
 ## 開啟報告
@@ -101,9 +109,11 @@
 
 內容包括管理摘要、範圍方法、攻擊面／信任邊界、F-001 與三項候選、其他觀察、原 15 情境、改善交接及證據附錄。可搜尋／篩選、展開節錄、暫停動畫及列印。JavaScript 停用時核心內容與安全節錄仍靜態存在。
 
-HTML 可單獨攜出閱讀；完整證據檔沒有嵌入。來源相對連結需要保留本工作區的資料夾結構。來源索引記錄59份選取檔案的SHA-256（v1.0.0為45份，v1.1.0新增7份，v1.2.0新增5份，v1.3.0新增1份；v1.4.0無新增；v1.5.0重新雜湊既有SRC-041/SRC-046，未新增筆數；v1.6.0新增SRC-059；v1.7.0新增SRC-060/SRC-061，共61份；v1.8.0無新增，僅重算SRC-058；v1.9.0新增SRC-062，共62份），不是數位簽章或整個歷史執行範圍的證明。
+HTML 可單獨攜出閱讀；完整證據檔沒有嵌入。來源相對連結需要保留本工作區的資料夾結構。來源索引記錄59份選取檔案的SHA-256（v1.0.0為45份，v1.1.0新增7份，v1.2.0新增5份，v1.3.0新增1份；v1.4.0無新增；v1.5.0重新雜湊既有SRC-041/SRC-046，未新增筆數；v1.6.0新增SRC-059；v1.7.0新增SRC-060/SRC-061，共61份；v1.8.0無新增，僅重算SRC-058；v1.9.0新增SRC-062，共62份；v1.9.1無新增），不是數位簽章或整個歷史執行範圍的證明。
 
 ## QA 結果與限制
+
+v1.9.1 新增 `qa/check_v1.9.1.py`，取代`check_v1.9.py`作為目前版本的通用稽核（全部PASS，見`qa/check-v1.9.1-audit.json`）。
 
 v1.9.0 新增 `qa/check_v1.9.py`，取代`check_v1.8.py`作為目前版本的通用稽核（全部PASS，見`qa/check-v1.9-audit.json`）。
 

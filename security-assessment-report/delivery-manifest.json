@@ -1,18 +1,18 @@
 {
-  "report_version": "1.9.0",
+  "report_version": "1.9.1",
   "scope": "Core report and selected QA deliverables; not original security evidence. Excludes manifest itself and optional raster QA files.",
   "signature": null,
   "assessment_status": "INCOMPLETE",
   "files": [
     {
       "path": "index.html",
-      "bytes": 440710,
-      "sha256": "d7892ebbfe415a67cc9905b2cb41190358849bfe0d23d9c1d737314f69b3596b"
+      "bytes": 442166,
+      "sha256": "1a55d0faf94d415f10cc1f55a3e181c1f97aad0aec1a4c2280a5ac0dcabd2f36"
     },
     {
       "path": "report-data.json",
-      "bytes": 156766,
-      "sha256": "474fa229e022b6cd87249670f5295123c35001be41df3a79d20b54c30923e61b"
+      "bytes": 157499,
+      "sha256": "954a6955b02904766a0a02994efb67fe0cb77071326c4a3de0af8061382021cf"
     },
     {
       "path": "source-index.json",
@@ -26,8 +26,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 22010,
-      "sha256": "36bf0293aa132a6f0fb7f017530fa011ce95473972f6d5e00be828c272f337f0"
+      "bytes": 23075,
+      "sha256": "ad310415f66db2fac986b495a4296477850f9babbefd9fdbccfb81e4cfe968d3"
     },
     {
       "path": "qa/task-8-summary.json",
@@ -176,8 +176,8 @@
     },
     {
       "path": "qa/check_v1.9.py",
-      "bytes": 7764,
-      "sha256": "1a649ba7b75915dabb2b94813b012df79dbbf05cd0da790b27f1762369c7ddcd"
+      "bytes": 8138,
+      "sha256": "f01da0c683aea9cc7929de681922dab50c2923c7a2f499cc0af3d9231db35ba4"
     },
     {
       "path": "qa/check-v1.9-audit.json",
@@ -188,6 +188,16 @@
       "path": "qa/environment-capability-2026-11-09.md",
       "bytes": 2644,
       "sha256": "7878e3167bf9680cd791f9d4b235b0e2566764b4e957df663a1bc417f7de2d70"
+    },
+    {
+      "path": "qa/check_v1.9.1.py",
+      "bytes": 8209,
+      "sha256": "1290cc76b34784bffffcfb9e971c800cf89adbd4f2c3eaf013f54b2315ab5d3a"
+    },
+    {
+      "path": "qa/check-v1.9.1-audit.json",
+      "bytes": 246,
+      "sha256": "aaa86593de44fb4fcdcd496a75b964023483a7a54ea6820651d5af86e09bb8f4"
     }
   ]
 }

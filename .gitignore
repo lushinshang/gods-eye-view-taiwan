@@ -35,3 +35,5 @@ dist/
 .gstack/
 sdd/
 scratch_readme_claude.md
+__pycache__/
+*.pyc

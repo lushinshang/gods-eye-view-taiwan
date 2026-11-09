@@ -1,4 +1,9 @@
 /* ── Responsive ───────────────────────────────── */
+/* This breakpoint reacts to the content viewport width, not device type or
+   page zoom — opening DevTools docked beside the page (or any other change
+   that leaves less than 720px for the page itself) crosses it too, forcing
+   the compact mobile layout on an otherwise full-size desktop window. Not a
+   bug: check window.innerWidth before assuming the panel sizing is wrong. */
 @media (max-width: 720px) {
   #pp-toggles {
     --pp-expanded-width: 176px;

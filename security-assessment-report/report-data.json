@@ -1,14 +1,14 @@
 {
  "metadata": {
-  "data_version": "1.2.0",
+  "data_version": "1.3.0",
   "implementation_stage": "TASK_8_DELIVERED_WITH_QA_LIMITATIONS",
   "language": "zh-Hant-TW",
   "title": "A24 戰情台安全評估報告",
   "subtitle": "紅隊導向攻擊面分析與原生 macOS 受控驗證",
-  "cutoff_label": "截至 Review 45、2026-11-09 交接文件勘誤，以及同日三輪後續session（F-001/vite/主動測試/413死碼修補、安全報告v1.1.0改版、記憶體監控與PAT畫面隱藏）",
+  "cutoff_label": "截至 Review 45、2026-11-09 交接文件勘誤，以及同日四輪後續session（F-001/vite/主動測試/413死碼修補、v1.1.0改版、記憶體監控與PAT畫面隱藏、C-004正向對照測試）",
   "prepared_date": "2026-11-09",
   "timezone": "Asia/Taipei",
-  "product_commit": "72b1d17",
+  "product_commit": "7ae38a7",
   "working_tree_status": "DIRTY_HISTORICAL_TRACKED_PYC_DELETIONS",
   "overall_status": "INCOMPLETE",
   "release_authorization": false,
@@ -398,7 +398,8 @@
     "SRC-006",
     "SRC-044",
     "SRC-041",
-    "SRC-025"
+    "SRC-025",
+    "SRC-058"
    ],
    "content_state": "DRAFT_CONTENT_COMPLETE",
    "details": {
@@ -414,7 +415,8 @@
     "established_facts": [
      "產品註解明示key不是access control；可讀panel的MCP client可以取得。",
      "代理僅轉送accept／content-type；指定路由由proxy阻斷或由真handler拒絕。",
-     "既有指定負向案例中，advisor client與token rotate計數為0；Gemini provider未全面計數。"
+     "既有指定負向案例中，advisor client與token rotate計數為0；Gemini provider未全面計數。",
+     "2026-11-09新增panelRequestRealHandlers.test.mjs：對真實/api/cctv/sources的正向對照成功（200，真實資料，非mock）；對真實/api/taiwan-ai-status（無憑證）的負向案例收到401，確認來自下游handler的isLocalBrowser/PAT檢查，不是panelRequest工具層的REFUSED_PATHS。原報告run-34/35引用的同類負向觀察在repo裡找不到對應已提交測試，此次是永久化版本，不是沿用舊證據。"
     ],
     "reproduction": {
      "kind": "DOCUMENTED_EXISTING_OBSERVATION",
@@ -437,7 +439,8 @@
     "limitations": [
      "PassThrough不是獨立socket服務。",
      "token verify固定false；公開tracks正控制為mock；Gemini實際provider呼叫未全面計數。",
-     "合法PAT在來源呼叫存在，不表示會通過proxy白名單；不得假設Authorization被轉送。"
+     "合法PAT在來源呼叫存在，不表示會通過proxy白名單；不得假設Authorization被轉送。",
+     "只補了1條路由（/api/cctv/sources）的正向對照，不是「每個核准路由」的完整契約；仍缺路由責任文件（哪些路由proxy負責拒絕、哪些下游負責准入），C-004不能因此關閉。"
     ],
     "recommendations": [
      "逐路由明定proxy負責拒絕與下游負責准入的契約；不把取得panelKey本身列成認證繞過。",
@@ -452,7 +455,9 @@
     "evidence_ids": [
      "EV-C004-DESIGN",
      "EV-C004-HEADERS",
-     "EV-C004-OBS"
+     "EV-C004-OBS",
+     "EV-C004-POSITIVE",
+     "EV-C004-NEGATIVE-REAL"
     ],
     "source_refs": [
      "SRC-044",
@@ -460,7 +465,8 @@
      "SRC-020",
      "SRC-025",
      "SRC-011",
-     "SRC-006"
+     "SRC-006",
+     "SRC-058"
     ],
     "owner_label": "待指定",
     "target_date": null,
@@ -1374,6 +1380,14 @@
     "SRC-056",
     "SRC-057"
    ]
+  },
+  {
+   "task_id": "TASK-7",
+   "execution_kind": "EXECUTED",
+   "origin_run": "session-2026-11-09-v1.3",
+   "refs": [
+    "SRC-058"
+   ]
   }
  ],
  "conflict_decisions": [
@@ -1950,9 +1964,9 @@
   }
  ],
  "document_control": {
-  "report_version": "1.2.0",
+  "report_version": "1.3.0",
   "document_status": "DELIVERABLE_WITH_QA_LIMITATIONS",
-  "data_cutoff": "2026-11-09 Asia/Taipei；至Review45、交接文件勘誤，以及同日後續三輪session",
+  "data_cutoff": "2026-11-09 Asia/Taipei；至Review45、交接文件勘誤，以及同日後續四輪session",
   "assessment_execution_dates": "2026-11-07至2026-11-09既有證據，以及2026-11-09同日三輪後續session的實際執行（EXECUTED）；不表示連續演練或完整執行窗口",
   "report_author_role": "工作區使用者授權之報告整理；Codex協助",
   "endorsement": null,
@@ -2409,6 +2423,36 @@
    "format": "text",
    "text": "    const { copied, revealed } = await copyNewToken(data.token);\n    copiedNotice.value = copied;\n    // Only ever assigned to this (rendered) ref when the clipboard write\n    // failed — otherwise the raw token never enters a value the template\n    // can display.\n    newToken.value = revealed ? data.token : '';",
    "qualification": "靜態程式碼；複製成功路徑上原始token字串從未指派給任何會被渲染的ref。",
+   "contains_only": "non_secret_product_code",
+   "render_as": "plain_text"
+  },
+  {
+   "id": "EV-C004-POSITIVE",
+   "source_ref": "SRC-058",
+   "label": "正向對照：panel_request對真實/api/cctv/sources成功端到端",
+   "locator": {
+    "kind": "lines",
+    "start": 81,
+    "end": 92
+   },
+   "format": "text",
+   "text": "test('positive control: panel_request succeeds end to end against the real cctv/sources handler', async (t) => {\n  const catalog = await startRealServer(t);\n  const { data } = await catalog.call('panel_request', {\n    key: KEY,\n    path: '/api/cctv/sources',\n  });\n  assert.equal(data.status, 200);\n  assert.equal(data.headers['content-type'], 'application/json');\n  const body = JSON.parse(new TextDecoder().decode(fromBase64(data.body)));\n  assert.ok(Array.isArray(body.sources));\n  assert.ok(body.sources.some((source) => source.id === 'fixture-cam'));\n});",
+   "qualification": "真實provider（非mock fetchImpl），僅證明此1條路由；不代表所有核准路由都有正向對照。",
+   "contains_only": "non_secret_product_code",
+   "render_as": "plain_text"
+  },
+  {
+   "id": "EV-C004-NEGATIVE-REAL",
+   "source_ref": "SRC-058",
+   "label": "負向案例（已永久化）：真實taiwan-ai-status拒絕無憑證呼叫",
+   "locator": {
+    "kind": "lines",
+    "start": 94,
+    "end": 106
+   },
+   "format": "text",
+   "text": "test('negative control: the real taiwan-ai-status handler itself refuses an uncredentialed call (not panelRequest\\'s own REFUSED_PATHS)', async (t) => {\n  const catalog = await startRealServer(t);\n  // /api/taiwan-ai-status is not in panelRequest.js's REFUSED_PATHS list —\n  // the refusal below must come from the downstream handler's own gate\n  // (isLocalBrowser + PAT check), proving the tool-layer allowlist alone\n  // does not protect this route; the real handler's auth does.\n  const { data } = await catalog.call('panel_request', {\n    key: KEY,\n    path: '/api/taiwan-ai-status',\n  });\n  assert.equal(data.status, 401);\n  const body = JSON.parse(new TextDecoder().decode(fromBase64(data.body)));\n  assert.match(body.error, /Local same-origin browser or valid Bearer PAT required/);",
+   "qualification": "原報告（run-34/35）引用的同類觀察在repo裡找不到對應已提交測試，這是本次新增的永久化版本，不是沿用舊證據。",
    "contains_only": "non_secret_product_code",
    "render_as": "plain_text"
   }
@@ -3896,6 +3940,24 @@
      "json_pointer": null,
      "precision": "DOCUMENT_DATE"
     }
+   },
+   {
+    "id": "session-2026-11-09-v1.3",
+    "date_label": "11/09｜同日第四輪後續session",
+    "title": "C-004正向對照測試（v1.3.0）",
+    "kind": "EXECUTED",
+    "summary": "新增panelRequestRealHandlers.test.mjs（commit 7ae38a7）：對真實/api/cctv/sources的正向對照、對真實/api/taiwan-ai-status的負向案例永久化。C-004仍NEEDS_VALIDATION。",
+    "qualification": "只補1條路由的正向對照，不是完整路由責任契約；C-004不能因此關閉。",
+    "source_refs": [
+     "SRC-058"
+    ],
+    "time_basis": {
+     "timezone": "Asia/Taipei",
+     "source_timestamp": null,
+     "source_ref": "SRC-058",
+     "json_pointer": null,
+     "precision": "DOCUMENT_DATE"
+    }
    }
   ],
   "source_refs": [
@@ -3905,7 +3967,8 @@
    "SRC-006",
    "SRC-051",
    "SRC-053",
-   "SRC-057"
+   "SRC-057",
+   "SRC-058"
   ]
  },
  "proof_level_definitions": [

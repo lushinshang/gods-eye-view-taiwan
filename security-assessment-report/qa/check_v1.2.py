@@ -9,6 +9,11 @@ matches its locator) and adds the v1.2.0-specific facts this update is
 supposed to establish. check_v1.1.py now also only asserts v1.1.0's exact
 metadata (data_version/product_commit); its generic checks still hold.
 
+UPDATE (v1.3.0, same day): sections 6-7's exact-metadata assertions
+(data_version==1.2.0, product_commit==72b1d17) are now PINNED TO v1.2.0 and
+EXPECTED TO FAIL from v1.3.0 onward. Sections 1-5 are still generic and
+should still pass. See qa/check_v1.3.py for the current version's audit.
+
 Deliberately NOT cross-checked here: security-assessment/execution/
 snapshot.json. That file is a frozen hash record of the files as they stood
 for v1.0.0; source-index.json instead reflects each file's live state as of

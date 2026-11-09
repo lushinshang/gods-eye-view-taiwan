@@ -12,6 +12,8 @@ import { composeCatalog, coreTools } from '../index.js';
 import { localProviderPlugins } from '../../../server/providers/local.js';
 import { apiNotFoundPlugin } from '../../../server/standalone/api-not-found.js';
 import { makeFixtureRoot } from '../../tooling/fixtureRoot.mjs';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 const KEY = 'panel-key-for-tests';
 const fromBase64 = (text) => Buffer.from(text, 'base64');
@@ -121,4 +123,54 @@ test('negative control: the real taiwan-ai-status handler itself refuses an uncr
   assert.equal(data.status, 401);
   const body = JSON.parse(new TextDecoder().decode(fromBase64(data.body)));
   assert.match(body.error, /Local same-origin browser or valid Bearer PAT required/);
+});
+
+// GEV-C-004 full coverage: every route security-assessment-report/qa/
+// c004-route-contract.mjs classified as "allowed to the panel, no own auth
+// gate" (40 of them, re-derived there by actually calling panelRequest.run,
+// not hand-copied here) gets called end to end through the real server, not
+// just grouped by static analysis. External upstream calls are blocked by
+// the same fetch mock startRealServer always installs — these routes are
+// not expected to return real provider data (no API keys are configured in
+// this environment); what each assertion below checks is that panelRequest
+// let the call through to the real handler and that handler's own response
+// is not the specific 401/403 shape isLocalBrowser/PAT or sameSiteGated
+// produce. A 404/500/502 from a route failing without real upstream
+// credentials still proves the absence of that app-level auth gate.
+const routeContractPath = fileURLToPath(
+  new URL(
+    '../../../../security-assessment-report/qa/c004-route-contract.json',
+    import.meta.url,
+  ),
+);
+const NO_GATE_ROUTES = JSON.parse(readFileSync(routeContractPath, 'utf8'))
+  .rows.filter((r) => !r.panel_refused && !r.has_own_auth_gate)
+  .map((r) => r.route);
+
+test('GEV-C-004 full coverage: every route classified as having no own auth gate reaches the real handler without an isLocalBrowser/PAT or sameSiteGated refusal', async (t) => {
+  assert.ok(
+    NO_GATE_ROUTES.length >= 39,
+    `expected around 40 no-gate routes from the live contract audit, got ${NO_GATE_ROUTES.length}`,
+  );
+  const catalog = await startRealServer(t);
+  const results = [];
+  for (const route of NO_GATE_ROUTES) {
+    try {
+      const { data } = await catalog.call('panel_request', {
+        key: KEY,
+        path: route,
+      });
+      results.push({ route, status: data.status, body: data.body });
+    } catch (error) {
+      results.push({ route, error: error.message });
+    }
+  }
+  const misclassified = results.filter(
+    (r) => r.error?.includes('is not available') || r.status === 401 || r.status === 403,
+  );
+  assert.deepEqual(
+    misclassified.map((r) => ({ route: r.route, status: r.status, error: r.error })),
+    [],
+    'route(s) refused with a denylist or auth-style status despite being classified as having no own auth gate',
+  );
 });

@@ -18,6 +18,11 @@ this is reachability coverage for all 40, not a "real data" positive
 control for all 40 — only /api/cctv/sources still has that. product_commit
 moves to 848a856. GEV-C-004's remediation_status stays PARTIAL_MITIGATION;
 confirmation_status does not change.
+
+UPDATE (v1.9.0, same day): section 6's exact-metadata assertions
+(data_version==1.8.0) are now PINNED TO v1.8.0 and EXPECTED TO FAIL from
+v1.9.0 onward. Sections 1-5 are still generic and should still pass. See
+qa/check_v1.9.py for the current version's audit.
 """
 from pathlib import Path
 import hashlib

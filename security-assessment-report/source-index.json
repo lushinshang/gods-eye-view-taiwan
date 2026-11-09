@@ -886,6 +886,23 @@
    },
    "summary": "路由契約稽核結果：54條已掛載路由，9條被panelRequest拒絕，45條放行中僅5條有獨立門控",
    "embed_policy": "selected_safe_excerpt_only"
+  },
+  {
+   "id": "SRC-062",
+   "path": "1151104_gods-eye-view/security-assessment-report/qa/environment-capability-2026-11-09.md",
+   "href": "../../1151104_gods-eye-view/security-assessment-report/qa/environment-capability-2026-11-09.md",
+   "sha256": "7878e3167bf9680cd791f9d4b235b0e2566764b4e957df663a1bc417f7de2d70",
+   "size_bytes": 2644,
+   "role": "current_observation",
+   "source_run": null,
+   "locator": {
+    "kind": "lines",
+    "start": 1,
+    "end": 1,
+    "anchor_text": "# 環境能力確認記錄（2026-11-09）"
+   },
+   "summary": "實測確認：無sudo無法做C-003跨UID驗證；C-004多數路由所需API金鑰未設定，兩者是路徑一在此環境的終點狀態",
+   "embed_policy": "selected_safe_excerpt_only"
   }
  ]
 }

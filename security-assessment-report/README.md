@@ -1,6 +1,14 @@
 # A24 戰情台安全評估 HTML 報告
 
-版本：1.8.0（2026-11-09 同日第九輪後續session更新；v1.0.0～v1.7.0原文見下方「版本歷史」）。**產品安全評估仍為 INCOMPLETE，無發布放行。** F-001／F-002／F-003已修補。三項候選風險均維持NEEDS_VALIDATION：C-002已正式接受風險；C-003／C-004 remediation_status皆為PARTIAL_MITIGATION。C-004現已對全部40條無獨立門控路由逐一實測reachability（不是只測3種代表情境），但因環境缺對應API金鑰，仍只有1條（/api/cctv/sources）有真實資料的完整正向對照——更多測試覆蓋不等於風險消除，見下方「v1.8.0 更新了什麼」。SDD 紀錄：v1.0.0文件曾稱其記錄位於`sdd/archive/2026-11-09-a24-security-html-report/`，但核實該路徑不存在，無法追溯；v1.1.0～v1.7.0改版已分別歸檔於`sdd/archive/2026-11-09-update-security-report-v1.1/`、`sdd/archive/2026-11-09-update-security-report-v1.2/`、`sdd/archive/2026-11-09-update-security-report-v1.3/`、`sdd/archive/2026-11-09-accept-risk-c002/`、`sdd/archive/2026-11-09-fix-pat-parent-symlink/`、`sdd/archive/2026-11-09-add-automated-scan-obs/`、`sdd/archive/2026-11-09-close-candidate-risks-path1/`；v1.8.0改版的SDD提案目前在`sdd/c004-full-route-coverage/`（尚未歸檔）。
+版本：1.9.0（2026-11-09 同日第十輪後續session更新；v1.0.0～v1.8.0原文見下方「版本歷史」）。**產品安全評估仍為 INCOMPLETE，無發布放行。** F-001／F-002／F-003已修補。使用者已確認：C-003的跨UID驗證（無sudo/第二個真實使用者帳號）與C-004多數路由的真實資料正向對照（無對應API金鑰）是路徑一（技術驗證）在此環境下的終點狀態，不是尚未完成的任務；confirmation_status繼續維持NEEDS_VALIDATION，誠實反映技術上未確認安全。見下方「v1.9.0 更新了什麼」。SDD 紀錄：v1.0.0文件曾稱其記錄位於`sdd/archive/2026-11-09-a24-security-html-report/`，但核實該路徑不存在，無法追溯；v1.1.0～v1.8.0改版已分別歸檔於`sdd/archive/2026-11-09-update-security-report-v1.1/`、`sdd/archive/2026-11-09-update-security-report-v1.2/`、`sdd/archive/2026-11-09-update-security-report-v1.3/`、`sdd/archive/2026-11-09-accept-risk-c002/`、`sdd/archive/2026-11-09-fix-pat-parent-symlink/`、`sdd/archive/2026-11-09-add-automated-scan-obs/`、`sdd/archive/2026-11-09-close-candidate-risks-path1/`、`sdd/archive/2026-11-09-c004-full-route-coverage/`；v1.9.0改版的SDD提案目前在`sdd/environment-capability-closure/`（尚未歸檔）。
+
+## v1.9.0 更新了什麼（不是只改雜湊）
+
+本次無程式碼變更，`product_commit`維持`848a856`。
+
+- **環境能力確認（C-003/C-004路徑一的終點）**：新增`qa/environment-capability-2026-11-09.md`，實測記錄兩個基礎設施缺口：(1) `sudo -n true`回傳需要密碼，這個環境沒有passwordless sudo也沒有第二個真實使用者帳號，C-003的跨UID攻擊測試走不下去；(2) `printenv`確認Google/TomTom/OpenSky/FIRMS等路由所需的API金鑰完全沒設定，C-004多數路由無法做「真實資料」正向對照。
+- **使用者已確認這是終點狀態，不是縮小範圍**：兩項finding的`confirmation_status`繼續維持`NEEDS_VALIDATION`——記錄「這個環境做不到什麼」不等於「風險不存在」，不偽裝成已解決。
+- **本次未做、仍是缺口**：Standalone建置、受控瀏覽器DOM、Docker實體拓樸、真模型／真上游測試；happy-dom的2筆dev相依漏洞；人工滲透測試，`overall_status`維持`INCOMPLETE`。未來若要再推進C-003/C-004，需要(1)有管理員權限可建立第二個真實使用者帳號的環境，或(2)使用者提供真實API金鑰。
 
 ## v1.8.0 更新了什麼（不是只改雜湊）
 
@@ -84,6 +92,7 @@
 - **v1.6.0**（2026-11-09同日第七輪後續session）：見上「v1.6.0 更新了什麼」。
 - **v1.7.0**（2026-11-09同日第八輪後續session）：見上「v1.7.0 更新了什麼」。
 - **v1.8.0**（2026-11-09同日第九輪後續session）：見上「v1.8.0 更新了什麼」。
+- **v1.9.0**（2026-11-09同日第十輪後續session）：見上「v1.9.0 更新了什麼」。
 - **v1.4.0**（2026-11-09同日第五輪後續session）：見上「v1.4.0 更新了什麼」。
 
 ## 開啟報告
@@ -92,9 +101,11 @@
 
 內容包括管理摘要、範圍方法、攻擊面／信任邊界、F-001 與三項候選、其他觀察、原 15 情境、改善交接及證據附錄。可搜尋／篩選、展開節錄、暫停動畫及列印。JavaScript 停用時核心內容與安全節錄仍靜態存在。
 
-HTML 可單獨攜出閱讀；完整證據檔沒有嵌入。來源相對連結需要保留本工作區的資料夾結構。來源索引記錄59份選取檔案的SHA-256（v1.0.0為45份，v1.1.0新增7份，v1.2.0新增5份，v1.3.0新增1份；v1.4.0無新增；v1.5.0重新雜湊既有SRC-041/SRC-046，未新增筆數；v1.6.0新增SRC-059；v1.7.0新增SRC-060/SRC-061，共61份；v1.8.0無新增，僅重算SRC-058），不是數位簽章或整個歷史執行範圍的證明。
+HTML 可單獨攜出閱讀；完整證據檔沒有嵌入。來源相對連結需要保留本工作區的資料夾結構。來源索引記錄59份選取檔案的SHA-256（v1.0.0為45份，v1.1.0新增7份，v1.2.0新增5份，v1.3.0新增1份；v1.4.0無新增；v1.5.0重新雜湊既有SRC-041/SRC-046，未新增筆數；v1.6.0新增SRC-059；v1.7.0新增SRC-060/SRC-061，共61份；v1.8.0無新增，僅重算SRC-058；v1.9.0新增SRC-062，共62份），不是數位簽章或整個歷史執行範圍的證明。
 
 ## QA 結果與限制
+
+v1.9.0 新增 `qa/check_v1.9.py`，取代`check_v1.8.py`作為目前版本的通用稽核（全部PASS，見`qa/check-v1.9-audit.json`）。
 
 v1.8.0 新增 `qa/check_v1.8.py`，取代`check_v1.7.py`作為目前版本的通用稽核（全部PASS，見`qa/check-v1.8-audit.json`）。
 

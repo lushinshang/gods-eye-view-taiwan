@@ -1,23 +1,23 @@
 {
-  "report_version": "1.8.0",
+  "report_version": "1.9.0",
   "scope": "Core report and selected QA deliverables; not original security evidence. Excludes manifest itself and optional raster QA files.",
   "signature": null,
   "assessment_status": "INCOMPLETE",
   "files": [
     {
       "path": "index.html",
-      "bytes": 434708,
-      "sha256": "1f6c55fece5aecc2dd78b1d5d04e34e5a3e6a4473fd4b4023fc86025329c6246"
+      "bytes": 440710,
+      "sha256": "d7892ebbfe415a67cc9905b2cb41190358849bfe0d23d9c1d737314f69b3596b"
     },
     {
       "path": "report-data.json",
-      "bytes": 154688,
-      "sha256": "b57baa48d5e833e5b16286b8a731935a12e419be291b314604c7a61b8f086044"
+      "bytes": 156766,
+      "sha256": "474fa229e022b6cd87249670f5295123c35001be41df3a79d20b54c30923e61b"
     },
     {
       "path": "source-index.json",
-      "bytes": 35622,
-      "sha256": "eb81996ed632eefa5c8c78d31c25cd1b691a00ac754cf931c8121573360fbad6"
+      "bytes": 36367,
+      "sha256": "73bbacad741c447b5b808c9bbeaabd58c69ec12ae9f74dda15396a5212866efc"
     },
     {
       "path": "build_report.py",
@@ -26,8 +26,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 20552,
-      "sha256": "6c7872196fe55f5898a2d429577568ad550d8f97efe97b984f531295c406549f"
+      "bytes": 22010,
+      "sha256": "36bf0293aa132a6f0fb7f017530fa011ce95473972f6d5e00be828c272f337f0"
     },
     {
       "path": "qa/task-8-summary.json",
@@ -166,13 +166,28 @@
     },
     {
       "path": "qa/check_v1.8.py",
-      "bytes": 8026,
-      "sha256": "3d9fd5e5722b19e4591624c48a83ccad75ccf06cb7bcf4add3c921e7ef60f454"
+      "bytes": 8288,
+      "sha256": "1daac6202cd31298d33b107ef22779d4348b54948984a12c6d553352ab2a0acc"
     },
     {
       "path": "qa/check-v1.8-audit.json",
       "bytes": 246,
       "sha256": "9bba4076f0f0fe3cd9d8d69205f1dbf01b6ed2837df6ed2cc3fdbb3290cdc373"
+    },
+    {
+      "path": "qa/check_v1.9.py",
+      "bytes": 7764,
+      "sha256": "1a649ba7b75915dabb2b94813b012df79dbbf05cd0da790b27f1762369c7ddcd"
+    },
+    {
+      "path": "qa/check-v1.9-audit.json",
+      "bytes": 246,
+      "sha256": "9c0279310172c74577d257fee5d4079295af1a7fa3b3ae8d721402e3cf557e60"
+    },
+    {
+      "path": "qa/environment-capability-2026-11-09.md",
+      "bytes": 2644,
+      "sha256": "7878e3167bf9680cd791f9d4b235b0e2566764b4e957df663a1bc417f7de2d70"
     }
   ]
 }

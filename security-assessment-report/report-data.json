@@ -1,11 +1,11 @@
 {
  "metadata": {
-  "data_version": "1.8.0",
+  "data_version": "1.9.0",
   "implementation_stage": "TASK_8_DELIVERED_WITH_QA_LIMITATIONS",
   "language": "zh-Hant-TW",
   "title": "A24 戰情台安全評估報告",
   "subtitle": "紅隊導向攻擊面分析與原生 macOS 受控驗證",
-  "cutoff_label": "截至 Review 45、2026-11-09 交接文件勘誤，以及同日九輪後續session（F-001/vite/主動測試/413死碼修補、v1.1.0改版、記憶體監控與PAT畫面隱藏、C-004正向對照測試、C-002風險接受、C-003父目錄symlink檢查、AI驅動diff安全掃描、C-003 owner/world-writable檢查與C-004全路由契約稽核、C-004全部40條無門控路由逐一reachability實測）",
+  "cutoff_label": "截至 Review 45、2026-11-09 交接文件勘誤，以及同日十輪後續session（F-001/vite/主動測試/413死碼修補、v1.1.0改版、記憶體監控與PAT畫面隱藏、C-004正向對照測試、C-002風險接受、C-003父目錄symlink檢查、AI驅動diff安全掃描、C-003 owner/world-writable檢查與C-004全路由契約稽核、C-004全部40條無門控路由逐一reachability實測、環境能力確認——C-003/C-004定為路徑一在此環境的終點狀態）",
   "prepared_date": "2026-11-09",
   "timezone": "Asia/Taipei",
   "product_commit": "848a856",
@@ -299,7 +299,8 @@
     "SRC-041",
     "SRC-025",
     "SRC-050",
-    "SRC-046"
+    "SRC-046",
+    "SRC-062"
    ],
    "content_state": "DRAFT_CONTENT_COMPLETE",
    "details": {
@@ -343,7 +344,8 @@
      "SECURITY.md已於2026-11-09新增Deployment model段落，文件化PAT儲存假設單一OS使用者、不支援共享主機；補文件不等於新增父目錄鏈驗證，風險判斷不變。",
      "新增的assertNoSymlinkAncestors只是單次lstat，檢查完到實際open/write之間理論上仍有極小的競態窗口（TOCTOU），不構成完整防護；報告自身acceptance_criteria已承認補強父鏈不自動關閉候選。",
      "只覆蓋ollama-advisor.js的createTokenStore，不包含server/mcp/panelKey.js（MCP panel key）或server/standalone/key-setup.js（.env store）等其他也寫入檔案系統的程式碼路徑——那些不在C-003的finding範圍內，風險判斷各自獨立。",
-     "owner檢查無法在這個sandbox實測：環境只有單一真實UID，沒有第二個真實使用者帳號可以模擬跨使用者攻擊；owner不符的拒絕邏輯只用mock lstatSync驗證過，不是真實跨UID的端到端證據。acceptance_criteria裡「若跨UID屬支援範圍需在有授權環境證明」這條因此仍未達成——我們改成「宣告不支援多使用者」來迴避這個要求，但這代表confirmation_status仍不能說「已確認安全」。"
+     "owner檢查無法在這個sandbox實測：環境只有單一真實UID，沒有第二個真實使用者帳號可以模擬跨使用者攻擊；owner不符的拒絕邏輯只用mock lstatSync驗證過，不是真實跨UID的端到端證據。acceptance_criteria裡「若跨UID屬支援範圍需在有授權環境證明」這條因此仍未達成——我們改成「宣告不支援多使用者」來迴避這個要求，但這代表confirmation_status仍不能說「已確認安全」。",
+     "2026-11-09實測確認（qa/environment-capability-2026-11-09.md）：這個環境沒有passwordless sudo、沒有第二個真實OS使用者帳號，無法做真正的跨使用者攻擊測試。這是路徑一（技術驗證）在此環境下的終點狀態，不是尚未完成的任務；confirmation_status繼續維持NEEDS_VALIDATION，誠實反映技術上未確認安全。"
     ],
     "recommendations": [
      "明定支援單使用者或共享主機的部署模型與PAT路徑擁有者。",
@@ -361,7 +363,8 @@
      "EV-C003-READ",
      "EV-C003-OBS",
      "EV-C003-FIX-CODE",
-     "EV-C003-FIX-TEST"
+     "EV-C003-FIX-TEST",
+     "EV-ENV-CAPABILITY"
     ],
     "source_refs": [
      "SRC-041",
@@ -370,7 +373,8 @@
      "SRC-011",
      "SRC-006",
      "SRC-050",
-     "SRC-046"
+     "SRC-046",
+     "SRC-062"
     ],
     "owner_label": "待指定",
     "target_date": null,
@@ -417,7 +421,8 @@
     "SRC-025",
     "SRC-058",
     "SRC-060",
-    "SRC-061"
+    "SRC-061",
+    "SRC-062"
    ],
    "content_state": "DRAFT_CONTENT_COMPLETE",
    "details": {
@@ -460,7 +465,8 @@
      "PassThrough不是獨立socket服務。",
      "token verify固定false；公開tracks正控制為mock；Gemini實際provider呼叫未全面計數。",
      "合法PAT在來源呼叫存在，不表示會通過proxy白名單；不得假設Authorization被轉送。",
-     "40條無獨立門控的路由已全部逐一實測reachability(確認沒有被任何auth gate或panelRequest denylist擋下)，但只有/api/cctv/sources這1條有「真實資料」的完整正向對照——其餘39條因為這個環境沒有設定對應的外部API金鑰，無法在不依賴真實第三方憑證的情況下證明「回傳真實正確資料」，只能證明「沒有被擋」。這是環境限制(缺金鑰)，不是測試範圍的縮小；仍缺「每個核准路由的下游資料契約」驗證，C-004不能因此關閉。"
+     "40條無獨立門控的路由已全部逐一實測reachability(確認沒有被任何auth gate或panelRequest denylist擋下)，但只有/api/cctv/sources這1條有「真實資料」的完整正向對照——其餘39條因為這個環境沒有設定對應的外部API金鑰，無法在不依賴真實第三方憑證的情況下證明「回傳真實正確資料」，只能證明「沒有被擋」。這是環境限制(缺金鑰)，不是測試範圍的縮小；仍缺「每個核准路由的下游資料契約」驗證，C-004不能因此關閉。",
+     "2026-11-09實測確認（qa/environment-capability-2026-11-09.md）：Google Places、TomTom、OpenSky、FIRMS等路由所需的API金鑰在這個環境完全沒有設定，無法進一步證明「拿到正確下游資料」。這是路徑一在此環境下的終點狀態，不是測試範圍縮小；confirmation_status繼續維持NEEDS_VALIDATION。"
     ],
     "recommendations": [
      "逐路由明定proxy負責拒絕與下游負責准入的契約；不把取得panelKey本身列成認證繞過。",
@@ -480,7 +486,8 @@
      "EV-C004-SAMESITE",
      "EV-C004-NEGATIVE-REAL",
      "EV-C004-ROUTE-CONTRACT",
-     "EV-C004-FULL-COVERAGE"
+     "EV-C004-FULL-COVERAGE",
+     "EV-ENV-CAPABILITY"
     ],
     "source_refs": [
      "SRC-044",
@@ -491,7 +498,8 @@
      "SRC-006",
      "SRC-058",
      "SRC-060",
-     "SRC-061"
+     "SRC-061",
+     "SRC-062"
     ],
     "owner_label": "待指定",
     "target_date": null,
@@ -1595,7 +1603,7 @@
      {
       "title": "仍待確認的風險",
       "paragraphs": [
-       "C-002（上游回應缺少累積位元組上限）已由開發/維護者正式接受風險，confirmation_status技術上仍維持NEEDS_VALIDATION。C-003（PAT父目錄鏈）已擴充assertTrustedAncestors，除symlink外新增owner(POSIX uid)與world-writable檢查，remediation_status為PARTIAL_MITIGATION；owner檢查無法在單一真實UID的環境實測跨使用者攻擊，只用mock驗證邏輯，confirmation_status維持NEEDS_VALIDATION。C-004（代理路由責任契約）已用qa/c004-route-contract.mjs實際呼叫真實panelRequest工具枚舉全部54條已掛載路由：9條被拒絕，45條放行中僅5條有獨立門控（3條isLocalBrowser+PAT、2條sameSiteGated——後者對panel_request路徑並無防護力，已實測證明），其餘40條完全依賴panelRequest黑名單加loopback-only網路曝露模型，現已全部40條逐一實測reachability（確認沒有被任何auth gate或denylist擋下），但因環境缺對應API金鑰，僅/api/cctv/sources這1條有「真實資料」的完整正向對照；remediation_status為PARTIAL_MITIGATION，confirmation_status維持NEEDS_VALIDATION。三者均無新確認之可利用缺陷，但也都未達成報告自身acceptance_criteria要求的完整技術驗證。另對本次session的commit diff跑過Claude Code AI驅動安全掃描（OBS-005），未發現符合條件的具體漏洞，但該掃描明確排除DoS/資源耗盡（C-002不在評估範圍），也不涉及代理路由契約（C-004）。已知程式行為不足以直接證明可利用的阻斷服務、跨使用者越權或完整授權繞過。"
+       "C-002（上游回應缺少累積位元組上限）已由開發/維護者正式接受風險，confirmation_status技術上仍維持NEEDS_VALIDATION。C-003（PAT父目錄鏈）已擴充assertTrustedAncestors，除symlink外新增owner(POSIX uid)與world-writable檢查，remediation_status為PARTIAL_MITIGATION；owner檢查無法在單一真實UID的環境實測跨使用者攻擊，只用mock驗證邏輯，confirmation_status維持NEEDS_VALIDATION。C-004（代理路由責任契約）已用qa/c004-route-contract.mjs實際呼叫真實panelRequest工具枚舉全部54條已掛載路由：9條被拒絕，45條放行中僅5條有獨立門控（3條isLocalBrowser+PAT、2條sameSiteGated——後者對panel_request路徑並無防護力，已實測證明），其餘40條完全依賴panelRequest黑名單加loopback-only網路曝露模型，現已全部40條逐一實測reachability（確認沒有被任何auth gate或denylist擋下），但因環境缺對應API金鑰，僅/api/cctv/sources這1條有「真實資料」的完整正向對照；remediation_status為PARTIAL_MITIGATION，confirmation_status維持NEEDS_VALIDATION。三者均無新確認之可利用缺陷，但也都未達成報告自身acceptance_criteria要求的完整技術驗證。另對本次session的commit diff跑過Claude Code AI驅動安全掃描（OBS-005），未發現符合條件的具體漏洞，但該掃描明確排除DoS/資源耗盡（C-002不在評估範圍），也不涉及代理路由契約（C-004）。已知程式行為不足以直接證明可利用的阻斷服務、跨使用者越權或完整授權繞過。 2026-11-09另實測確認：這個環境沒有sudo/第二個真實使用者帳號，C-003的跨UID驗證走不下去；Google/TomTom/OpenSky/FIRMS等路由所需API金鑰完全沒設定，C-004多數路由無法做「真實資料」正向對照。使用者已確認：這是路徑一（技術驗證）在此環境下的終點狀態，不是尚未完成的任務；C-003/C-004的confirmation_status因此繼續維持NEEDS_VALIDATION，誠實反映技術上未確認安全，不偽裝成已解決。"
       ],
       "source_refs": [
        "SRC-007",
@@ -1609,7 +1617,8 @@
        "SRC-059",
        "SRC-060",
        "SRC-061",
-       "SRC-058"
+       "SRC-058",
+       "SRC-062"
       ]
      },
      {
@@ -1995,9 +2004,9 @@
   }
  ],
  "document_control": {
-  "report_version": "1.8.0",
+  "report_version": "1.9.0",
   "document_status": "DELIVERABLE_WITH_QA_LIMITATIONS",
-  "data_cutoff": "2026-11-09 Asia/Taipei；至Review45、交接文件勘誤，以及同日後續九輪session",
+  "data_cutoff": "2026-11-09 Asia/Taipei；至Review45、交接文件勘誤，以及同日後續十輪session",
   "assessment_execution_dates": "2026-11-07至2026-11-09既有證據，以及2026-11-09同日三輪後續session的實際執行（EXECUTED）；不表示連續演練或完整執行窗口",
   "report_author_role": "工作區使用者授權之報告整理；Codex協助",
   "endorsement": null,
@@ -2586,6 +2595,21 @@
    "format": "text",
    "text": "test('GEV-C-004 full coverage: every route classified as having no own auth gate reaches the real handler without an isLocalBrowser/PAT or sameSiteGated refusal', async (t) => {\n  assert.ok(\n    NO_GATE_ROUTES.length >= 39,\n    `expected around 40 no-gate routes from the live contract audit, got ${NO_GATE_ROUTES.length}`,\n  );\n  const catalog = await startRealServer(t);\n  const results = [];\n  for (const route of NO_GATE_ROUTES) {\n    try {\n      const { data } = await catalog.call('panel_request', {\n        key: KEY,\n        path: route,\n      });\n      results.push({ route, status: data.status, body: data.body });\n    } catch (error) {\n      results.push({ route, error: error.message });\n    }\n  }\n  const misclassified = results.filter(\n    (r) => r.error?.includes('is not available') || r.status === 401 || r.status === 403,",
    "qualification": "外部上游呼叫仍由既有fetch mock擋下（這個環境沒有多數路由需要的API金鑰），所以不是「每條都拿到真實資料」的正向對照，但是「每條都逐一實測reachability」，不是只靠靜態分類推論全部40條都一樣。",
+   "contains_only": "non_secret_product_code",
+   "render_as": "plain_text"
+  },
+  {
+   "id": "EV-ENV-CAPABILITY",
+   "source_ref": "SRC-062",
+   "label": "實測確認：無sudo（C-003跨UID走不下去）、API金鑰未設定（C-004多數路由無真實資料可測）",
+   "locator": {
+    "kind": "lines",
+    "start": 12,
+    "end": 15
+   },
+   "format": "text",
+   "text": "$ sudo -n true 2>&1; echo \"sudo exit: $?\"\nsudo: a password is required\nsudo exit: 1\n```",
+   "qualification": "確認的是「這個環境做不到」的事實，不是「風險不存在」；confirmation_status不因此改變。",
    "contains_only": "non_secret_product_code",
    "render_as": "plain_text"
   }

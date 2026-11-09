@@ -17,6 +17,12 @@ than relax it, for both GEV-C-003 and GEV-C-004. This update records that
 decision as a one-line governance note on each finding. confirmation_status
 is unchanged (NEEDS_VALIDATION); product_commit is unchanged from v1.9.0
 (848a856) since no code changed.
+
+UPDATE (v2.0.0, same day): section 6's data_version assertion ('1.9.1') is
+now PINNED and EXPECTED TO FAIL from v2.0.0 onward — this version also
+changes the long-standing "cvss is None for every finding" invariant (now
+true for every finding EXCEPT GEV-F-002, which adopts an official score).
+See qa/check_v2.0.py.
 """
 from pathlib import Path
 import hashlib

@@ -1,11 +1,11 @@
 {
  "metadata": {
-  "data_version": "1.9.1",
+  "data_version": "2.0.0",
   "implementation_stage": "TASK_8_DELIVERED_WITH_QA_LIMITATIONS",
   "language": "zh-Hant-TW",
   "title": "A24 戰情台安全評估報告",
   "subtitle": "紅隊導向攻擊面分析與原生 macOS 受控驗證",
-  "cutoff_label": "截至 Review 45、2026-11-09 交接文件勘誤，以及同日十輪後續session（F-001/vite/主動測試/413死碼修補、v1.1.0改版、記憶體監控與PAT畫面隱藏、C-004正向對照測試、C-002風險接受、C-003父目錄symlink檢查、AI驅動diff安全掃描、C-003 owner/world-writable檢查與C-004全路由契約稽核、C-004全部40條無門控路由逐一reachability實測、環境能力確認——C-003/C-004定為路徑一在此環境的終點狀態）",
+  "cutoff_label": "截至 Review 45、2026-11-09 交接文件勘誤，以及同日十二輪後續session（F-001/vite/主動測試/413死碼修補、v1.1.0改版、記憶體監控與PAT畫面隱藏、C-004正向對照測試、C-002風險接受、C-003父目錄symlink檢查、AI驅動diff安全掃描、C-003 owner/world-writable檢查與C-004全路由契約稽核、C-004全部40條無門控路由逐一reachability實測、環境能力確認、不自動關閉治理決定、OWASP/CVSS框架對齊）",
   "prepared_date": "2026-11-09",
   "timezone": "Asia/Taipei",
   "product_commit": "848a856",
@@ -149,7 +149,16 @@
     "label": "已修補；待你複核後決定是否關閉",
     "kind": "REPORT_RECOMMENDATION",
     "approved": false
-   }
+   },
+   "owasp_mapping": [
+    {
+     "framework": "OWASP Top 10 for LLM Applications 2026",
+     "id": "LLM07",
+     "title": "Misinformation（錯誤資訊）",
+     "role": "primary"
+    }
+   ],
+   "plain_language": "白話說：AI助理回答船舶數量時，曾經有個邏輯漏洞——即使資料裡只有2艘船，仍可能說成「目前共有5艘」並通過系統自己的檢查，讓錯誤答案看起來像是驗證過的。這個問題已經修好了，現在不會再發生。沒有CVSS分數不是因為輕描淡寫，是因為CVSS需要知道「使用者實際上會不會因為這個答案做錯決定」，這類資訊需要知道誰在用、用來做什麼，目前沒有這些資料，誠實地說「不知道」比硬猜一個分數更負責。建議動作：已修補，不需要你採取任何動作；若未來把這個AI助理用在會影響實際決策的場景，建議重新評估一次。"
   },
   {
    "id": "GEV-C-002",
@@ -267,6 +276,20 @@
     "label": "先確認負載契約",
     "kind": "REPORT_RECOMMENDATION",
     "approved": false
+   },
+   "owasp_mapping": [
+    {
+     "framework": "OWASP Top 10:2021",
+     "id": "A04",
+     "title": "不安全設計（Insecure Design）",
+     "role": "primary"
+    }
+   ],
+   "plain_language": "白話說：系統接收上游船舶/交通資料時沒有設byte上限，理論上如果上游回應異常大，可能造成記憶體壓力。開發/維護者評估後決定接受這個風險——理由是上游是固定、受信任的官方來源，不是攻擊者能控制的，而且已經加了系統記憶體監控會主動警告。這不是「忽略問題」，是權衡後的正式決定。建議動作：目前不需要你做任何事；若未來上游來源改變（變成不受信任或可能被攻擊者控制），需要重新評估。",
+   "retest_recommendation": {
+    "when": "CONDITIONAL",
+    "condition": "若上游來源（MPB／交通資料）改為不受信任或可受外部控制，或部署模式改為多人共用",
+    "note": "沒有固定時間點——這是風險接受後的條件式複測，不是排程複測。"
    }
   },
   {
@@ -389,6 +412,20 @@
     "label": "先確認部署信任",
     "kind": "REPORT_RECOMMENDATION",
     "approved": false
+   },
+   "owasp_mapping": [
+    {
+     "framework": "OWASP Top 10:2021",
+     "id": "A01",
+     "title": "權限控制失效（Broken Access Control）",
+     "role": "primary"
+    }
+   ],
+   "plain_language": "白話說：系統存權杖（PAT）的檔案本身有保護（只有自己能讀寫），但存放檔案的「資料夾」理論上如果被同一台機器上的另一個使用者動手腳（例如換成捷徑），可能被繞過。已經加了檢查擋掉這種手法（換成捷徑、資料夾owner不對、資料夾全部人可寫都會被拒絕），但因為這台機器沒有第二個真實使用者帳號，沒辦法真正模擬「另一個人攻擊」的情境來驗證。建議動作：單人自己使用不需要做任何事；若要在多人共用的電腦上使用，目前不建議，需要先完成跨使用者的實際測試。",
+   "retest_recommendation": {
+    "when": "CONDITIONAL",
+    "condition": "取得可建立第二個真實系統帳號的測試環境（需要管理員權限）時",
+    "note": "沒有固定時間點——取決於是否取得測試所需的環境資源。"
    }
   },
   {
@@ -515,6 +552,26 @@
     "label": "先確定路由責任",
     "kind": "REPORT_RECOMMENDATION",
     "approved": false
+   },
+   "owasp_mapping": [
+    {
+     "framework": "OWASP Top 10:2021",
+     "id": "A01",
+     "title": "權限控制失效（Broken Access Control）",
+     "role": "primary"
+    },
+    {
+     "framework": "OWASP Top 10:2021",
+     "id": "A04",
+     "title": "不安全設計（Insecure Design）",
+     "role": "secondary"
+    }
+   ],
+   "plain_language": "白話說：面板（panel）能請求的API路由有黑名單擋住敏感項目，其餘約40條路由大多沒有自己的額外身分檢查，單靠黑名單跟「只開放本機存取」這道防線。已經逐一測過全部40條路由都不會被攔下（代表分類正確），但因為大部分路由需要第三方的付費API金鑰才能測「拿到真實正確資料」，這部分只測了1條（/api/cctv/sources）。建議動作：目前不需要你採取緊急行動；若要更完整的驗證，需要你提供對應服務的API金鑰。",
+   "retest_recommendation": {
+    "when": "CONDITIONAL",
+    "condition": "使用者提供Google／TomTom／OpenSky／FIRMS等路由所需的真實API金鑰時",
+    "note": "沒有固定時間點——取決於是否取得測試所需的金鑰資源。"
    }
   },
   {
@@ -524,10 +581,16 @@
    "category": "CONFIRMED_FINDING",
    "confirmation_status": "CONFIRMED",
    "risk_rating": {
-    "value": null,
-    "status": "PENDING_CONTEXT",
-    "cvss": null,
-    "rationale": "依賴版本層級的已知CVE（GHSA-8g5g-mxqh-grgj，CVSS 6.9），非本產品自身邏輯缺陷；本次只升級版本並做升級後的繞過回歸測試，未在舊版本上實際重現繞過成功。"
+    "value": "6.9",
+    "status": "ADOPTED_OFFICIAL_SCORE",
+    "cvss": {
+     "version": "4.0",
+     "score": 6.9,
+     "vector": "CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:N/VA:N/SC:H/SI:N/SA:N",
+     "source": "GitHub Security Advisory GHSA-8g5g-mxqh-grgj / CVE-2026-118662",
+     "source_ref": "SRC-063"
+    },
+    "rationale": "直接採用GHSA官方公布的CVSS v4.0分數與向量（非自行評分），CWE-180／CWE-284。官方描述明寫只有「明確用--host或server.host把dev server曝露到網路」的部署才受影響；GEV預設是loopback-only（見SECURITY.md），不符合官方前提，GEV使用者的實際曝險面可能低於這個分數所暗示的程度——分數是對CVE本身的描述，不是對GEV實際部署風險的重新評估。"
    },
    "remediation_status": "FIXED",
    "owner": null,
@@ -599,7 +662,22 @@
     "label": "已修補；建議納入日後相依升級的回歸測試基線",
     "kind": "REPORT_RECOMMENDATION",
     "approved": false
-   }
+   },
+   "owasp_mapping": [
+    {
+     "framework": "OWASP Top 10:2021",
+     "id": "A01",
+     "title": "權限控制失效（Broken Access Control）",
+     "role": "primary"
+    },
+    {
+     "framework": "OWASP Top 10:2021",
+     "id": "A05",
+     "title": "安全設定缺陷（Security Misconfiguration）",
+     "role": "secondary"
+    }
+   ],
+   "plain_language": "白話說：vite開發伺服器曾經有個已知漏洞，如果故意把它對外網公開（這個專案預設不會這樣做），攻擊者可能繞過黑名單讀到不該看到的設定檔案。這個漏洞不是本專案自己寫出來的，是上游套件本身的問題，已經靠「升級版本」修補，並且實際測過9種已知繞過手法全部守住。建議動作：確認已更新到vite 6.4.5以上即可，不需要額外動作。"
   },
   {
    "id": "GEV-F-003",
@@ -685,7 +763,17 @@
     "label": "已修補；建議納入既有測試套件長期保留",
     "kind": "REPORT_RECOMMENDATION",
     "approved": false
-   }
+   },
+   "owasp_mapping": [
+    {
+     "framework": "CWE",
+     "id": "CWE-755",
+     "title": "Improper Handling of Exceptional Conditions",
+     "role": "primary",
+     "note": "沒有乾淨對應到OWASP Top 10:2021任一分類；這是純錯誤處理缺陷，不是存取控制或設定問題，用CWE標示更準確。"
+    }
+   ],
+   "plain_language": "白話說：如果你一次送出太大的設定請求（超過8KB），原本系統會直接斷線、不會告訴你為什麼失敗；現在已經修好，會清楚回應「請求太大」。這個問題從頭到尾都不是「有人可以繞過防護」，只是「失敗時的錯誤訊息不夠清楚」，所以不套用CVSS——那套系統是設計給「有人可以攻破防護」這種情況用的，硬套在這裡只會誤導你以為有安全缺口。建議動作：已修補，不需要你採取任何動作。"
   }
  ],
  "scenarios": [
@@ -1555,7 +1643,7 @@
      {
       "title": "目前判斷",
       "paragraphs": [
-       "本次評估已確認一項 Grounding 邏輯缺陷並已修補，另確認並修補兩項本次新發現的問題（vite已知CVE、API錯誤回應死碼），並取得部分本機准入、PAT 生命週期、代理隔離、取消恢復、受控建置及六面向主動動態測試的驗證證據。三項候選風險均維持NEEDS_VALIDATION：C-002 已由開發/維護者正式接受風險；C-003 已補父目錄symlink/owner/world-writable三項檢查，remediation_status為PARTIAL_MITIGATION；C-004 已完整枚舉並分類全部45條核准路由的門控狀態，remediation_status同為PARTIAL_MITIGATION，但三者均未達到技術上「已確認安全」的門檻。完整主 App、目前受控瀏覽器流程及 Docker 實體拓樸、真模型／真上游測試尚未完成，現有證據仍不足以支持整體安全驗收或發布放行。"
+       "本次評估已確認一項 Grounding 邏輯缺陷並已修補，另確認並修補兩項本次新發現的問題（vite已知CVE、API錯誤回應死碼），並取得部分本機准入、PAT 生命週期、代理隔離、取消恢復、受控建置及六面向主動動態測試的驗證證據。三項候選風險均維持NEEDS_VALIDATION：C-002 已由開發/維護者正式接受風險；C-003 已補父目錄symlink/owner/world-writable三項檢查，remediation_status為PARTIAL_MITIGATION；C-004 已完整枚舉並分類全部45條核准路由的門控狀態，remediation_status同為PARTIAL_MITIGATION，但三者均未達到技術上「已確認安全」的門檻。完整主 App、目前受控瀏覽器流程及 Docker 實體拓樸、真模型／真上游測試尚未完成，現有證據仍不足以支持整體安全驗收或發布放行。 2026-11-09另完成OWASP／CVSS框架對齊：F-002正式採用GHSA官方CVSS v4.0=6.9（非自行評分）；F-001/F-003因CVSS規格本身不適用（無C/I/A影響或曝險範圍未確認）維持無分數；6個finding均已對應OWASP Top 10:2021或OWASP LLM Top 10 2026分類。"
       ],
       "source_refs": [
        "SRC-003",
@@ -1565,7 +1653,9 @@
        "SRC-008",
        "SRC-047",
        "SRC-048",
-       "SRC-051"
+       "SRC-051",
+       "SRC-063",
+       "SRC-064"
       ]
      },
      {
@@ -1605,7 +1695,7 @@
      {
       "title": "仍待確認的風險",
       "paragraphs": [
-       "C-002（上游回應缺少累積位元組上限）已由開發/維護者正式接受風險，confirmation_status技術上仍維持NEEDS_VALIDATION。C-003（PAT父目錄鏈）已擴充assertTrustedAncestors，除symlink外新增owner(POSIX uid)與world-writable檢查，remediation_status為PARTIAL_MITIGATION；owner檢查無法在單一真實UID的環境實測跨使用者攻擊，只用mock驗證邏輯，confirmation_status維持NEEDS_VALIDATION。C-004（代理路由責任契約）已用qa/c004-route-contract.mjs實際呼叫真實panelRequest工具枚舉全部54條已掛載路由：9條被拒絕，45條放行中僅5條有獨立門控（3條isLocalBrowser+PAT、2條sameSiteGated——後者對panel_request路徑並無防護力，已實測證明），其餘40條完全依賴panelRequest黑名單加loopback-only網路曝露模型，現已全部40條逐一實測reachability（確認沒有被任何auth gate或denylist擋下），但因環境缺對應API金鑰，僅/api/cctv/sources這1條有「真實資料」的完整正向對照；remediation_status為PARTIAL_MITIGATION，confirmation_status維持NEEDS_VALIDATION。三者均無新確認之可利用缺陷，但也都未達成報告自身acceptance_criteria要求的完整技術驗證。另對本次session的commit diff跑過Claude Code AI驅動安全掃描（OBS-005），未發現符合條件的具體漏洞，但該掃描明確排除DoS/資源耗盡（C-002不在評估範圍），也不涉及代理路由契約（C-004）。已知程式行為不足以直接證明可利用的阻斷服務、跨使用者越權或完整授權繞過。 2026-11-09另實測確認：這個環境沒有sudo/第二個真實使用者帳號，C-003的跨UID驗證走不下去；Google/TomTom/OpenSky/FIRMS等路由所需API金鑰完全沒設定，C-004多數路由無法做「真實資料」正向對照。使用者已確認：這是路徑一（技術驗證）在此環境下的終點狀態，不是尚未完成的任務；C-003/C-004的confirmation_status因此繼續維持NEEDS_VALIDATION，誠實反映技術上未確認安全，不偽裝成已解決。"
+       "C-002（上游回應缺少累積位元組上限）已由開發/維護者正式接受風險，confirmation_status技術上仍維持NEEDS_VALIDATION。C-003（PAT父目錄鏈）已擴充assertTrustedAncestors，除symlink外新增owner(POSIX uid)與world-writable檢查，remediation_status為PARTIAL_MITIGATION；owner檢查無法在單一真實UID的環境實測跨使用者攻擊，只用mock驗證邏輯，confirmation_status維持NEEDS_VALIDATION。C-004（代理路由責任契約）已用qa/c004-route-contract.mjs實際呼叫真實panelRequest工具枚舉全部54條已掛載路由：9條被拒絕，45條放行中僅5條有獨立門控（3條isLocalBrowser+PAT、2條sameSiteGated——後者對panel_request路徑並無防護力，已實測證明），其餘40條完全依賴panelRequest黑名單加loopback-only網路曝露模型，現已全部40條逐一實測reachability（確認沒有被任何auth gate或denylist擋下），但因環境缺對應API金鑰，僅/api/cctv/sources這1條有「真實資料」的完整正向對照；remediation_status為PARTIAL_MITIGATION，confirmation_status維持NEEDS_VALIDATION。三者均無新確認之可利用缺陷，但也都未達成報告自身acceptance_criteria要求的完整技術驗證。另對本次session的commit diff跑過Claude Code AI驅動安全掃描（OBS-005），未發現符合條件的具體漏洞，但該掃描明確排除DoS/資源耗盡（C-002不在評估範圍），也不涉及代理路由契約（C-004）。已知程式行為不足以直接證明可利用的阻斷服務、跨使用者越權或完整授權繞過。 2026-11-09另實測確認：這個環境沒有sudo/第二個真實使用者帳號，C-003的跨UID驗證走不下去；Google/TomTom/OpenSky/FIRMS等路由所需API金鑰完全沒設定，C-004多數路由無法做「真實資料」正向對照。使用者已確認：這是路徑一（技術驗證）在此環境下的終點狀態，不是尚未完成的任務；C-003/C-004的confirmation_status因此繼續維持NEEDS_VALIDATION，誠實反映技術上未確認安全，不偽裝成已解決。 治理說明：GEV-C-003的acceptance_criteria第3條明文規定「補強父鏈不自動關閉候選」，使用者已明確確認保留這條規則——這代表C-003（以及精神相同的C-004）按這份報告的設計不會因為更多技術緩解而自動關閉，是刻意的治理決定，不是工作未完成。三者各附retest_recommendation（條件式複測建議，沒有固定時間點，取決於資源是否到位）。"
       ],
       "source_refs": [
        "SRC-007",
@@ -2006,9 +2096,9 @@
   }
  ],
  "document_control": {
-  "report_version": "1.9.1",
+  "report_version": "2.0.0",
   "document_status": "DELIVERABLE_WITH_QA_LIMITATIONS",
-  "data_cutoff": "2026-11-09 Asia/Taipei；至Review45、交接文件勘誤，以及同日後續十輪session",
+  "data_cutoff": "2026-11-09/10 Asia/Taipei；至Review45、交接文件勘誤，以及後續十二輪session",
   "assessment_execution_dates": "2026-11-07至2026-11-09既有證據，以及2026-11-09同日三輪後續session的實際執行（EXECUTED）；不表示連續演練或完整執行窗口",
   "report_author_role": "工作區使用者授權之報告整理；Codex協助",
   "endorsement": null,

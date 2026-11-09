@@ -903,6 +903,40 @@
    },
    "summary": "實測確認：無sudo無法做C-003跨UID驗證；C-004多數路由所需API金鑰未設定，兩者是路徑一在此環境的終點狀態",
    "embed_policy": "selected_safe_excerpt_only"
+  },
+  {
+   "id": "SRC-063",
+   "path": "1151104_gods-eye-view/security-assessment-report/qa/ghsa-8g5g-mxqh-grgj-2026-11-09.json",
+   "href": "../../1151104_gods-eye-view/security-assessment-report/qa/ghsa-8g5g-mxqh-grgj-2026-11-09.json",
+   "sha256": "60434b88e5fa498d15cb6ca555dd48e8a9291ccc6387bcc239181d38af1b5093",
+   "size_bytes": 5305,
+   "role": "external_reference",
+   "source_run": null,
+   "locator": {
+    "kind": "lines",
+    "start": 2,
+    "end": 2,
+    "anchor_text": "    \"ghsa_id\": \"GHSA-8g5g-mxqh-grgj\","
+   },
+   "summary": "GitHub Advisory API原始回應：F-002對應CVE-2026-118662官方CVSS v4.0=6.9，向量與CWE",
+   "embed_policy": "selected_safe_excerpt_only"
+  },
+  {
+   "id": "SRC-064",
+   "path": "1151104_gods-eye-view/security-assessment-report/qa/owasp-mapping-notes-2026-11-09.md",
+   "href": "../../1151104_gods-eye-view/security-assessment-report/qa/owasp-mapping-notes-2026-11-09.md",
+   "sha256": "7219ea6bb98eaf96b627c4cf07d1228c80a365de1d247306affbb2cad5a657a4",
+   "size_bytes": 3342,
+   "role": "current_observation",
+   "source_run": null,
+   "locator": {
+    "kind": "lines",
+    "start": 1,
+    "end": 1,
+    "anchor_text": "# OWASP／CVSS 對應方法說明（2026-11-09）"
+   },
+   "summary": "記錄6個finding對應OWASP分類、F-002採用官方CVSS、F-001/F-003仍無CVSS的依據",
+   "embed_policy": "selected_safe_excerpt_only"
   }
  ]
 }

@@ -1,6 +1,18 @@
 # A24 戰情台安全評估 HTML 報告
 
-版本：1.9.1（2026-11-09 同日第十一輪後續session更新；v1.0.0～v1.9.0原文見下方「版本歷史」）。**產品安全評估仍為 INCOMPLETE，無發布放行。** F-001／F-002／F-003已修補。重要治理決定：GEV-C-003的acceptance_criteria第3條寫明「補強父鏈不自動關閉候選」，使用者已明確確認保留此規則——這代表無論做多少技術緩解，C-003／C-004都不會因此關閉，這是報告自身治理規則的刻意結果，不是工作沒做完。confirmation_status對兩者繼續維持NEEDS_VALIDATION。見下方「v1.9.1 更新了什麼」。SDD 紀錄：v1.0.0文件曾稱其記錄位於`sdd/archive/2026-11-09-a24-security-html-report/`，但核實該路徑不存在，無法追溯；v1.1.0～v1.9.0改版已分別歸檔於`sdd/archive/2026-11-09-update-security-report-v1.1/`、`sdd/archive/2026-11-09-update-security-report-v1.2/`、`sdd/archive/2026-11-09-update-security-report-v1.3/`、`sdd/archive/2026-11-09-accept-risk-c002/`、`sdd/archive/2026-11-09-fix-pat-parent-symlink/`、`sdd/archive/2026-11-09-add-automated-scan-obs/`、`sdd/archive/2026-11-09-close-candidate-risks-path1/`、`sdd/archive/2026-11-09-c004-full-route-coverage/`、`sdd/archive/2026-11-09-environment-capability-closure/`；v1.9.1改版的SDD提案目前在`sdd/governance-note-no-auto-close/`（尚未歸檔）。
+版本：2.0.0（2026-11-10 同日第十二輪後續session更新；v1.0.0～v1.9.1原文見下方「版本歷史」）。**產品安全評估仍為 INCOMPLETE，無發布放行。** 本版加入OWASP／CVSS框架對齊：F-002正式採用GHSA官方CVSS v4.0=6.9；F-001/F-003因CVSS規格本身不適用維持無分數；6個finding均補上OWASP對應、白話說明與風險矩陣視覺化；C-002/C-003/C-004各附條件式複測建議。見下方「v2.0.0 更新了什麼」。SDD 紀錄：v1.0.0文件曾稱其記錄位於`sdd/archive/2026-11-09-a24-security-html-report/`，但核實該路徑不存在，無法追溯；v1.1.0～v1.9.1改版已分別歸檔於`sdd/archive/2026-11-09-update-security-report-v1.1/`、`sdd/archive/2026-11-09-update-security-report-v1.2/`、`sdd/archive/2026-11-09-update-security-report-v1.3/`、`sdd/archive/2026-11-09-accept-risk-c002/`、`sdd/archive/2026-11-09-fix-pat-parent-symlink/`、`sdd/archive/2026-11-09-add-automated-scan-obs/`、`sdd/archive/2026-11-09-close-candidate-risks-path1/`、`sdd/archive/2026-11-09-c004-full-route-coverage/`、`sdd/archive/2026-11-09-environment-capability-closure/`、`sdd/archive/2026-11-09-governance-note-no-auto-close/`；v2.0.0改版的SDD提案目前在`sdd/owasp-cvss-alignment/`（尚未歸檔）。
+
+## v2.0.0 更新了什麼（不是只改雜湊）
+
+本次無程式碼變更，`product_commit`維持`848a856`。
+
+- **F-002正式採用官方CVSS**：直接呼叫GitHub Advisory API取得GHSA-8g5g-mxqh-grgj / CVE-2026-118662的原始回應（`qa/ghsa-8g5g-mxqh-grgj-2026-11-09.json`），採用CVSS v4.0=6.9（非自行評分）；同時附註GEV的loopback-only部署不符合官方描述的「明確曝露到網路」前提，實際曝險面可能更低。
+- **F-001、F-003維持無CVSS**：CVSS規格本身不適用——F-003沒有C/I/A影響（報告既有分析已說明），F-001的blocker是曝險範圍與業務用途未確認，跟是否已修補無關。詳細依據見`qa/owasp-mapping-notes-2026-11-09.md`。
+- **全部6個finding加OWASP／CWE對應**：F-001對應OWASP LLM Top 10 2026的LLM07（Misinformation）；F-002對應OWASP Top 10:2021的A01/A05；F-003因沒有乾淨對應改標CWE-755；C-002對應A04；C-003對應A01；C-004對應A01/A04。
+- **全部6個finding加白話說明**：每段都用非技術語言解釋實際影響，並以具體建議動作收尾。
+- **風險矩陣視覺化**：新增一張SVG 2x3矩陣（確認狀態×處置狀態），座標由既有欄位即時計算，不是新的獨立評分。
+- **C-002/C-003/C-004加條件式複測建議**：都是「沒有固定時間點，取決於資源是否到位」，不是排程複測。
+- **狀態徽章icon**：用`codex exec`生成3個inline SVG（已修補/部分緩解/風險接受），已驗證是純`<path>`圖形、無外部參照、無script，符合既有CSP限制。
 
 ## v1.9.1 更新了什麼（不是只改雜湊）
 
@@ -101,6 +113,7 @@
 - **v1.8.0**（2026-11-09同日第九輪後續session）：見上「v1.8.0 更新了什麼」。
 - **v1.9.0**（2026-11-09同日第十輪後續session）：見上「v1.9.0 更新了什麼」。
 - **v1.9.1**（2026-11-09同日第十一輪後續session）：見上「v1.9.1 更新了什麼」。
+- **v2.0.0**（2026-11-10同日第十二輪後續session）：見上「v2.0.0 更新了什麼」。
 - **v1.4.0**（2026-11-09同日第五輪後續session）：見上「v1.4.0 更新了什麼」。
 
 ## 開啟報告
@@ -109,9 +122,11 @@
 
 內容包括管理摘要、範圍方法、攻擊面／信任邊界、F-001 與三項候選、其他觀察、原 15 情境、改善交接及證據附錄。可搜尋／篩選、展開節錄、暫停動畫及列印。JavaScript 停用時核心內容與安全節錄仍靜態存在。
 
-HTML 可單獨攜出閱讀；完整證據檔沒有嵌入。來源相對連結需要保留本工作區的資料夾結構。來源索引記錄59份選取檔案的SHA-256（v1.0.0為45份，v1.1.0新增7份，v1.2.0新增5份，v1.3.0新增1份；v1.4.0無新增；v1.5.0重新雜湊既有SRC-041/SRC-046，未新增筆數；v1.6.0新增SRC-059；v1.7.0新增SRC-060/SRC-061，共61份；v1.8.0無新增，僅重算SRC-058；v1.9.0新增SRC-062，共62份；v1.9.1無新增），不是數位簽章或整個歷史執行範圍的證明。
+HTML 可單獨攜出閱讀；完整證據檔沒有嵌入。來源相對連結需要保留本工作區的資料夾結構。來源索引記錄59份選取檔案的SHA-256（v1.0.0為45份，v1.1.0新增7份，v1.2.0新增5份，v1.3.0新增1份；v1.4.0無新增；v1.5.0重新雜湊既有SRC-041/SRC-046，未新增筆數；v1.6.0新增SRC-059；v1.7.0新增SRC-060/SRC-061，共61份；v1.8.0無新增，僅重算SRC-058；v1.9.0新增SRC-062，共62份；v1.9.1無新增；v2.0.0新增SRC-063/SRC-064，共64份），不是數位簽章或整個歷史執行範圍的證明。
 
 ## QA 結果與限制
+
+v2.0.0 新增 `qa/check_v2.0.py`，取代`check_v1.9.1.py`作為目前版本的通用稽核（全部PASS，見`qa/check-v2.0-audit.json`）。
 
 v1.9.1 新增 `qa/check_v1.9.1.py`，取代`check_v1.9.py`作為目前版本的通用稽核（全部PASS，見`qa/check-v1.9.1-audit.json`）。
 

@@ -24,6 +24,8 @@ LABELS = {
     'BLOCKED': '受阻', 'NOT_TESTED': '未測試',
     'DECISION_REQUIRED': '待決策', 'CONTRACT_REQUIRED': '待定契約',
     'BLOCKED_MISSING_TOOL_BINARY': '缺必要工具', 'OWNER_DECISION_REQUIRED': '待責任人決定',
+    'PARTIAL_MITIGATION': '部分緩解', 'NOT_APPLICABLE': '不適用',
+    'ADOPTED_OFFICIAL_SCORE': '採用官方分數', 'PENDING_CONTEXT': '待補脈絡',
 }
 
 def label(value):
@@ -31,6 +33,20 @@ def label(value):
 
 def tag(value, tone='neutral'):
     return f'<span class="tag {esc(tone)}">{esc(label(value))}</span>'
+
+# Inline SVG badge icons (generated via `codex exec`, reviewed and validated
+# as plain single-color <path> markup before embedding — no scripts, no
+# external refs, no ids). Decorative only: the text label next to each icon
+# always carries the actual status; the icon never substitutes for it.
+STATUS_ICONS = {
+    'FIXED': '<svg class="badge-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M12 2 3 6v6c0 5 6 9 9 10 3-1 9-5 9-10V6L12 2Zm-1.5 14.5-4-4L8 11l2.5 2.5L16 8l1.5 1.5-7 7Z"/></svg>',
+    'PARTIAL_MITIGATION': '<svg class="badge-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M12 2 3 6v6c0 5 6 9 9 10 3-1 9-5 9-10V6L12 2Zm0 2.2v15.6c3-1.4 7-4.6 7-7.8V7.3l-7-3.1Z"/></svg>',
+    'PENDING_VALIDATION': '<svg class="badge-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M12 2 3 6v6c0 5 6 9 9 10 3-1 9-5 9-10V6L12 2Zm-1 5h2v6h-2V7Zm0 8h2v2h-2v-2Z"/></svg>',
+}
+
+def status_tag(value, tone='neutral'):
+    icon = STATUS_ICONS.get(value, '')
+    return f'<span class="tag {esc(tone)}">{icon}{esc(label(value))}</span>'
 
 def refs(items):
     return '<p class="refs">證據 '+ ' · '.join(f'<a href="#{esc(s)}">{esc(s)}</a>' for s in dict.fromkeys(items))+'</p>' if items else ''
@@ -175,11 +191,12 @@ window.addEventListener('afterprint', () => {
 STYLE = '''
 :root{--ink:#172d36;--muted:#4c6470;--paper:#fff;--bg:#f1f3f1;--line:#d4dedb;--accent:#126a62;--warm:#a74624;--warn:#794f09;--soft:#edf4f1;--radius:12px;color-scheme:light}
 *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:24px}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.8 -apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif}a{color:var(--accent);text-underline-offset:3px}a:hover{text-decoration-thickness:2px}button,input,select{font:inherit}button{cursor:pointer}button,a,input,select,summary{touch-action:manipulation}:focus-visible{outline:3px solid #b2760b;outline-offset:4px}.skip{position:fixed;top:-100px;left:12px;z-index:50;background:#fff;padding:12px}.skip:focus{top:12px}.layout{display:grid;grid-template-columns:250px minmax(0,1fr);max-width:1600px;margin:auto}.sidebar{position:sticky;top:0;height:100vh;padding:32px 20px;overflow:auto;border-right:1px solid var(--line)}.brand{font-size:28px;font-weight:800;letter-spacing:.1em}.small,.sidebar p{font-size:13px;color:var(--muted)}.sidebar nav{display:grid;gap:6px;margin:30px 0}.sidebar nav a{padding:8px 10px;text-decoration:none;border-left:3px solid transparent}.sidebar nav a[aria-current="location"]{background:#e0eae5;border-left-color:var(--accent);font-weight:700}.sidebar button{background:white;border:1px solid var(--line);border-radius:6px;padding:8px 12px;width:100%}main{min-width:0;background:var(--paper);padding:48px clamp(24px,5vw,80px) 72px}.hero{border-top:5px solid var(--accent);padding:32px 0 40px;border-bottom:1px solid var(--line)}.eyebrow{font-size:12px;letter-spacing:.16em;font-weight:700;color:var(--accent);margin:0 0 10px;text-transform:uppercase}h1{font-size:clamp(28px,3.5vw,46px);line-height:1.35;letter-spacing:-.02em;margin:12px 0}h2{font-size:29px;line-height:1.5;margin:0 0 12px}h3{font-size:20px;line-height:1.6;margin:20px 0 8px}h4{font-size:16px;margin:16px 0 6px}p{margin:8px 0 14px}.subtitle{font-size:19px;color:var(--muted)}.status-banner{border-left:4px solid var(--warm);background:#fbf1eb;padding:16px 20px;margin:24px 0;color:#653723}.status-banner strong{display:block;font-size:20px}.meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 24px;margin:24px 0 0}.meta div{min-width:0}.meta dt{font-size:12px;color:var(--muted)}.meta dd{margin:2px 0;font-size:14px;overflow-wrap:anywhere}.report-section{padding-top:52px;margin-top:12px}.section-heading{border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:24px}.section-heading>p:last-child{color:var(--muted)}.prose-block{margin:24px 0}.refs{font-size:12px;color:var(--muted);overflow-wrap:anywhere;line-height:1.8}.refs a{display:inline-block}.tag{display:inline-block;font-size:12px;padding:2px 9px;background:#edf0ef;border:1px solid #d9e0dd;border-radius:4px;vertical-align:middle;line-height:1.8}.tag.confirmed{color:#8a321c;background:#fcf0e8;border-color:#edc9b8}.tag.pending{color:var(--warn);background:#faf4df;border-color:#e6d69c}.tag.teal{background:#e9f2f0;color:#17594f}.tags{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}.stat-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:24px 0 4px}.stat-tile{border:1px solid var(--line);border-radius:var(--radius);padding:16px 14px;min-width:0;background:var(--soft);display:flex;flex-direction:column;gap:4px}.stat-tile.confirmed{border-color:#edc9b8;background:#fcf0e8}.stat-tile.pending{border-color:#e6d69c;background:#faf4df}.stat-value{font-size:28px;font-weight:800;line-height:1.1;overflow-wrap:anywhere}.stat-tile.confirmed .stat-value{color:#8a321c}.stat-tile.pending .stat-value{color:var(--warn)}.stat-label{font-size:12px;color:var(--muted)}.card{border:1px solid var(--line);border-radius:var(--radius);padding:24px;margin:20px 0;min-width:0;overflow-wrap:anywhere}.card-heading{display:flex;gap:12px;align-items:flex-start;justify-content:space-between}.card-heading h3{margin:0}.identifier{font:700 12px/1.6 ui-monospace,SFMono-Regular,monospace;color:var(--accent);display:block;margin-bottom:5px}.subgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 28px}.subgrid>div{min-width:0}.risk-note{border-left:3px solid #d7bf7d;padding:8px 14px;background:#fcfaf3}.qualifier{font-size:14px;color:var(--muted)}.filter{background:var(--soft);border-radius:8px;padding:16px;display:flex;gap:12px;flex-wrap:wrap;align-items:end}.filter label{display:grid;gap:4px;font-size:13px;color:var(--muted);flex:1;min-width:150px}.filter input,.filter select{width:100%;min-width:0;border:1px solid #b7c9c3;background:#fff;color:var(--ink);border-radius:5px;padding:8px}.filter button,.toolbar button{border:1px solid #b7c9c3;background:white;color:var(--ink);border-radius:5px;padding:8px 13px}.count{font-size:13px;color:var(--muted)}.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}details{margin:14px 0}summary{cursor:pointer;color:var(--accent);font-weight:600;overflow-wrap:anywhere}summary::marker{font-size:12px}pre{padding:16px;background:#f3f5f4;border:1px solid var(--line);border-radius:6px;font:12px/1.7 ui-monospace,SFMono-Regular,monospace;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;color:#253b44}code{font-family:ui-monospace,SFMono-Regular,monospace;font-size:.85em;overflow-wrap:anywhere}.evidence{margin:16px 0;padding:16px 0;border-top:1px dashed var(--line)}.evidence h4{margin-top:0}.source-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.source-item{padding:16px;border:1px solid var(--line);border-radius:8px;min-width:0;overflow-wrap:anywhere}.source-item p{font-size:13px}.source-item code{font-size:11px}.source-item:target,.evidence:target{outline:2px solid var(--accent);outline-offset:4px}.callout{background:var(--soft);padding:18px 22px;border-radius:8px}.draft-note{font-size:13px;border:1px dashed #b6c7bf;padding:12px 16px;color:var(--muted);margin-top:20px}li{margin:6px 0}ul,ol{padding-left:24px}.no-results{padding:24px;background:#faf7ed}footer{margin-top:48px;padding-top:22px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}[hidden]{display:none!important}.js-only{display:none}.js-enabled .js-only{display:flex}.mono{font-family:ui-monospace,monospace;font-size:12px;overflow-wrap:anywhere}
+.plain-language{border-left:3px solid #4c8f84;background:#eef6f4;padding:10px 16px;margin:14px 0}.plain-language h4{margin-top:0;color:#17594f}.risk-matrix{margin:24px 0;padding:18px 20px;border:1px solid var(--line);border-radius:var(--radius);background:var(--soft)}.risk-matrix figcaption h3{margin-top:0}.risk-matrix-svg{display:block;width:100%;max-width:420px;height:auto;margin:10px auto}.rm-axis{font-size:13px;fill:var(--muted)}.rm-cell{stroke:#c7d3cd;stroke-width:1}.rm-cell-label{font-size:12px;fill:var(--ink);font-weight:600}.badge-icon{width:16px;height:16px;vertical-align:-3px;margin-right:4px}
 @media(max-width:1000px){.layout{grid-template-columns:205px minmax(0,1fr)}.sidebar{padding:24px 12px}main{padding:32px 26px}.source-list{grid-template-columns:1fr}}
-@media(max-width:720px){html{scroll-padding-top:12px}.layout{display:block}.sidebar{position:relative;height:auto;border-right:0;border-bottom:1px solid var(--line);padding:16px 20px}.sidebar .brand{font-size:22px}.sidebar p{margin:2px 0}.sidebar nav{display:flex;flex-wrap:wrap;gap:4px;margin:12px 0}.sidebar nav a{font-size:13px;padding:4px 8px}.sidebar button{width:auto;padding:5px 12px}.sidebar .sidebar-note{display:none}main{padding:24px 20px 48px}.hero{padding:22px 0 28px}.meta,.subgrid{grid-template-columns:1fr}.stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.meta{gap:10px}.report-section{padding-top:36px}h2{font-size:24px}.card{padding:18px}.card-heading{display:block}.filter{padding:12px}.source-list{grid-template-columns:1fr}.status-banner{padding:12px 16px}.status-banner strong{font-size:17px}}
+@media(max-width:720px){html{scroll-padding-top:12px}.layout{display:block}.sidebar{position:relative;height:auto;border-right:0;border-bottom:1px solid var(--line);padding:16px 20px}.sidebar .brand{font-size:22px}.sidebar p{margin:2px 0}.sidebar nav{display:flex;flex-wrap:wrap;gap:4px;margin:12px 0}.sidebar nav a{font-size:13px;padding:4px 8px}.sidebar button{width:auto;padding:5px 12px}.sidebar .sidebar-note{display:none}main{padding:24px 20px 48px}.hero{padding:22px 0 28px}.meta,.subgrid{grid-template-columns:1fr}.stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.meta{gap:10px}.report-section{padding-top:36px}h2{font-size:24px}.card{padding:18px}.card-heading{display:block}.filter{padding:12px}.source-list{grid-template-columns:1fr}.status-banner{padding:12px 16px}.status-banner strong{font-size:17px}.risk-matrix{padding:12px}.risk-matrix-svg{max-width:300px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
 @page{size:A4;margin:17mm 15mm;@bottom-left{content:'A24 · 安全評估 · 無發布放行';font-size:8pt;color:#536a62}@bottom-right{content:counter(page) ' / ' counter(pages);font-size:8pt;color:#536a62}}
-@media print{html{scroll-behavior:auto}body{background:#fff;color:#111;font-size:10pt;line-height:1.65}.layout{display:block;max-width:none}.sidebar,.skip,.filter,.toolbar,.count,.no-results,.js-only,.draft-note{display:none!important}main{padding:0}.hero{padding:12px 0 20px}h1{font-size:26pt}h2{font-size:19pt}h3{font-size:13pt}h4{font-size:11pt}.report-section{padding-top:20px;margin-top:10px}.report-section:not(#executive-summary){break-before:page}#executive-summary .prose-block{margin:14px 0}.card{padding:12px;margin:12px 0;border-radius:0}.card,.prose-block{break-inside:auto}h2,h3,h4,summary{break-after:avoid}.refs{font-size:8pt}.source-list{display:block}.source-item{margin-bottom:10px;break-inside:avoid}pre{font-size:8pt;white-space:pre-wrap;break-inside:auto}a{color:inherit;text-decoration:underline}.tag{font-size:8pt}details[open]>summary{list-style:none}details::details-content{display:block;content-visibility:visible}details>*:not(summary){display:block!important}.filterable[hidden]{display:block!important}.status-banner{padding:10px 14px;background:#fff;border:1px solid #555;border-left-width:4px}.meta{gap:8px 16px}.meta dd{font-size:9pt}.stat-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}.stat-tile{padding:8px 6px}.stat-value{font-size:16pt}.stat-label{font-size:8pt}.callout{padding:10px 14px;background:#f4f4f4}.subgrid{gap:8px 20px}footer{font-size:8pt}}
+@media print{html{scroll-behavior:auto}body{background:#fff;color:#111;font-size:10pt;line-height:1.65}.layout{display:block;max-width:none}.sidebar,.skip,.filter,.toolbar,.count,.no-results,.js-only,.draft-note{display:none!important}main{padding:0}.hero{padding:12px 0 20px}h1{font-size:26pt}h2{font-size:19pt}h3{font-size:13pt}h4{font-size:11pt}.report-section{padding-top:20px;margin-top:10px}.report-section:not(#executive-summary){break-before:page}#executive-summary .prose-block{margin:14px 0}.card{padding:12px;margin:12px 0;border-radius:0}.card,.prose-block{break-inside:auto}h2,h3,h4,summary{break-after:avoid}.refs{font-size:8pt}.source-list{display:block}.source-item{margin-bottom:10px;break-inside:avoid}pre{font-size:8pt;white-space:pre-wrap;break-inside:auto}a{color:inherit;text-decoration:underline}.tag{font-size:8pt}details[open]>summary{list-style:none}details::details-content{display:block;content-visibility:visible}details>*:not(summary){display:block!important}.filterable[hidden]{display:block!important}.status-banner{padding:10px 14px;background:#fff;border:1px solid #555;border-left-width:4px}.meta{gap:8px 16px}.meta dd{font-size:9pt}.stat-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}.stat-tile{padding:8px 6px}.stat-value{font-size:16pt}.stat-label{font-size:8pt}.callout{padding:10px 14px;background:#f4f4f4}.subgrid{gap:8px 20px}footer{font-size:8pt}.risk-matrix{padding:8px 10px;background:#fff;border:1px solid #555}.risk-matrix-svg{max-width:100mm}.plain-language{padding:6px 10px;background:#f4f4f4}}
 '''
 
 SCRIPT = '''
@@ -371,6 +388,42 @@ def stat_dashboard(data):
     ) + '</div><p class="qualifier">以上數字由本頁其他段落已引用的資料即時計算得出，不是獨立宣稱；逐項證據見下方管理摘要與安全發現。</p>'
 
 
+RISK_MATRIX_ROWS = [('FIXED', '已修補'), ('PARTIAL_MITIGATION', '部分緩解'), ('PENDING_VALIDATION', '風險接受／待處理')]
+RISK_MATRIX_COLS = [('CONFIRMED', '已確認'), ('NEEDS_VALIDATION', '待確認')]
+
+def risk_matrix(data):
+    """2x3矩陣：橫軸confirmation_status、縱軸remediation_status，純粹由findings既有欄位
+    即時計算座標，不是獨立宣稱的嚴重度評分——座標本身不代表CVSS或OWASP等級。"""
+    cells = {(r, c): [] for r, _ in RISK_MATRIX_ROWS for c, _ in RISK_MATRIX_COLS}
+    for f in data['findings']:
+        row_key = f['remediation_status'] if f['remediation_status'] in dict(RISK_MATRIX_ROWS) else 'PENDING_VALIDATION'
+        col_key = f['confirmation_status']
+        cells.setdefault((row_key, col_key), []).append(f['id'])
+    cell_w, cell_h, pad_l, pad_t = 170, 70, 150, 36
+    width = pad_l + cell_w * len(RISK_MATRIX_COLS) + 20
+    height = pad_t + cell_h * len(RISK_MATRIX_ROWS) + 40
+    svg = [f'<svg class="risk-matrix-svg" viewBox="0 0 {width} {height}" role="img" aria-labelledby="risk-matrix-title" xmlns="http://www.w3.org/2000/svg">',
+           f'<title id="risk-matrix-title">候選風險與發現：確認狀態 × 處置狀態矩陣</title>']
+    for ci, (_, clabel) in enumerate(RISK_MATRIX_COLS):
+        x = pad_l + ci * cell_w + cell_w / 2
+        svg.append(f'<text x="{x}" y="{pad_t - 12}" text-anchor="middle" class="rm-axis">{esc(clabel)}</text>')
+    for ri, (_, rlabel) in enumerate(RISK_MATRIX_ROWS):
+        y = pad_t + ri * cell_h + cell_h / 2
+        svg.append(f'<text x="{pad_l - 12}" y="{y + 4}" text-anchor="end" class="rm-axis">{esc(rlabel)}</text>')
+    for ri, (rkey, _) in enumerate(RISK_MATRIX_ROWS):
+        for ci, (ckey, _) in enumerate(RISK_MATRIX_COLS):
+            x, y = pad_l + ci * cell_w, pad_t + ri * cell_h
+            ids = cells.get((rkey, ckey), [])
+            fill = '#fcf0e8' if ckey == 'CONFIRMED' else '#faf4df'
+            svg.append(f'<rect x="{x}" y="{y}" width="{cell_w - 6}" height="{cell_h - 6}" rx="8" class="rm-cell" style="fill:{fill}"></rect>')
+            label_text = '、'.join(i.replace('GEV-', '') for i in ids) if ids else '—'
+            svg.append(f'<text x="{x + (cell_w - 6) / 2}" y="{y + (cell_h - 6) / 2 + 5}" text-anchor="middle" class="rm-cell-label">{esc(label_text)}</text>')
+    svg.append('</svg>')
+    return ('<figure class="risk-matrix"><figcaption><h3>風險矩陣：確認狀態 × 處置狀態</h3>'
+            '<p class="qualifier">座標由findings的confirmation_status／remediation_status即時計算，不是獨立的嚴重度評分；'
+            '不能取代逐項finding的CVSS／OWASP對應與白話說明。</p></figcaption>' + ''.join(svg) + '</figure>')
+
+
 def build(data, index):
     source_ids={s['id'] for s in index['sources']}
     for s in index['sources']:
@@ -387,7 +440,7 @@ def build(data, index):
         return f'<article class="evidence" id="{esc(eid)}"><h4>{esc(e["label"])}</h4><p class="small">{esc(eid)} · {esc(position)}</p><pre><code>{esc(payload)}</code></pre><p class="qualifier">{esc(e["qualification"])}</p>{refs([e["source_ref"]])}</article>'
     nav=[('executive-summary','管理摘要'),('scope-method','範圍與方法'),('attack-surface','攻擊面'),('findings','安全發現'),('defense-validation','防禦驗證'),('coverage','情境覆蓋'),('remediation','改善與交接'),('appendix','證據附錄')]
     content=[]
-    content.append(head('executive-summary','01 / DECISION','管理摘要')+stat_dashboard(data)+blocks(sections['executive-summary'])+'</section>')
+    content.append(head('executive-summary','01 / DECISION','管理摘要')+stat_dashboard(data)+risk_matrix(data)+blocks(sections['executive-summary'])+'</section>')
     content.append(head('scope-method','02 / SCOPE','範圍與方法')+blocks(sections['scope-method'])+'</section>')
     diagrams={g['id']:g for g in data.get('diagrams',[])}
     content.append(head('attack-surface','03 / BOUNDARIES','攻擊面與信任邊界')+blocks(sections['attack-surface'])+diagram_figure(diagrams['attack-map'])+'</section>')
@@ -395,12 +448,24 @@ def build(data, index):
     fhtml+=filter_form('finding-list',[('CONFIRMED','已確認'),('NEEDS_VALIDATION','待確認')],'搜尋發現、元件或證據')+'<div id="finding-list">'
     for f in data['findings']:
         q=f['details'];tone='confirmed' if f['confirmation_status']=='CONFIRMED' else 'pending'
-        fhtml+=f'<article class="card filterable" id="{esc(f["id"])}" data-status="{esc(f["confirmation_status"])}"><div class="card-heading"><h3><span class="identifier">{esc(f["id"])}</span>{esc(f["title"])}</h3>{tag(f["confirmation_status"],tone)}</div><div class="tags">{tag(f["remediation_status"])}{tag("風險等級待評","pending")}{tag("責任人待指定")}</div><p>{esc(q["summary"])}</p><div class="risk-note"><strong>分級依據</strong><p>{esc(f["risk_rating"]["rationale"])}</p></div>'
-        if f['id']=='GEV-F-001':fhtml+=diagram_figure(diagrams['f001-cause'])
+        rr=f['risk_rating']
+        severity_tag=tag(f'CVSS {rr["cvss"]["score"]}（v{rr["cvss"]["version"]}）','confirmed') if isinstance(rr.get('cvss'),dict) else tag('風險等級待評','pending')
+        fhtml+=f'<article class="card filterable" id="{esc(f["id"])}" data-status="{esc(f["confirmation_status"])}"><div class="card-heading"><h3><span class="identifier">{esc(f["id"])}</span>{esc(f["title"])}</h3>{tag(f["confirmation_status"],tone)}</div><div class="tags">{status_tag(f["remediation_status"])}{severity_tag}{tag("責任人待指定")}</div><p>{esc(q["summary"])}</p><div class="risk-note"><strong>分級依據</strong><p>{esc(rr["rationale"])}</p></div>'
+        if isinstance(rr.get('cvss'),dict):
+            c=rr['cvss']
+            fhtml+=f'<p class="qualifier">CVSS向量：<code>{esc(c["vector"])}</code> · 來源：{esc(c["source"])}</p>'
+        if f.get('owasp_mapping'):
+            fhtml+='<h4>OWASP／CWE 對應</h4><ul>'+''.join(f'<li>{esc(m["framework"])} {esc(m["id"])}：{esc(m["title"])}（{esc(m["role"])}）{"－"+esc(m["note"]) if m.get("note") else ""}</li>' for m in f['owasp_mapping'])+'</ul>'
+        if f.get('plain_language'):
+            fhtml+=f'<div class="plain-language"><h4>白話說明</h4><p>{esc(f["plain_language"])}</p></div>'
+        if f.get('id')=='GEV-F-001':fhtml+=diagram_figure(diagrams['f001-cause'])
         fhtml+='<div class="subgrid"><div><h4>受影響元件</h4>'+ul(q['affected_components'])+'</div><div><h4>成立前提</h4>'+ul(q['preconditions'])+'</div></div>'
         fhtml+='<h4>已證實事實</h4>'+ul(q['established_facts'])+'<h4>既有重現紀錄</h4><p class="qualifier">以下整理歷史觀察，本次未重跑產品。</p>'+ul(q['reproduction']['steps'],True)
         fhtml+='<h4>影響判讀</h4>'+paras(['已觀察：'+q['impact']['demonstrated'],'有條件影響：'+q['impact']['conditional']])+'<p><strong>尚未證明</strong></p>'+ul(q['impact']['not_demonstrated'])
         fhtml+='<h4>證據限制</h4>'+ul(q['limitations'])+'<h4>改善建議</h4>'+ul(q['recommendations'])+'<h4>驗收條件</h4>'+ul(q['acceptance_criteria'])
+        if f.get('retest_recommendation'):
+            rt=f['retest_recommendation']
+            fhtml+=f'<h4>複測建議</h4><p class="qualifier">{esc(rt["condition"])} · {esc(rt["note"])}</p>'
         fhtml+=f'<details open data-fold><summary>查看 {len(q["evidence_ids"])} 段安全證據節錄</summary>'+''.join(evidence(eid) for eid in q['evidence_ids'])+'</details>'+refs(f['source_refs'])+'</article>'
     fhtml+='</div><p id="finding-list-empty" class="no-results" hidden>沒有符合條件的發現；可清除篩選查看全部。</p><h3>其他觀察</h3>'
     for o in data['observations']:

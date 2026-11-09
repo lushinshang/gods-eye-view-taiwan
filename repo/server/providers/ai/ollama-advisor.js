@@ -10,12 +10,48 @@ import { buildPrompt } from './prompt.js';
 import { runOllama, ollamaStatus } from './ollama-client.js';
 
 const digest = (token) => createHash('sha256').update(token).digest();
+
+/**
+ * O_NOFOLLOW on the token file itself only guards the final path component —
+ * a symlinked `.gev-cache/ai-advisor/` would still be followed transparently.
+ * Walk every directory between `file` and `root` and refuse if any of them
+ * is a symlink. A single lstat here is not a full TOCTOU guard (the
+ * directory could still be swapped between this check and the open/write
+ * that follows), so this narrows the known parent-chain risk without
+ * claiming to close it.
+ */
+function assertNoSymlinkAncestors(file, root) {
+  let dir = path.dirname(file);
+  while (dir !== root && dir !== path.dirname(dir)) {
+    let entry;
+    try {
+      entry = fs.lstatSync(dir);
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        dir = path.dirname(dir);
+        continue;
+      }
+      throw error;
+    }
+    if (entry.isSymbolicLink()) {
+      const error = new Error(
+        'refusing to use a PAT store whose parent directory is a symlink',
+      );
+      error.code = 'GEV_PARENT_SYMLINK';
+      throw error;
+    }
+    dir = path.dirname(dir);
+  }
+}
+
 export function createTokenStore(
   file = path.join(defaultSourceRoot, '.gev-cache/ai-advisor/token.json'),
+  { root = defaultSourceRoot } = {},
 ) {
   const read = () => {
     let fd;
     try {
+      assertNoSymlinkAncestors(file, root);
       fd = fs.openSync(file, fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW);
       const stat = fs.fstatSync(fd);
       if (!stat.isFile() || (stat.mode & 0o777) !== 0o600) return null;
@@ -49,6 +85,7 @@ export function createTokenStore(
       );
     },
     rotate() {
+      assertNoSymlinkAncestors(file, root);
       const token = randomBytes(32).toString('hex');
       fs.mkdirSync(path.dirname(file), { recursive: true, mode: 0o700 });
       const temporary = `${file}.${randomBytes(8).toString('hex')}.tmp`;

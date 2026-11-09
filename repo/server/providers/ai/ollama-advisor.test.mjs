@@ -433,7 +433,7 @@ test('PAT stores SHA-256 only, permissions 0600, constant time verification, rot
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'advisor-pat-'));
   const file = path.join(dir, 'token.json');
   try {
-    const store = createTokenStore(file),
+    const store = createTokenStore(file, { root: dir }),
       first = store.rotate();
     assert.match(first.token, /^[a-f0-9]{64}$/);
     assert.equal(store.verify(first.token), true);
@@ -453,6 +453,38 @@ test('PAT stores SHA-256 only, permissions 0600, constant time verification, rot
     assert.equal(store.verify(second.token), false);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+test('PAT store refuses a symlinked parent directory (GEV-C-003)', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'advisor-root-'));
+  const real = path.join(root, 'real-elsewhere');
+  fs.mkdirSync(real, { recursive: true });
+  try {
+    const linked = path.join(root, 'ai-advisor');
+    fs.symlinkSync(real, linked);
+    const file = path.join(linked, 'token.json');
+    const store = createTokenStore(file, { root });
+    assert.throws(() => store.rotate(), { code: 'GEV_PARENT_SYMLINK' });
+    assert.equal(fs.existsSync(file), false);
+    // A token written directly through the symlink (as if rotate() had no
+    // guard) must still be refused on read — not just on rotate.
+    fs.writeFileSync(path.join(real, 'token.json'), JSON.stringify({
+      sha256: 'a'.repeat(64),
+    }), { mode: 0o600 });
+    assert.equal(store.status().configured, false);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+test('PAT store works normally when the parent chain has no symlink', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'advisor-root-'));
+  try {
+    const file = path.join(root, 'ai-advisor', 'token.json');
+    const store = createTokenStore(file, { root });
+    const { token } = store.rotate();
+    assert.equal(store.verify(token), true);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
   }
 });
 const localReq = (extra = {}) => ({
@@ -488,7 +520,7 @@ test('local gate requires trusted socket, local Host, exact Origin and JSON; ref
 });
 async function httpHarness(t, overrides = {}) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'advisor-http-'));
-  const store = createTokenStore(path.join(dir, 'token.json'));
+  const store = createTokenStore(path.join(dir, 'token.json'), { root: dir });
   const source = fixtures();
   const middleware = createAdvisorMiddleware({
     env: {},

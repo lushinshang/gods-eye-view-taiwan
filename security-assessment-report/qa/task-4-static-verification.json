@@ -2,7 +2,7 @@
   "task": 4,
   "status": "PASS",
   "scope": "Static single-file HTML and generator checks, not browser security or visual acceptance.",
-  "html_bytes": 363473,
+  "html_bytes": 368854,
   "unique_ids": 172,
   "source_links": 52,
   "checks": {

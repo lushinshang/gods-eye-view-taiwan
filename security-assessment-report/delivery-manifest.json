@@ -6,13 +6,13 @@
   "files": [
     {
       "path": "index.html",
-      "bytes": 363473,
-      "sha256": "80b4efa7401fd08f661ab5e44607b99e2596d63c3c3c05081d3126e6d3527230"
+      "bytes": 368854,
+      "sha256": "d0b7f9a0667fac3e5bdca5212c546c4eff9502d624e24f11a592b0569ab424a4"
     },
     {
       "path": "report-data.json",
-      "bytes": 125992,
-      "sha256": "e586c100203ef891b4a0ac68669fb8ad94ef56bfe94bd8d899885219e4da7885"
+      "bytes": 127794,
+      "sha256": "75230128f891637914fe16e2a1999ef01ebf8e3370dac663edd80119a181d1b3"
     },
     {
       "path": "source-index.json",
@@ -21,8 +21,8 @@
     },
     {
       "path": "build_report.py",
-      "bytes": 48581,
-      "sha256": "19b8916bcee0b2a11aa34e8486a5b983c7a068e8fb15fb89da45faaed3bc6c7c"
+      "bytes": 51169,
+      "sha256": "b348bc7b483a8ec3d6f2f758975838fb67728bab4eb6e3fe66958e7de45d97f2"
     },
     {
       "path": "README.md",
@@ -52,7 +52,7 @@
     {
       "path": "qa/task-4-static-verification.json",
       "bytes": 674,
-      "sha256": "445fcbb2b334a365b100ec6ed57080c2fbc1ca3f41008448c0c3336df1b8903e"
+      "sha256": "783d34df3e78432333b8f683c33ac0eb4e4f489622b595925bb774ea6b29dee3"
     },
     {
       "path": "qa/task-4-dom-verification.json",

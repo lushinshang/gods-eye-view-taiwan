@@ -270,10 +270,15 @@ function keySetupEndpoint({ sourceRoot = defaultSourceRoot } = {}) {
         let body = '';
         let overflowed = false;
         req.on('data', (chunk) => {
+          // Once over the cap, stop accumulating (free the memory) but let
+          // the stream keep flowing to a normal 'end' — destroy()ing the
+          // socket here would close it before the 413 below could be
+          // written, leaving the caller with a bare connection reset.
+          if (overflowed) return;
           body += chunk;
           if (body.length > 8192) {
             overflowed = true;
-            req.destroy();
+            body = '';
           }
         });
         req.on('end', () => {

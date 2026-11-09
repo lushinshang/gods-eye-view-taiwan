@@ -89,6 +89,35 @@ Allowing `maps.googleapis.com` in `script-src` also trusts its JSONP endpoints, 
 - **Typed chat spends the provider keys.** `/api/openai/chat` and `/api/gemini/chat` send the conversation to OpenAI Chat Completions or Gemini `generateContent` with the server's `OPENAI_API_KEY` or `GEMINI_API_KEY`. They require a same-site `Origin` (the Gemini request check), cap request bodies at 512 KB, refuse upstream redirects, cut the upstream call off after 60 s and return only sanitized errors. OpenAI chat can only bill `OPENAI_API_KEY`, so while `GEV_PREFER_CODEX_OAUTH` pins OpenAI to ChatGPT OAuth it refuses with `503` (`CODEX_OAUTH_REQUIRED`) rather than spend the key. After the provider refuses the key or account (a `401`, a `403`, Gemini's `400` `API_KEY_INVALID` or OpenAI's `429` `insufficient_quota`), a route stops sending that key upstream for a minute, or until the key changes.
 - **ChatGPT OAuth voice reuses the local Codex sign-in.** `/api/realtime/oauth-status`, `/api/realtime/oauth-login` and `/api/realtime/token?auth=oauth` answer only loopback connections, behind the same cross-site gate as the token endpoint; the login route also refuses a foreign `Origin`. None of them returns the access token. The login route runs `codex login` (or the executable named by `CODEX_BIN`) with an allowlisted environment that leaves out GEV's provider keys, keeps one attempt pending at a time and cancels it after two minutes or when the server stops. **Limits:** any program on this machine that can reach the server can mint Realtime sessions on the signed-in ChatGPT account, as it can with the API key; a local reverse proxy that hides the client's address defeats the loopback check; and OpenAI has not documented this use of Codex credentials for Realtime, so it may stop working or fall outside the account's terms.
 
+## Deployment model
+
+GEV is built for **one person running it on their own machine** — the same
+machine that will be the only client, under one OS account. It is not a
+hardened multi-tenant or shared-host service, and the points below are
+consequences of that assumption rather than gaps to close with more code:
+
+- **Upstream sources are fixed and operator-trusted.** The vessel (MPB) and
+  traffic feeds are the official endpoints `DATA_SOURCES.md` lists, not
+  attacker-reachable inputs. `server/providers/vessels/mpb-taiwan.js` and
+  `server/providers/traffic/taiwan-traffic.js` accumulate the upstream
+  response (`Buffer.concat`, `response.text()`) without a cap on total
+  received bytes; the existing controls are the fixed source and the request
+  timeout, not a byte ceiling. This is an accepted limitation, not a defense
+  against a hostile upstream — if a deployment ever needs to point these
+  providers at a source it does not fully trust, add an explicit cap first.
+- **PAT storage trusts the single OS user running the process.** The advisor
+  token file (`createTokenStore` in `server/providers/ai/ollama-advisor.js`)
+  opens the terminal file with `O_NOFOLLOW` and a `0600` mode check, which
+  guards that one file; it does not independently verify every directory in
+  the path above it. On a machine where another account can write into that
+  parent chain, that account can redirect the path (for example via a
+  symlink) to read or replace the token file itself — not merely "influence
+  where it resolves." This is fine on the assumed single-user machine and is
+  **not supported** on a
+  shared or multi-tenant host — do not point `GEV_KEY_SETUP_TRUSTED_PEERS` or
+  the token store path at a shared filesystem without first adding that
+  verification.
+
 ## Network exposure — the operator threat model
 
 The dev server is a **key broker**: every server-side key above is spendable by anyone who can send HTTP requests to it. That shapes the defaults:

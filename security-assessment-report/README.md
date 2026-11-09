@@ -1,6 +1,14 @@
 # A24 戰情台安全評估 HTML 報告
 
-版本：1.5.0（2026-11-09 同日第六輪後續session更新；v1.0.0/v1.1.0/v1.2.0/v1.3.0/v1.4.0原文見下方「版本歷史」）。**產品安全評估仍為 INCOMPLETE，無發布放行。** F-001／F-002／F-003已修補，C-002已由開發/維護者正式接受風險（confirmation_status技術上仍維持NEEDS_VALIDATION），C-003已補父目錄symlink檢查作為部分緩解（remediation_status=PARTIAL_MITIGATION，confirmation_status仍維持NEEDS_VALIDATION），C-004仍維持NEEDS_VALIDATION。SDD 紀錄：v1.0.0文件曾稱其記錄位於`sdd/archive/2026-11-09-a24-security-html-report/`，但核實該路徑不存在，無法追溯；v1.1.0～v1.4.0改版已分別歸檔於`sdd/archive/2026-11-09-update-security-report-v1.1/`、`sdd/archive/2026-11-09-update-security-report-v1.2/`、`sdd/archive/2026-11-09-update-security-report-v1.3/`、`sdd/archive/2026-11-09-accept-risk-c002/`；v1.5.0改版的SDD提案目前在`sdd/fix-pat-parent-symlink/`（尚未歸檔）。
+版本：1.6.0（2026-11-09 同日第七輪後續session更新；v1.0.0～v1.5.0原文見下方「版本歷史」）。**產品安全評估仍為 INCOMPLETE，無發布放行。** F-001／F-002／F-003已修補，C-002已由開發/維護者正式接受風險，C-003已補父目錄symlink檢查作為部分緩解（remediation_status=PARTIAL_MITIGATION），C-004仍維持NEEDS_VALIDATION；三者confirmation_status均維持NEEDS_VALIDATION，新增的OBS-005（AI驅動diff安全掃描，未發現具體漏洞）也不改變這點。SDD 紀錄：v1.0.0文件曾稱其記錄位於`sdd/archive/2026-11-09-a24-security-html-report/`，但核實該路徑不存在，無法追溯；v1.1.0～v1.5.0改版已分別歸檔於`sdd/archive/2026-11-09-update-security-report-v1.1/`、`sdd/archive/2026-11-09-update-security-report-v1.2/`、`sdd/archive/2026-11-09-update-security-report-v1.3/`、`sdd/archive/2026-11-09-accept-risk-c002/`、`sdd/archive/2026-11-09-fix-pat-parent-symlink/`；v1.6.0改版的SDD提案目前在`sdd/add-automated-scan-obs/`（尚未歸檔）。
+
+## v1.6.0 更新了什麼（不是只改雜湊）
+
+本次無程式碼變更，`product_commit`維持`cc53107`。
+
+- **新增OBS-005（AI驅動diff安全掃描）**：對origin/HEAD(375dfa7)到本機main(2bdec8a)的10個commit diff跑Claude Code `/security-review`，檢查5類（輸入驗證、認證授權、加密密鑰管理、注入/RCE、資料暴露），明確排除DoS/資源耗盡、磁碟secrets儲存、rate limiting。結果：未發現符合信心門檻（>80%）的具體漏洞，完整記錄見`qa/automated-review-2026-11-09.md`（SRC-059）。
+- **不改變任何candidate risk**：此掃描明確排除DoS/資源耗盡，C-002完全不在評估範圍內；C-003的殘留TOCTOU間隙被掃描辨識為「已知並接受的風險」而非新漏洞，不等於問題已解決；C-004（代理路由契約）不屬於這5個檢查類別，未被觸及。C-002/C-003/C-004的confirmation_status均維持NEEDS_VALIDATION。
+- **本次未做、仍是缺口**：Standalone建置、受控瀏覽器DOM、Docker實體拓樸、真模型／真上游測試；happy-dom的2筆dev相依漏洞；C-004完整路由責任契約文件；人工滲透測試（這次是AI診diff審查，不是形式化稽核），`overall_status`維持`INCOMPLETE`。
 
 ## v1.5.0 更新了什麼（不是只改雜湊）
 
@@ -55,6 +63,7 @@
 - **v1.3.0**（2026-11-09同日第四輪後續session）：見上「v1.3.0 更新了什麼」。
 - **v1.4.0**（2026-11-09同日第五輪後續session）：見上「v1.4.0 更新了什麼」。
 - **v1.5.0**（2026-11-09同日第六輪後續session）：見上「v1.5.0 更新了什麼」。
+- **v1.6.0**（2026-11-09同日第七輪後續session）：見上「v1.6.0 更新了什麼」。
 - **v1.4.0**（2026-11-09同日第五輪後續session）：見上「v1.4.0 更新了什麼」。
 
 ## 開啟報告
@@ -63,9 +72,11 @@
 
 內容包括管理摘要、範圍方法、攻擊面／信任邊界、F-001 與三項候選、其他觀察、原 15 情境、改善交接及證據附錄。可搜尋／篩選、展開節錄、暫停動畫及列印。JavaScript 停用時核心內容與安全節錄仍靜態存在。
 
-HTML 可單獨攜出閱讀；完整證據檔沒有嵌入。來源相對連結需要保留本工作區的資料夾結構。來源索引記錄58份選取檔案的SHA-256（v1.0.0為45份，v1.1.0新增7份，v1.2.0新增5份，v1.3.0新增1份；v1.4.0無新增；v1.5.0重新雜湊既有SRC-041/SRC-046，未新增筆數），不是數位簽章或整個歷史執行範圍的證明。
+HTML 可單獨攜出閱讀；完整證據檔沒有嵌入。來源相對連結需要保留本工作區的資料夾結構。來源索引記錄59份選取檔案的SHA-256（v1.0.0為45份，v1.1.0新增7份，v1.2.0新增5份，v1.3.0新增1份；v1.4.0無新增；v1.5.0重新雜湊既有SRC-041/SRC-046，未新增筆數；v1.6.0新增SRC-059），不是數位簽章或整個歷史執行範圍的證明。
 
 ## QA 結果與限制
+
+v1.6.0 新增 `qa/check_v1.6.py`，取代`check_v1.5.py`作為目前版本的通用稽核（全部PASS，見`qa/check-v1.6-audit.json`）。`qa/check_v1.5.py`／更早版本的metadata版本斷言依序從各自下一版起預期失敗（檔頭已補註記）。
 
 v1.5.0 新增 `qa/check_v1.5.py`，取代`check_v1.4.py`作為目前版本的通用稽核：來源雜湊/連結、證據節錄逐字核對、15情境原名不變、v1.5.0應有事實（GEV-C-003的remediation_status=PARTIAL_MITIGATION且引用EV-C003-FIX-CODE/TEST、C-002/C-004未被連帶誤標PARTIAL_MITIGATION、product_commit=cc53107等）全部PASS，見`qa/check-v1.5-audit.json`。`qa/check_v1.4.py`／`check_v1.3.py`／`check_v1.2.py`／`check_v1.1.py`的metadata版本斷言分別從v1.5.0／v1.4.0／v1.3.0／v1.2.0起預期失敗（檔頭已補註記），但其餘通用檢查section仍應通過——這證明每次改版沒有意外改壞前一版已確立的事實，只是版本號本身往前移。`qa/check_task7.py`與`qa/task4-dom.mjs`／`task5-diagrams.mjs`／`task6-coverage.mjs`／`task8-final.mjs`釘死在v1.0.0的具體內容，從v1.1.0起預期會失敗，各檔頭已加註記；這些都是版本釘死的歷史稽核，不是未知迴歸。
 

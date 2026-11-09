@@ -534,14 +534,14 @@
    "id": "SRC-041",
    "path": "1151104_gods-eye-view/repo/server/providers/ai/ollama-advisor.js",
    "href": "../../1151104_gods-eye-view/repo/server/providers/ai/ollama-advisor.js",
-   "sha256": "852ce4b4e547670eda1b2f0ab6eb573cb974d80bf98641834c390eef105a6562",
-   "size_bytes": 11965,
+   "sha256": "e014eca424383e675cd44ea887b7d80c0f607170e0a5b647fe4978ef2c2eaae3",
+   "size_bytes": 12876,
    "role": "product_source",
    "source_run": null,
    "locator": {
     "kind": "lines",
-    "start": 47,
-    "end": 47,
+    "start": 66,
+    "end": 66,
     "anchor_text": "export function createTokenStore("
    },
    "summary": "PAT終端讀取、權限、父目錄symlink檢查(2026-11-09新增)與旋轉流程；僅節錄程式碼",
@@ -619,14 +619,14 @@
    "id": "SRC-046",
    "path": "1151104_gods-eye-view/repo/server/providers/ai/ollama-advisor.test.mjs",
    "href": "../../1151104_gods-eye-view/repo/server/providers/ai/ollama-advisor.test.mjs",
-   "sha256": "848aec4c07df4b70cf3255a253a4a515129999bee6c89b4afa6b6a907b8ef926",
-   "size_bytes": 31231,
+   "sha256": "b755b02137ab35bc0b7243fb1e78301864a2aae11b6f64c34c249ce7f1768c5a",
+   "size_bytes": 32761,
    "role": "current_observation",
    "source_run": null,
    "locator": {
     "kind": "lines",
-    "start": 867,
-    "end": 867,
+    "start": 906,
+    "end": 906,
     "anchor_text": "test('vessel count 5 is rejected when the context holds only 2 vessels (GEV-F-001)', () => {"
    },
    "summary": "2026-11-09新增回歸測試：真實總數2時，5與3被拒、2通過；還原修補後會轉紅，證明鑑別力",
@@ -687,8 +687,8 @@
    "id": "SRC-050",
    "path": "1151104_gods-eye-view/repo/SECURITY.md",
    "href": "../../1151104_gods-eye-view/repo/SECURITY.md",
-   "sha256": "9094d272edfca6aa3b19c58d05fc16d898c89d0049e707bf334009710142825c",
-   "size_bytes": 29644,
+   "sha256": "15a01a7ea2743994396be6ecc4665ffbcd3d1acd410a4081a44c8563612d405e",
+   "size_bytes": 29976,
    "role": "derived_record",
    "source_run": null,
    "locator": {
@@ -823,8 +823,8 @@
    "id": "SRC-058",
    "path": "1151104_gods-eye-view/repo/src/tools/queries/panelRequestRealHandlers.test.mjs",
    "href": "../../1151104_gods-eye-view/repo/src/tools/queries/panelRequestRealHandlers.test.mjs",
-   "sha256": "f92f6ae7986e47c264e74962fbbf20ad92a63d27e5226a247e82168f08f71504",
-   "size_bytes": 4371,
+   "sha256": "e29fb993f3eaef017383629b2299f357595db87ecc6dfa459e570e4a989700a7",
+   "size_bytes": 5289,
    "role": "current_observation",
    "source_run": null,
    "locator": {
@@ -851,6 +851,40 @@
     "anchor_text": "# 自動化安全掃描記錄（2026-11-09）"
    },
    "summary": "Claude Code security-review對10個commit diff的AI驅動安全掃描記錄，未發現符合條件的具體漏洞",
+   "embed_policy": "selected_safe_excerpt_only"
+  },
+  {
+   "id": "SRC-060",
+   "path": "1151104_gods-eye-view/security-assessment-report/qa/c004-route-contract.mjs",
+   "href": "../../1151104_gods-eye-view/security-assessment-report/qa/c004-route-contract.mjs",
+   "sha256": "a3a8a06891e2980c8187e86a648e05f98980c18aba773533360baa9a72b68e7e",
+   "size_bytes": 5238,
+   "role": "current_observation",
+   "source_run": null,
+   "locator": {
+    "kind": "lines",
+    "start": 1,
+    "end": 1,
+    "anchor_text": "// Re-derives, by actually CALLING the real panelRequest tool (never by"
+   },
+   "summary": "實際呼叫真實panelRequest工具，枚舉全部已掛載路由並分類是否有獨立auth gate",
+   "embed_policy": "selected_safe_excerpt_only"
+  },
+  {
+   "id": "SRC-061",
+   "path": "1151104_gods-eye-view/security-assessment-report/qa/c004-route-contract.json",
+   "href": "../../1151104_gods-eye-view/security-assessment-report/qa/c004-route-contract.json",
+   "sha256": "2bce03e5ce8a228a775b2d17fb6dfbbaaa98b9164af3751b8bbf23a11a589624",
+   "size_bytes": 8896,
+   "role": "current_observation",
+   "source_run": null,
+   "locator": {
+    "kind": "lines",
+    "start": 1,
+    "end": 1,
+    "anchor_text": "{"
+   },
+   "summary": "路由契約稽核結果：54條已掛載路由，9條被panelRequest拒絕，45條放行中僅5條有獨立門控",
    "embed_policy": "selected_safe_excerpt_only"
   }
  ]

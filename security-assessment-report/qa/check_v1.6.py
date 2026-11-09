@@ -12,6 +12,11 @@ result of a Claude Code AI-driven diff security review (no high-confidence
 findings in 10 commits' diff). product_commit is unchanged from v1.5.0
 (cc53107); only data_version/report_version move. One new source
 (SRC-059, qa/automated-review-2026-11-09.md) was added.
+
+UPDATE (v1.7.0, same day): section 6's exact-metadata assertions
+(data_version==1.6.0, product_commit==cc53107) are now PINNED TO v1.6.0 and
+EXPECTED TO FAIL from v1.7.0 onward. Sections 1-5 are still generic and
+should still pass. See qa/check_v1.7.py for the current version's audit.
 """
 from pathlib import Path
 import hashlib

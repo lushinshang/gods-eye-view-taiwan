@@ -1,14 +1,14 @@
 {
  "metadata": {
-  "data_version": "1.6.0",
+  "data_version": "1.7.0",
   "implementation_stage": "TASK_8_DELIVERED_WITH_QA_LIMITATIONS",
   "language": "zh-Hant-TW",
   "title": "A24 戰情台安全評估報告",
   "subtitle": "紅隊導向攻擊面分析與原生 macOS 受控驗證",
-  "cutoff_label": "截至 Review 45、2026-11-09 交接文件勘誤，以及同日七輪後續session（F-001/vite/主動測試/413死碼修補、v1.1.0改版、記憶體監控與PAT畫面隱藏、C-004正向對照測試、C-002風險接受、C-003父目錄symlink檢查、AI驅動diff安全掃描）",
+  "cutoff_label": "截至 Review 45、2026-11-09 交接文件勘誤，以及同日八輪後續session（F-001/vite/主動測試/413死碼修補、v1.1.0改版、記憶體監控與PAT畫面隱藏、C-004正向對照測試、C-002風險接受、C-003父目錄symlink檢查、AI驅動diff安全掃描、C-003 owner/world-writable檢查與C-004全路由契約稽核）",
   "prepared_date": "2026-11-09",
   "timezone": "Asia/Taipei",
-  "product_commit": "cc53107",
+  "product_commit": "d348fb4",
   "working_tree_status": "DIRTY_HISTORICAL_TRACKED_PYC_DELETIONS",
   "overall_status": "INCOMPLETE",
   "release_authorization": false,
@@ -315,7 +315,8 @@
      "read以O_NOFOLLOW開啟終端檔，要求一般檔案且mode為0600。",
      "rotate使用暫存檔與rename；既有測試支持0644及損毀JSON拒絕、旋轉恢復。",
      "修補前：同UID父目錄symlink會被解析，目標0600檔案建立且canary保留。",
-     "已於commit cc53107新增assertNoSymlinkAncestors：read()/rotate()都會從檔案往上逐層lstat到root，發現symlink即拒絕；新增回歸測試確認父目錄為symlink時rotate丟GEV_PARENT_SYMLINK、read回報未設定，正常父目錄行為不變。"
+     "已於commit cc53107新增assertNoSymlinkAncestors：read()/rotate()都會從檔案往上逐層lstat到root，發現symlink即拒絕；新增回歸測試確認父目錄為symlink時rotate丟GEV_PARENT_SYMLINK、read回報未設定，正常父目錄行為不變。",
+     "已於commit 5ccccc2擴充為assertTrustedAncestors：在既有symlink檢查之外，新增owner(POSIX uid)比對與world-writable(mode & 0o002)檢查，任一違反即拒絕；新增2筆測試(world-writable目錄被拒、owner不符時用mock lstatSync驗證拒絕邏輯)。SECURITY.md同步更新：明確宣告不支援多使用者/共享主機部署，不是「盡力而為」的假設。"
     ],
     "reproduction": {
      "kind": "DOCUMENTED_EXISTING_OBSERVATION",
@@ -341,7 +342,8 @@
      "0777沒有作為已測變體；本機同UID信任前提不是程式碼強制隔離。",
      "SECURITY.md已於2026-11-09新增Deployment model段落，文件化PAT儲存假設單一OS使用者、不支援共享主機；補文件不等於新增父目錄鏈驗證，風險判斷不變。",
      "新增的assertNoSymlinkAncestors只是單次lstat，檢查完到實際open/write之間理論上仍有極小的競態窗口（TOCTOU），不構成完整防護；報告自身acceptance_criteria已承認補強父鏈不自動關閉候選。",
-     "只覆蓋ollama-advisor.js的createTokenStore，不包含server/mcp/panelKey.js（MCP panel key）或server/standalone/key-setup.js（.env store）等其他也寫入檔案系統的程式碼路徑——那些不在C-003的finding範圍內，風險判斷各自獨立。"
+     "只覆蓋ollama-advisor.js的createTokenStore，不包含server/mcp/panelKey.js（MCP panel key）或server/standalone/key-setup.js（.env store）等其他也寫入檔案系統的程式碼路徑——那些不在C-003的finding範圍內，風險判斷各自獨立。",
+     "owner檢查無法在這個sandbox實測：環境只有單一真實UID，沒有第二個真實使用者帳號可以模擬跨使用者攻擊；owner不符的拒絕邏輯只用mock lstatSync驗證過，不是真實跨UID的端到端證據。acceptance_criteria裡「若跨UID屬支援範圍需在有授權環境證明」這條因此仍未達成——我們改成「宣告不支援多使用者」來迴避這個要求，但這代表confirmation_status仍不能說「已確認安全」。"
     ],
     "recommendations": [
      "明定支援單使用者或共享主機的部署模型與PAT路徑擁有者。",
@@ -398,7 +400,7 @@
     "cvss": null,
     "rationale": "已有特定負向防護證據，但合法正控制及完整副作用量測不足；既不能判繞過，也不能判全路由安全。"
    },
-   "remediation_status": "PENDING_VALIDATION",
+   "remediation_status": "PARTIAL_MITIGATION",
    "owner": null,
    "scenario_ids": [
     "GEV-06",
@@ -413,7 +415,9 @@
     "SRC-044",
     "SRC-041",
     "SRC-025",
-    "SRC-058"
+    "SRC-058",
+    "SRC-060",
+    "SRC-061"
    ],
    "content_state": "DRAFT_CONTENT_COMPLETE",
    "details": {
@@ -430,7 +434,8 @@
      "產品註解明示key不是access control；可讀panel的MCP client可以取得。",
      "代理僅轉送accept／content-type；指定路由由proxy阻斷或由真handler拒絕。",
      "既有指定負向案例中，advisor client與token rotate計數為0；Gemini provider未全面計數。",
-     "2026-11-09新增panelRequestRealHandlers.test.mjs：對真實/api/cctv/sources的正向對照成功（200，真實資料，非mock）；對真實/api/taiwan-ai-status（無憑證）的負向案例收到401，確認來自下游handler的isLocalBrowser/PAT檢查，不是panelRequest工具層的REFUSED_PATHS。原報告run-34/35引用的同類負向觀察在repo裡找不到對應已提交測試，此次是永久化版本，不是沿用舊證據。"
+     "2026-11-09新增panelRequestRealHandlers.test.mjs：對真實/api/cctv/sources的正向對照成功（200，真實資料，非mock）；對真實/api/taiwan-ai-status（無憑證）的負向案例收到401，確認來自下游handler的isLocalBrowser/PAT檢查，不是panelRequest工具層的REFUSED_PATHS。原報告run-34/35引用的同類負向觀察在repo裡找不到對應已提交測試，此次是永久化版本，不是沿用舊證據。",
+     "2026-11-09新增qa/c004-route-contract.mjs：實際呼叫真實panelRequest工具(不是手抄REFUSED_PATHS regex)，枚舉repo裡全部54個已掛載路由。結果：panelRequest拒絕9條；放行45條中，只有5條有獨立門控——3條(/api/taiwan-ai-advisor、-status、-token)用isLocalBrowser+PAT，2條(/api/mapillary/status、/tiles)用sameSiteGated；其餘40條完全沒有獨立auth gate，只依賴panelRequest的黑名單加loopback-only網路曝露模型。新增實測證明sameSiteGated對panel_request路徑沒有防護力：該gate明確放行loopback非瀏覽器呼叫，實測/api/mapillary/status回200而不是403。"
     ],
     "reproduction": {
      "kind": "DOCUMENTED_EXISTING_OBSERVATION",
@@ -454,7 +459,7 @@
      "PassThrough不是獨立socket服務。",
      "token verify固定false；公開tracks正控制為mock；Gemini實際provider呼叫未全面計數。",
      "合法PAT在來源呼叫存在，不表示會通過proxy白名單；不得假設Authorization被轉送。",
-     "只補了1條路由（/api/cctv/sources）的正向對照，不是「每個核准路由」的完整契約；仍缺路由責任文件（哪些路由proxy負責拒絕、哪些下游負責准入），C-004不能因此關閉。"
+     "已完整枚舉並分類全部45條放行路由的門控狀態(有門控/無門控)，但只對3種代表性情境做了真實端到端測試(無門控的/api/cctv/sources、sameSiteGated的/api/mapillary/status、PAT門控的/api/taiwan-ai-status)；其餘約37條「無獨立門控」的路由沒有逐條做正向對照測試，只是結構上確認它們跟/api/cctv/sources同一類——仍缺「每個核准路由」逐條的下游行為驗證，C-004不能因此關閉。"
     ],
     "recommendations": [
      "逐路由明定proxy負責拒絕與下游負責准入的契約；不把取得panelKey本身列成認證繞過。",
@@ -471,7 +476,9 @@
      "EV-C004-HEADERS",
      "EV-C004-OBS",
      "EV-C004-POSITIVE",
-     "EV-C004-NEGATIVE-REAL"
+     "EV-C004-SAMESITE",
+     "EV-C004-NEGATIVE-REAL",
+     "EV-C004-ROUTE-CONTRACT"
     ],
     "source_refs": [
      "SRC-044",
@@ -480,7 +487,9 @@
      "SRC-025",
      "SRC-011",
      "SRC-006",
-     "SRC-058"
+     "SRC-058",
+     "SRC-060",
+     "SRC-061"
     ],
     "owner_label": "待指定",
     "target_date": null,
@@ -1534,7 +1543,7 @@
      {
       "title": "目前判斷",
       "paragraphs": [
-       "本次評估已確認一項 Grounding 邏輯缺陷並已修補，另確認並修補兩項本次新發現的問題（vite已知CVE、API錯誤回應死碼），並取得部分本機准入、PAT 生命週期、代理隔離、取消恢復、受控建置及六面向主動動態測試的驗證證據。三項候選風險中，C-002 已由開發/維護者正式接受風險；C-003 已補上父目錄symlink檢查作為部分緩解（PARTIAL_MITIGATION），但只是單次lstat、不構成完整TOCTOU防護；C-004 仍需釐清部署前提與產品契約。三者confirmation_status技術上均維持NEEDS_VALIDATION，補程式碼或補文件都不等於風險解除。完整主 App、目前受控瀏覽器流程及 Docker 實體拓樸、真模型／真上游測試尚未完成，現有證據仍不足以支持整體安全驗收或發布放行。"
+       "本次評估已確認一項 Grounding 邏輯缺陷並已修補，另確認並修補兩項本次新發現的問題（vite已知CVE、API錯誤回應死碼），並取得部分本機准入、PAT 生命週期、代理隔離、取消恢復、受控建置及六面向主動動態測試的驗證證據。三項候選風險均維持NEEDS_VALIDATION：C-002 已由開發/維護者正式接受風險；C-003 已補父目錄symlink/owner/world-writable三項檢查，remediation_status為PARTIAL_MITIGATION；C-004 已完整枚舉並分類全部45條核准路由的門控狀態，remediation_status同為PARTIAL_MITIGATION，但三者均未達到技術上「已確認安全」的門檻。完整主 App、目前受控瀏覽器流程及 Docker 實體拓樸、真模型／真上游測試尚未完成，現有證據仍不足以支持整體安全驗收或發布放行。"
       ],
       "source_refs": [
        "SRC-003",
@@ -1584,7 +1593,7 @@
      {
       "title": "仍待確認的風險",
       "paragraphs": [
-       "C-002（上游回應缺少累積位元組上限）已由開發/維護者於2026-11-09正式接受風險（risk_acceptance.accepted=true）：上游為固定、受信任官方來源，且已有系統記憶體監控（OBS-003）作為可觀察/預警手段，單人自架部署情境下不再要求額外byte上限；若未來改為多租戶或不受信任上游，此接受失效需重新評估。技術上confirmation_status仍維持NEEDS VALIDATION（風險接受是業務決定，不等於技術上已確認無風險）。C-003（PAT父目錄鏈）已於commit cc53107新增assertNoSymlinkAncestors，read()/rotate()都會檢查父目錄鏈是否含symlink並拒絕；remediation_status更新為PARTIAL_MITIGATION，但這只是單次lstat，不是完整TOCTOU防護，也只覆蓋ollama-advisor.js一處，confirmation_status仍維持NEEDS VALIDATION。C-004 關注代理敏感路由的責任及副作用邊界，維持NEEDS VALIDATION。SECURITY.md已新增Deployment model段落文件化C-002與C-003的既有信任假設（commit 375dfa7）。另OBS-002（Docker閘道信任）機制已查明是docker-start.mjs開機時主動設定，非意外；部署拓樸層面風險判斷仍待確認。另對本次session的10個commit diff跑過Claude Code AI驅動安全掃描（OBS-005），未發現符合條件的具體漏洞，但該掃描明確排除DoS/資源耗盡（C-002不在評估範圍），也不涉及代理路由契約（C-004），三項候選風險的confirmation_status均不受影響。已知程式行為不足以直接證明可利用的阻斷服務、跨使用者越權或完整授權繞過。"
+       "C-002（上游回應缺少累積位元組上限）已由開發/維護者正式接受風險，confirmation_status技術上仍維持NEEDS_VALIDATION。C-003（PAT父目錄鏈）已擴充assertTrustedAncestors，除symlink外新增owner(POSIX uid)與world-writable檢查，remediation_status為PARTIAL_MITIGATION；owner檢查無法在單一真實UID的環境實測跨使用者攻擊，只用mock驗證邏輯，confirmation_status維持NEEDS_VALIDATION。C-004（代理路由責任契約）已用qa/c004-route-contract.mjs實際呼叫真實panelRequest工具枚舉全部54條已掛載路由：9條被拒絕，45條放行中僅5條有獨立門控（3條isLocalBrowser+PAT、2條sameSiteGated——後者對panel_request路徑並無防護力，已實測證明），其餘40條完全依賴panelRequest黑名單加loopback-only網路曝露模型，僅3種代表情境做過真實端到端測試；remediation_status為PARTIAL_MITIGATION，confirmation_status維持NEEDS_VALIDATION。三者均無新確認之可利用缺陷，但也都未達成報告自身acceptance_criteria要求的完整技術驗證。另對本次session的commit diff跑過Claude Code AI驅動安全掃描（OBS-005），未發現符合條件的具體漏洞，但該掃描明確排除DoS/資源耗盡（C-002不在評估範圍），也不涉及代理路由契約（C-004）。已知程式行為不足以直接證明可利用的阻斷服務、跨使用者越權或完整授權繞過。"
       ],
       "source_refs": [
        "SRC-007",
@@ -1595,7 +1604,9 @@
        "SRC-052",
        "SRC-041",
        "SRC-046",
-       "SRC-059"
+       "SRC-059",
+       "SRC-060",
+       "SRC-061"
       ]
      },
      {
@@ -1981,9 +1992,9 @@
   }
  ],
  "document_control": {
-  "report_version": "1.6.0",
+  "report_version": "1.7.0",
   "document_status": "DELIVERABLE_WITH_QA_LIMITATIONS",
-  "data_cutoff": "2026-11-09 Asia/Taipei；至Review45、交接文件勘誤，以及同日後續七輪session",
+  "data_cutoff": "2026-11-09 Asia/Taipei；至Review45、交接文件勘誤，以及同日後續八輪session",
   "assessment_execution_dates": "2026-11-07至2026-11-09既有證據，以及2026-11-09同日三輪後續session的實際執行（EXECUTED）；不表示連續演練或完整執行窗口",
   "report_author_role": "工作區使用者授權之報告整理；Codex協助",
   "endorsement": null,
@@ -2175,15 +2186,15 @@
   {
    "id": "EV-C003-READ",
    "source_ref": "SRC-041",
-   "label": "終端O_NOFOLLOW與0600檢查（2026-11-09新增父目錄symlink檢查呼叫）",
+   "label": "終端O_NOFOLLOW與0600檢查（2026-11-09新增父目錄鏈檢查呼叫）",
    "locator": {
     "kind": "lines",
-    "start": 52,
-    "end": 59
+    "start": 71,
+    "end": 78
    },
    "format": "text",
-   "text": "    let fd;\n    try {\n      assertNoSymlinkAncestors(file, root);\n      fd = fs.openSync(file, fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW);\n      const stat = fs.fstatSync(fd);\n      if (!stat.isFile() || (stat.mode & 0o777) !== 0o600) return null;\n      const value = JSON.parse(fs.readFileSync(fd, 'utf8'));\n      return /^[a-f0-9]{64}$/.test(value.sha256) ? value : null;",
-   "qualification": "只作用於終端元件＋父目錄鏈（單次lstat）；不是完整TOCTOU防護，不證明跨UID隔離。",
+   "text": "    let fd;\n    try {\n      assertTrustedAncestors(file, root);\n      fd = fs.openSync(file, fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW);\n      const stat = fs.fstatSync(fd);\n      if (!stat.isFile() || (stat.mode & 0o777) !== 0o600) return null;\n      const value = JSON.parse(fs.readFileSync(fd, 'utf8'));\n      return /^[a-f0-9]{64}$/.test(value.sha256) ? value : null;",
+   "qualification": "只作用於終端元件＋父目錄鏈（單次lstat）；不是完整TOCTOU防護，不證明跨UID越權攻擊（只有單一真實UID可測）。",
    "contains_only": "non_secret_product_code",
    "render_as": "plain_text"
   },
@@ -2329,8 +2340,8 @@
    "label": "回歸測試：總數2時5與3被拒、2通過",
    "locator": {
     "kind": "lines",
-    "start": 867,
-    "end": 876
+    "start": 906,
+    "end": 915
    },
    "format": "text",
    "text": "test('vessel count 5 is rejected when the context holds only 2 vessels (GEV-F-001)', () => {\n  const q = '基隆港 貨輪 >15kt';\n  const fx = fixtures();\n  fx.vessels.rows = [vessel(), vessel(1)];\n  const p = buildPrompt(retrieve({ ...fx, query: q }), q);\n  assert.equal(p.context.vessels.length, 2);\n  assert.equal(p.context.summary.total_vessels, 2);\n  assert.equal(validateGrounding('目前共有 2 艘。', p), true);\n  assert.equal(validateGrounding('目前共有 3 艘。', p), false);\n  assert.equal(validateGrounding('目前共有 5 艘。', p), false);",
@@ -2341,15 +2352,15 @@
   {
    "id": "EV-C003-FIX-CODE",
    "source_ref": "SRC-041",
-   "label": "新增父目錄symlink檢查函式（2026-11-09部分緩解）",
+   "label": "父目錄鏈檢查函式：symlink＋owner＋world-writable（2026-11-09擴充）",
    "locator": {
     "kind": "lines",
-    "start": 23,
-    "end": 45
+    "start": 28,
+    "end": 64
    },
    "format": "text",
-   "text": "function assertNoSymlinkAncestors(file, root) {\n  let dir = path.dirname(file);\n  while (dir !== root && dir !== path.dirname(dir)) {\n    let entry;\n    try {\n      entry = fs.lstatSync(dir);\n    } catch (error) {\n      if (error.code === 'ENOENT') {\n        dir = path.dirname(dir);\n        continue;\n      }\n      throw error;\n    }\n    if (entry.isSymbolicLink()) {\n      const error = new Error(\n        'refusing to use a PAT store whose parent directory is a symlink',\n      );\n      error.code = 'GEV_PARENT_SYMLINK';\n      throw error;\n    }\n    dir = path.dirname(dir);\n  }\n}",
-   "qualification": "靜態程式碼；已於commit cc53107新增；只是單次lstat，不是完整TOCTOU防護，不能據此宣稱C-003已解決。",
+   "text": "function assertTrustedAncestors(file, root) {\n  const uid = process.getuid?.();\n  let dir = path.dirname(file);\n  while (dir !== root && dir !== path.dirname(dir)) {\n    let entry;\n    try {\n      entry = fs.lstatSync(dir);\n    } catch (error) {\n      if (error.code === 'ENOENT') {\n        dir = path.dirname(dir);\n        continue;\n      }\n      throw error;\n    }\n    const refuse = (code, message) => {\n      const error = new Error(message);\n      error.code = code;\n      throw error;\n    };\n    if (entry.isSymbolicLink())\n      refuse(\n        'GEV_PARENT_SYMLINK',\n        'refusing to use a PAT store whose parent directory is a symlink',\n      );\n    if (uid !== undefined && entry.uid !== uid)\n      refuse(\n        'GEV_PARENT_UNTRUSTED_OWNER',\n        'refusing to use a PAT store whose parent directory is owned by a different user',\n      );\n    if ((entry.mode & 0o002) !== 0)\n      refuse(\n        'GEV_PARENT_WORLD_WRITABLE',\n        'refusing to use a PAT store whose parent directory is world-writable',\n      );\n    dir = path.dirname(dir);\n  }\n}",
+   "qualification": "靜態程式碼；已於commit 5ccccc2擴充（原commit cc53107只有symlink檢查）；只是單次lstat，不是完整TOCTOU防護；owner檢查在這個環境只有單一真實UID，只能用mock驗證邏輯，沒有真正跨使用者攻擊測試，不能據此宣稱C-003已解決。",
    "contains_only": "non_secret_product_code",
    "render_as": "plain_text"
   },
@@ -2504,18 +2515,60 @@
    "render_as": "plain_text"
   },
   {
+   "id": "EV-C004-SAMESITE",
+   "source_ref": "SRC-058",
+   "label": "sameSiteGated不擋panel_request：mapillary/status實測200",
+   "locator": {
+    "kind": "lines",
+    "start": 94,
+    "end": 109
+   },
+   "format": "text",
+   "text": "test('GEV-C-004: sameSiteGated on /api/mapillary/status does not block panel_request (loopback tool call, not a cross-site browser)', async (t) => {\n  // mapillary.js wraps its status handler in sameSiteGated, a DIFFERENT gate\n  // from isLocalBrowser/PAT: it refuses cross-site BROWSER requests (foreign\n  // Origin, Sec-Fetch-Site) but explicitly passes loopback non-browser\n  // callers through. panelRequest's own fetch to the app's server is such a\n  // caller, so this route has NO independent defense against the panel\n  // path specifically — only against a malicious webpage calling it directly.\n  const catalog = await startRealServer(t);\n  const { data } = await catalog.call('panel_request', {\n    key: KEY,\n    path: '/api/mapillary/status',\n  });\n  assert.equal(data.status, 200);\n  const body = JSON.parse(new TextDecoder().decode(fromBase64(data.body)));\n  assert.equal(body.configured, false);\n});",
+   "qualification": "證明sameSiteGated這個額外的cross-site瀏覽器門控，對panel_request這條路徑沒有防護力——它明確放行loopback非瀏覽器呼叫，不代表這條路由對panel_request安全。",
+   "contains_only": "non_secret_product_code",
+   "render_as": "plain_text"
+  },
+  {
    "id": "EV-C004-NEGATIVE-REAL",
    "source_ref": "SRC-058",
    "label": "負向案例（已永久化）：真實taiwan-ai-status拒絕無憑證呼叫",
    "locator": {
     "kind": "lines",
-    "start": 94,
-    "end": 106
+    "start": 111,
+    "end": 123
    },
    "format": "text",
    "text": "test('negative control: the real taiwan-ai-status handler itself refuses an uncredentialed call (not panelRequest\\'s own REFUSED_PATHS)', async (t) => {\n  const catalog = await startRealServer(t);\n  // /api/taiwan-ai-status is not in panelRequest.js's REFUSED_PATHS list —\n  // the refusal below must come from the downstream handler's own gate\n  // (isLocalBrowser + PAT check), proving the tool-layer allowlist alone\n  // does not protect this route; the real handler's auth does.\n  const { data } = await catalog.call('panel_request', {\n    key: KEY,\n    path: '/api/taiwan-ai-status',\n  });\n  assert.equal(data.status, 401);\n  const body = JSON.parse(new TextDecoder().decode(fromBase64(data.body)));\n  assert.match(body.error, /Local same-origin browser or valid Bearer PAT required/);",
    "qualification": "原報告（run-34/35）引用的同類觀察在repo裡找不到對應已提交測試，這是本次新增的永久化版本，不是沿用舊證據。",
    "contains_only": "non_secret_product_code",
+   "render_as": "plain_text"
+  },
+  {
+   "id": "EV-C004-ROUTE-CONTRACT",
+   "source_ref": "SRC-061",
+   "label": "全路由契約稽核：54條已掛載，9條拒絕，45條放行中僅5條有獨立門控",
+   "locator": {
+    "kind": "json_projection",
+    "pointer": "/",
+    "fields": [
+     "total_mounted_routes",
+     "refused_by_panel_request",
+     "allowed_to_panel",
+     "allowed_with_own_auth_gate",
+     "allowed_without_own_auth_gate"
+    ]
+   },
+   "format": "json",
+   "value": {
+    "total_mounted_routes": 54,
+    "refused_by_panel_request": 9,
+    "allowed_to_panel": 45,
+    "allowed_with_own_auth_gate": 5,
+    "allowed_without_own_auth_gate": 40
+   },
+   "qualification": "由qa/c004-route-contract.mjs實際呼叫真實panelRequest工具枚舉產生，不是手抄REFUSED_PATHS regex；「有獨立門控」只代表程式碼引用了isLocalBrowser/admitKeySetupRequest/sameSiteGated這些名稱，不代表該門控對panel_request這條呼叫路徑真的有效（見EV-C004-SAMESITE，sameSiteGated就是反例）；40條without own auth gate完全依賴panelRequest的黑名單加loopback-only網路曝露模型，其中只有1條（/api/cctv/sources）有實測正向對照。",
+   "contains_only": "allowlisted_synthetic_test_results",
    "render_as": "plain_text"
   }
  ],

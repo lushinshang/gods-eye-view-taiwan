@@ -1,23 +1,23 @@
 {
-  "report_version": "1.6.0",
+  "report_version": "1.7.0",
   "scope": "Core report and selected QA deliverables; not original security evidence. Excludes manifest itself and optional raster QA files.",
   "signature": null,
   "assessment_status": "INCOMPLETE",
   "files": [
     {
       "path": "index.html",
-      "bytes": 416906,
-      "sha256": "fb31f08c061f4188eddb653cf0bb8c929d2e52b9967f402c44f73f953fccbf72"
+      "bytes": 429704,
+      "sha256": "861c3171b7122e62a5e0ded246eadb159050251ed76ac0b385f657b0d50e5cf3"
     },
     {
       "path": "report-data.json",
-      "bytes": 146927,
-      "sha256": "44aa215634067a24ace7e4bbe401b2526ab4245065a2b0d7889b52aa5beba63a"
+      "bytes": 152256,
+      "sha256": "869336f729b33e951e0267c2b839b3369d0a6f45554cb03161a9cf37ad568ec7"
     },
     {
       "path": "source-index.json",
-      "bytes": 34168,
-      "sha256": "e73b1cdcbb3be60bd362e6e155409dc586d9ba030aa07c85d1051f98c02ff27f"
+      "bytes": 35529,
+      "sha256": "85aec76a910acc0bbceca8dce020b1c54996c6b5db80deca8e85e6a08b088011"
     },
     {
       "path": "build_report.py",
@@ -26,8 +26,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 16129,
-      "sha256": "333294889bc388664982718ebeaafb2a372e62d1ad1ab0201ad8e507a6baa909"
+      "bytes": 18726,
+      "sha256": "2fcb7734bfd8721ca5af17e9837ba17ec70d08e5afa78d7c1d92a164ab3bc26d"
     },
     {
       "path": "qa/task-8-summary.json",
@@ -131,8 +131,8 @@
     },
     {
       "path": "qa/check_v1.6.py",
-      "bytes": 7443,
-      "sha256": "738b0c978bee70bdbac39654823ac0d21828d8865dbb209e9abeed3c16c67465"
+      "bytes": 7730,
+      "sha256": "19b20481e9b6708b88a55b3bd447f02b7fa8db380bee4a5f1bf5c97afca31cd8"
     },
     {
       "path": "qa/check-v1.6-audit.json",
@@ -143,6 +143,26 @@
       "path": "qa/automated-review-2026-11-09.md",
       "bytes": 3114,
       "sha256": "f72fd76f7e3712df4c589045fddcaa2b2f24281d9b8ec0b38aba67d30016a87a"
+    },
+    {
+      "path": "qa/check_v1.7.py",
+      "bytes": 8100,
+      "sha256": "40f7e0860ea15ca940a8c9b3f9d00edfe398df81d7b3984e097f6833c61e2738"
+    },
+    {
+      "path": "qa/check-v1.7-audit.json",
+      "bytes": 246,
+      "sha256": "e359c97e2aec7ecb44948a52222a558570f0452c8ed14d996fa7a24d040cb62f"
+    },
+    {
+      "path": "qa/c004-route-contract.mjs",
+      "bytes": 5238,
+      "sha256": "a3a8a06891e2980c8187e86a648e05f98980c18aba773533360baa9a72b68e7e"
+    },
+    {
+      "path": "qa/c004-route-contract.json",
+      "bytes": 8896,
+      "sha256": "2bce03e5ce8a228a775b2d17fb6dfbbaaa98b9164af3751b8bbf23a11a589624"
     }
   ]
 }

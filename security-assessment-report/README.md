@@ -1,6 +1,15 @@
 # A24 戰情台安全評估 HTML 報告
 
-版本：1.6.0（2026-11-09 同日第七輪後續session更新；v1.0.0～v1.5.0原文見下方「版本歷史」）。**產品安全評估仍為 INCOMPLETE，無發布放行。** F-001／F-002／F-003已修補，C-002已由開發/維護者正式接受風險，C-003已補父目錄symlink檢查作為部分緩解（remediation_status=PARTIAL_MITIGATION），C-004仍維持NEEDS_VALIDATION；三者confirmation_status均維持NEEDS_VALIDATION，新增的OBS-005（AI驅動diff安全掃描，未發現具體漏洞）也不改變這點。SDD 紀錄：v1.0.0文件曾稱其記錄位於`sdd/archive/2026-11-09-a24-security-html-report/`，但核實該路徑不存在，無法追溯；v1.1.0～v1.5.0改版已分別歸檔於`sdd/archive/2026-11-09-update-security-report-v1.1/`、`sdd/archive/2026-11-09-update-security-report-v1.2/`、`sdd/archive/2026-11-09-update-security-report-v1.3/`、`sdd/archive/2026-11-09-accept-risk-c002/`、`sdd/archive/2026-11-09-fix-pat-parent-symlink/`；v1.6.0改版的SDD提案目前在`sdd/add-automated-scan-obs/`（尚未歸檔）。
+版本：1.7.0（2026-11-09 同日第八輪後續session更新；v1.0.0～v1.6.0原文見下方「版本歷史」）。**產品安全評估仍為 INCOMPLETE，無發布放行。** F-001／F-002／F-003已修補。三項候選風險均維持NEEDS_VALIDATION：C-002已由開發/維護者正式接受風險；C-003新增owner/world-writable檢查（remediation_status=PARTIAL_MITIGATION）；C-004完整枚舉並分類全部45條核准路由的門控狀態（remediation_status=PARTIAL_MITIGATION），但三者均未達到技術上「已確認安全」的門檻——更多文件與測試不等於風險消除，見下方「v1.7.0 更新了什麼」。SDD 紀錄：v1.0.0文件曾稱其記錄位於`sdd/archive/2026-11-09-a24-security-html-report/`，但核實該路徑不存在，無法追溯；v1.1.0～v1.6.0改版已分別歸檔於`sdd/archive/2026-11-09-update-security-report-v1.1/`、`sdd/archive/2026-11-09-update-security-report-v1.2/`、`sdd/archive/2026-11-09-update-security-report-v1.3/`、`sdd/archive/2026-11-09-accept-risk-c002/`、`sdd/archive/2026-11-09-fix-pat-parent-symlink/`、`sdd/archive/2026-11-09-add-automated-scan-obs/`；v1.7.0改版的SDD提案目前在`sdd/close-candidate-risks-path1/`（尚未歸檔）。
+
+## v1.7.0 更新了什麼（不是只改雜湊）
+
+本報告鎖定的 commit 從 `cc53107` 更新到 `d348fb4`。期間完成並反映進本報告：
+
+- **GEV-C-003 擴充父目錄鏈檢查**：`assertNoSymlinkAncestors`改名並擴充為`assertTrustedAncestors`（commit `5ccccc2`），除symlink外新增owner(POSIX uid)與world-writable(mode & 0o002)檢查，任一違反即拒絕；新增2筆測試。SECURITY.md同步宣告正式不支援多使用者/共享主機部署。owner檢查無法在單一真實UID的環境實測跨使用者攻擊，只用mock lstatSync驗證邏輯，`confirmation_status`仍維持`NEEDS_VALIDATION`；`remediation_status`更新為`PARTIAL_MITIGATION`。
+- **GEV-C-004 全路由契約稽核**：新增`qa/c004-route-contract.mjs`（commit `d348fb4`），實際呼叫真實panelRequest工具枚舉repo裡全部54個已掛載路由：panelRequest拒絕9條；放行45條中，只有5條有獨立門控（3條isLocalBrowser+PAT、2條sameSiteGated），其餘40條完全依賴panelRequest黑名單加loopback-only網路曝露模型。新增測試證明`sameSiteGated`對panel_request路徑沒有防護力（明確放行loopback非瀏覽器呼叫，實測`/api/mapillary/status`回200）。`remediation_status`更新為`PARTIAL_MITIGATION`，但只對3種代表情境做了真實端到端測試，其餘約37條無門控路由只是結構上分類，沒有逐條測試，`confirmation_status`仍維持`NEEDS_VALIDATION`。
+- **三項候選風險都不能視為消除**：這份報告的schema只有`CONFIRMED`(確認是真缺陷)跟`NEEDS_VALIDATION`，沒有「確認安全、已排除」這個值；要真正消除候選風險只有「完整技術驗證（acceptance_criteria逐條達成）」或「正式風險接受」兩條路，C-003/C-004都只是部分推進，不是走完任何一條路。
+- **本次未做、仍是缺口**：Standalone建置、受控瀏覽器DOM、Docker實體拓樸、真模型／真上游測試；happy-dom的2筆dev相依漏洞；C-003跨UID真實攻擊測試（環境限制）；C-004其餘37條路由逐一端到端測試；人工滲透測試，`overall_status`維持`INCOMPLETE`。
 
 ## v1.6.0 更新了什麼（不是只改雜湊）
 
@@ -64,6 +73,7 @@
 - **v1.4.0**（2026-11-09同日第五輪後續session）：見上「v1.4.0 更新了什麼」。
 - **v1.5.0**（2026-11-09同日第六輪後續session）：見上「v1.5.0 更新了什麼」。
 - **v1.6.0**（2026-11-09同日第七輪後續session）：見上「v1.6.0 更新了什麼」。
+- **v1.7.0**（2026-11-09同日第八輪後續session）：見上「v1.7.0 更新了什麼」。
 - **v1.4.0**（2026-11-09同日第五輪後續session）：見上「v1.4.0 更新了什麼」。
 
 ## 開啟報告
@@ -72,9 +82,11 @@
 
 內容包括管理摘要、範圍方法、攻擊面／信任邊界、F-001 與三項候選、其他觀察、原 15 情境、改善交接及證據附錄。可搜尋／篩選、展開節錄、暫停動畫及列印。JavaScript 停用時核心內容與安全節錄仍靜態存在。
 
-HTML 可單獨攜出閱讀；完整證據檔沒有嵌入。來源相對連結需要保留本工作區的資料夾結構。來源索引記錄59份選取檔案的SHA-256（v1.0.0為45份，v1.1.0新增7份，v1.2.0新增5份，v1.3.0新增1份；v1.4.0無新增；v1.5.0重新雜湊既有SRC-041/SRC-046，未新增筆數；v1.6.0新增SRC-059），不是數位簽章或整個歷史執行範圍的證明。
+HTML 可單獨攜出閱讀；完整證據檔沒有嵌入。來源相對連結需要保留本工作區的資料夾結構。來源索引記錄59份選取檔案的SHA-256（v1.0.0為45份，v1.1.0新增7份，v1.2.0新增5份，v1.3.0新增1份；v1.4.0無新增；v1.5.0重新雜湊既有SRC-041/SRC-046，未新增筆數；v1.6.0新增SRC-059；v1.7.0新增SRC-060/SRC-061，共61份），不是數位簽章或整個歷史執行範圍的證明。
 
 ## QA 結果與限制
+
+v1.7.0 新增 `qa/check_v1.7.py`，取代`check_v1.6.py`作為目前版本的通用稽核（全部PASS，見`qa/check-v1.7-audit.json`）。
 
 v1.6.0 新增 `qa/check_v1.6.py`，取代`check_v1.5.py`作為目前版本的通用稽核（全部PASS，見`qa/check-v1.6-audit.json`）。`qa/check_v1.5.py`／更早版本的metadata版本斷言依序從各自下一版起預期失敗（檔頭已補註記）。
 

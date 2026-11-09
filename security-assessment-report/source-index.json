@@ -823,17 +823,17 @@
    "id": "SRC-058",
    "path": "1151104_gods-eye-view/repo/src/tools/queries/panelRequestRealHandlers.test.mjs",
    "href": "../../1151104_gods-eye-view/repo/src/tools/queries/panelRequestRealHandlers.test.mjs",
-   "sha256": "e29fb993f3eaef017383629b2299f357595db87ecc6dfa459e570e4a989700a7",
-   "size_bytes": 5289,
+   "sha256": "3c98b812baa57e61eaf1b078cef8453a8ee21998dd5209fbb318ae76349f0524",
+   "size_bytes": 7662,
    "role": "current_observation",
    "source_run": null,
    "locator": {
     "kind": "lines",
-    "start": 81,
-    "end": 81,
+    "start": 83,
+    "end": 83,
     "anchor_text": "test('positive control: panel_request succeeds end to end against the real cctv/sources handler', async (t) => {"
    },
-   "summary": "2026-11-09新增：panel_request對真實/api/cctv/sources的正向對照（200）與對真實/api/taiwan-ai-status的負向案例（401，來自下游非panelRequest工具層）",
+   "summary": "2026-11-09新增：panel_request對真實/api/cctv/sources的正向對照（200）與對真實/api/taiwan-ai-status的負向案例（401，來自下游非panelRequest工具層）；2026-11-09新增全面覆蓋測試：對全部40條無門控路由逐一實測reachability",
    "embed_policy": "selected_safe_excerpt_only"
   },
   {

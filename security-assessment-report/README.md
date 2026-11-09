@@ -1,6 +1,15 @@
 # A24 戰情台安全評估 HTML 報告
 
-版本：1.7.0（2026-11-09 同日第八輪後續session更新；v1.0.0～v1.6.0原文見下方「版本歷史」）。**產品安全評估仍為 INCOMPLETE，無發布放行。** F-001／F-002／F-003已修補。三項候選風險均維持NEEDS_VALIDATION：C-002已由開發/維護者正式接受風險；C-003新增owner/world-writable檢查（remediation_status=PARTIAL_MITIGATION）；C-004完整枚舉並分類全部45條核准路由的門控狀態（remediation_status=PARTIAL_MITIGATION），但三者均未達到技術上「已確認安全」的門檻——更多文件與測試不等於風險消除，見下方「v1.7.0 更新了什麼」。SDD 紀錄：v1.0.0文件曾稱其記錄位於`sdd/archive/2026-11-09-a24-security-html-report/`，但核實該路徑不存在，無法追溯；v1.1.0～v1.6.0改版已分別歸檔於`sdd/archive/2026-11-09-update-security-report-v1.1/`、`sdd/archive/2026-11-09-update-security-report-v1.2/`、`sdd/archive/2026-11-09-update-security-report-v1.3/`、`sdd/archive/2026-11-09-accept-risk-c002/`、`sdd/archive/2026-11-09-fix-pat-parent-symlink/`、`sdd/archive/2026-11-09-add-automated-scan-obs/`；v1.7.0改版的SDD提案目前在`sdd/close-candidate-risks-path1/`（尚未歸檔）。
+版本：1.8.0（2026-11-09 同日第九輪後續session更新；v1.0.0～v1.7.0原文見下方「版本歷史」）。**產品安全評估仍為 INCOMPLETE，無發布放行。** F-001／F-002／F-003已修補。三項候選風險均維持NEEDS_VALIDATION：C-002已正式接受風險；C-003／C-004 remediation_status皆為PARTIAL_MITIGATION。C-004現已對全部40條無獨立門控路由逐一實測reachability（不是只測3種代表情境），但因環境缺對應API金鑰，仍只有1條（/api/cctv/sources）有真實資料的完整正向對照——更多測試覆蓋不等於風險消除，見下方「v1.8.0 更新了什麼」。SDD 紀錄：v1.0.0文件曾稱其記錄位於`sdd/archive/2026-11-09-a24-security-html-report/`，但核實該路徑不存在，無法追溯；v1.1.0～v1.7.0改版已分別歸檔於`sdd/archive/2026-11-09-update-security-report-v1.1/`、`sdd/archive/2026-11-09-update-security-report-v1.2/`、`sdd/archive/2026-11-09-update-security-report-v1.3/`、`sdd/archive/2026-11-09-accept-risk-c002/`、`sdd/archive/2026-11-09-fix-pat-parent-symlink/`、`sdd/archive/2026-11-09-add-automated-scan-obs/`、`sdd/archive/2026-11-09-close-candidate-risks-path1/`；v1.8.0改版的SDD提案目前在`sdd/c004-full-route-coverage/`（尚未歸檔）。
+
+## v1.8.0 更新了什麼（不是只改雜湊）
+
+本報告鎖定的 commit 從 `d348fb4` 更新到 `848a856`。期間完成並反映進本報告：
+
+- **GEV-C-004 全部40條無門控路由逐一實測**：`panelRequestRealHandlers.test.mjs` 新增一個測試（commit `848a856`），對 `qa/c004-route-contract.json` 分類為「放行且無獨立auth gate」的全部40條路由，透過真實vite dev server逐一呼叫 `panel_request`，斷言沒有任何一條觸發 isLocalBrowser/PAT式401、sameSiteGated式403，或panelRequest自己的denylist refusal。外部上游呼叫仍由既有fetch mock擋下（這個環境沒有設定大多數路由需要的API金鑰）。
+- **仍不是「真實資料」的正向對照**：這證明的是「reachability」（有沒有被auth gate擋），不是「拿到正確下游資料」；40條裡仍只有`/api/cctv/sources`這1條因為不需要外部金鑰而能做到完整的真實資料正向對照。這是環境限制（缺金鑰），不是刻意縮小測試範圍。
+- **C-004仍不能關閉**：`remediation_status`維持`PARTIAL_MITIGATION`，`confirmation_status`維持`NEEDS_VALIDATION`。
+- **本次未做、仍是缺口**：Standalone建置、受控瀏覽器DOM、Docker實體拓樸、真模型／真上游測試；happy-dom的2筆dev相依漏洞；C-003跨UID真實攻擊測試（環境限制）；C-004其餘39條路由的「真實資料」正向對照（環境缺金鑰）；人工滲透測試，`overall_status`維持`INCOMPLETE`。
 
 ## v1.7.0 更新了什麼（不是只改雜湊）
 
@@ -74,6 +83,7 @@
 - **v1.5.0**（2026-11-09同日第六輪後續session）：見上「v1.5.0 更新了什麼」。
 - **v1.6.0**（2026-11-09同日第七輪後續session）：見上「v1.6.0 更新了什麼」。
 - **v1.7.0**（2026-11-09同日第八輪後續session）：見上「v1.7.0 更新了什麼」。
+- **v1.8.0**（2026-11-09同日第九輪後續session）：見上「v1.8.0 更新了什麼」。
 - **v1.4.0**（2026-11-09同日第五輪後續session）：見上「v1.4.0 更新了什麼」。
 
 ## 開啟報告
@@ -82,9 +92,11 @@
 
 內容包括管理摘要、範圍方法、攻擊面／信任邊界、F-001 與三項候選、其他觀察、原 15 情境、改善交接及證據附錄。可搜尋／篩選、展開節錄、暫停動畫及列印。JavaScript 停用時核心內容與安全節錄仍靜態存在。
 
-HTML 可單獨攜出閱讀；完整證據檔沒有嵌入。來源相對連結需要保留本工作區的資料夾結構。來源索引記錄59份選取檔案的SHA-256（v1.0.0為45份，v1.1.0新增7份，v1.2.0新增5份，v1.3.0新增1份；v1.4.0無新增；v1.5.0重新雜湊既有SRC-041/SRC-046，未新增筆數；v1.6.0新增SRC-059；v1.7.0新增SRC-060/SRC-061，共61份），不是數位簽章或整個歷史執行範圍的證明。
+HTML 可單獨攜出閱讀；完整證據檔沒有嵌入。來源相對連結需要保留本工作區的資料夾結構。來源索引記錄59份選取檔案的SHA-256（v1.0.0為45份，v1.1.0新增7份，v1.2.0新增5份，v1.3.0新增1份；v1.4.0無新增；v1.5.0重新雜湊既有SRC-041/SRC-046，未新增筆數；v1.6.0新增SRC-059；v1.7.0新增SRC-060/SRC-061，共61份；v1.8.0無新增，僅重算SRC-058），不是數位簽章或整個歷史執行範圍的證明。
 
 ## QA 結果與限制
+
+v1.8.0 新增 `qa/check_v1.8.py`，取代`check_v1.7.py`作為目前版本的通用稽核（全部PASS，見`qa/check-v1.8-audit.json`）。
 
 v1.7.0 新增 `qa/check_v1.7.py`，取代`check_v1.6.py`作為目前版本的通用稽核（全部PASS，見`qa/check-v1.7-audit.json`）。
 

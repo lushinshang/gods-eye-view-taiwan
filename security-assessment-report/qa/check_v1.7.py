@@ -17,6 +17,11 @@ moves to d348fb4. GEV-C-003 and GEV-C-004 both move remediation_status to
 PARTIAL_MITIGATION; neither's confirmation_status changes — this update
 documents and tests more, it does not claim either candidate risk is
 technically confirmed safe.
+
+UPDATE (v1.8.0, same day): section 6's exact-metadata assertions
+(data_version==1.7.0, product_commit==d348fb4) are now PINNED TO v1.7.0 and
+EXPECTED TO FAIL from v1.8.0 onward. Sections 1-5 are still generic and
+should still pass. See qa/check_v1.8.py for the current version's audit.
 """
 from pathlib import Path
 import hashlib

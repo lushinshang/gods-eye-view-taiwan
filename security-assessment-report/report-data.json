@@ -1,14 +1,14 @@
 {
  "metadata": {
-  "data_version": "1.7.0",
+  "data_version": "1.8.0",
   "implementation_stage": "TASK_8_DELIVERED_WITH_QA_LIMITATIONS",
   "language": "zh-Hant-TW",
   "title": "A24 戰情台安全評估報告",
   "subtitle": "紅隊導向攻擊面分析與原生 macOS 受控驗證",
-  "cutoff_label": "截至 Review 45、2026-11-09 交接文件勘誤，以及同日八輪後續session（F-001/vite/主動測試/413死碼修補、v1.1.0改版、記憶體監控與PAT畫面隱藏、C-004正向對照測試、C-002風險接受、C-003父目錄symlink檢查、AI驅動diff安全掃描、C-003 owner/world-writable檢查與C-004全路由契約稽核）",
+  "cutoff_label": "截至 Review 45、2026-11-09 交接文件勘誤，以及同日九輪後續session（F-001/vite/主動測試/413死碼修補、v1.1.0改版、記憶體監控與PAT畫面隱藏、C-004正向對照測試、C-002風險接受、C-003父目錄symlink檢查、AI驅動diff安全掃描、C-003 owner/world-writable檢查與C-004全路由契約稽核、C-004全部40條無門控路由逐一reachability實測）",
   "prepared_date": "2026-11-09",
   "timezone": "Asia/Taipei",
-  "product_commit": "d348fb4",
+  "product_commit": "848a856",
   "working_tree_status": "DIRTY_HISTORICAL_TRACKED_PYC_DELETIONS",
   "overall_status": "INCOMPLETE",
   "release_authorization": false,
@@ -435,7 +435,8 @@
      "代理僅轉送accept／content-type；指定路由由proxy阻斷或由真handler拒絕。",
      "既有指定負向案例中，advisor client與token rotate計數為0；Gemini provider未全面計數。",
      "2026-11-09新增panelRequestRealHandlers.test.mjs：對真實/api/cctv/sources的正向對照成功（200，真實資料，非mock）；對真實/api/taiwan-ai-status（無憑證）的負向案例收到401，確認來自下游handler的isLocalBrowser/PAT檢查，不是panelRequest工具層的REFUSED_PATHS。原報告run-34/35引用的同類負向觀察在repo裡找不到對應已提交測試，此次是永久化版本，不是沿用舊證據。",
-     "2026-11-09新增qa/c004-route-contract.mjs：實際呼叫真實panelRequest工具(不是手抄REFUSED_PATHS regex)，枚舉repo裡全部54個已掛載路由。結果：panelRequest拒絕9條；放行45條中，只有5條有獨立門控——3條(/api/taiwan-ai-advisor、-status、-token)用isLocalBrowser+PAT，2條(/api/mapillary/status、/tiles)用sameSiteGated；其餘40條完全沒有獨立auth gate，只依賴panelRequest的黑名單加loopback-only網路曝露模型。新增實測證明sameSiteGated對panel_request路徑沒有防護力：該gate明確放行loopback非瀏覽器呼叫，實測/api/mapillary/status回200而不是403。"
+     "2026-11-09新增qa/c004-route-contract.mjs：實際呼叫真實panelRequest工具(不是手抄REFUSED_PATHS regex)，枚舉repo裡全部54個已掛載路由。結果：panelRequest拒絕9條；放行45條中，只有5條有獨立門控——3條(/api/taiwan-ai-advisor、-status、-token)用isLocalBrowser+PAT，2條(/api/mapillary/status、/tiles)用sameSiteGated；其餘40條完全沒有獨立auth gate，只依賴panelRequest的黑名單加loopback-only網路曝露模型。新增實測證明sameSiteGated對panel_request路徑沒有防護力：該gate明確放行loopback非瀏覽器呼叫，實測/api/mapillary/status回200而不是403。",
+     "2026-11-09進一步在panelRequestRealHandlers.test.mjs新增全面覆蓋測試(commit 848a856)：對c004-route-contract.json分類為「無獨立門控」的全部40條路由，透過真實vite dev server逐一呼叫panel_request，確認沒有任何一條回傳401(isLocalBrowser/PAT式)或403(sameSiteGated式)refusal，也沒有被panelRequest自己的denylist拒絕。外部上游呼叫仍由既有fetch mock擋下，所以不是40條都拿到真實資料的正向對照，但確實是40條都逐一實測過reachability，不是只對3條代表情境測試、其餘靠靜態分類推論。"
     ],
     "reproduction": {
      "kind": "DOCUMENTED_EXISTING_OBSERVATION",
@@ -459,7 +460,7 @@
      "PassThrough不是獨立socket服務。",
      "token verify固定false；公開tracks正控制為mock；Gemini實際provider呼叫未全面計數。",
      "合法PAT在來源呼叫存在，不表示會通過proxy白名單；不得假設Authorization被轉送。",
-     "已完整枚舉並分類全部45條放行路由的門控狀態(有門控/無門控)，但只對3種代表性情境做了真實端到端測試(無門控的/api/cctv/sources、sameSiteGated的/api/mapillary/status、PAT門控的/api/taiwan-ai-status)；其餘約37條「無獨立門控」的路由沒有逐條做正向對照測試，只是結構上確認它們跟/api/cctv/sources同一類——仍缺「每個核准路由」逐條的下游行為驗證，C-004不能因此關閉。"
+     "40條無獨立門控的路由已全部逐一實測reachability(確認沒有被任何auth gate或panelRequest denylist擋下)，但只有/api/cctv/sources這1條有「真實資料」的完整正向對照——其餘39條因為這個環境沒有設定對應的外部API金鑰，無法在不依賴真實第三方憑證的情況下證明「回傳真實正確資料」，只能證明「沒有被擋」。這是環境限制(缺金鑰)，不是測試範圍的縮小；仍缺「每個核准路由的下游資料契約」驗證，C-004不能因此關閉。"
     ],
     "recommendations": [
      "逐路由明定proxy負責拒絕與下游負責准入的契約；不把取得panelKey本身列成認證繞過。",
@@ -478,7 +479,8 @@
      "EV-C004-POSITIVE",
      "EV-C004-SAMESITE",
      "EV-C004-NEGATIVE-REAL",
-     "EV-C004-ROUTE-CONTRACT"
+     "EV-C004-ROUTE-CONTRACT",
+     "EV-C004-FULL-COVERAGE"
     ],
     "source_refs": [
      "SRC-044",
@@ -1593,7 +1595,7 @@
      {
       "title": "仍待確認的風險",
       "paragraphs": [
-       "C-002（上游回應缺少累積位元組上限）已由開發/維護者正式接受風險，confirmation_status技術上仍維持NEEDS_VALIDATION。C-003（PAT父目錄鏈）已擴充assertTrustedAncestors，除symlink外新增owner(POSIX uid)與world-writable檢查，remediation_status為PARTIAL_MITIGATION；owner檢查無法在單一真實UID的環境實測跨使用者攻擊，只用mock驗證邏輯，confirmation_status維持NEEDS_VALIDATION。C-004（代理路由責任契約）已用qa/c004-route-contract.mjs實際呼叫真實panelRequest工具枚舉全部54條已掛載路由：9條被拒絕，45條放行中僅5條有獨立門控（3條isLocalBrowser+PAT、2條sameSiteGated——後者對panel_request路徑並無防護力，已實測證明），其餘40條完全依賴panelRequest黑名單加loopback-only網路曝露模型，僅3種代表情境做過真實端到端測試；remediation_status為PARTIAL_MITIGATION，confirmation_status維持NEEDS_VALIDATION。三者均無新確認之可利用缺陷，但也都未達成報告自身acceptance_criteria要求的完整技術驗證。另對本次session的commit diff跑過Claude Code AI驅動安全掃描（OBS-005），未發現符合條件的具體漏洞，但該掃描明確排除DoS/資源耗盡（C-002不在評估範圍），也不涉及代理路由契約（C-004）。已知程式行為不足以直接證明可利用的阻斷服務、跨使用者越權或完整授權繞過。"
+       "C-002（上游回應缺少累積位元組上限）已由開發/維護者正式接受風險，confirmation_status技術上仍維持NEEDS_VALIDATION。C-003（PAT父目錄鏈）已擴充assertTrustedAncestors，除symlink外新增owner(POSIX uid)與world-writable檢查，remediation_status為PARTIAL_MITIGATION；owner檢查無法在單一真實UID的環境實測跨使用者攻擊，只用mock驗證邏輯，confirmation_status維持NEEDS_VALIDATION。C-004（代理路由責任契約）已用qa/c004-route-contract.mjs實際呼叫真實panelRequest工具枚舉全部54條已掛載路由：9條被拒絕，45條放行中僅5條有獨立門控（3條isLocalBrowser+PAT、2條sameSiteGated——後者對panel_request路徑並無防護力，已實測證明），其餘40條完全依賴panelRequest黑名單加loopback-only網路曝露模型，現已全部40條逐一實測reachability（確認沒有被任何auth gate或denylist擋下），但因環境缺對應API金鑰，僅/api/cctv/sources這1條有「真實資料」的完整正向對照；remediation_status為PARTIAL_MITIGATION，confirmation_status維持NEEDS_VALIDATION。三者均無新確認之可利用缺陷，但也都未達成報告自身acceptance_criteria要求的完整技術驗證。另對本次session的commit diff跑過Claude Code AI驅動安全掃描（OBS-005），未發現符合條件的具體漏洞，但該掃描明確排除DoS/資源耗盡（C-002不在評估範圍），也不涉及代理路由契約（C-004）。已知程式行為不足以直接證明可利用的阻斷服務、跨使用者越權或完整授權繞過。"
       ],
       "source_refs": [
        "SRC-007",
@@ -1606,7 +1608,8 @@
        "SRC-046",
        "SRC-059",
        "SRC-060",
-       "SRC-061"
+       "SRC-061",
+       "SRC-058"
       ]
      },
      {
@@ -1992,9 +1995,9 @@
   }
  ],
  "document_control": {
-  "report_version": "1.7.0",
+  "report_version": "1.8.0",
   "document_status": "DELIVERABLE_WITH_QA_LIMITATIONS",
-  "data_cutoff": "2026-11-09 Asia/Taipei；至Review45、交接文件勘誤，以及同日後續八輪session",
+  "data_cutoff": "2026-11-09 Asia/Taipei；至Review45、交接文件勘誤，以及同日後續九輪session",
   "assessment_execution_dates": "2026-11-07至2026-11-09既有證據，以及2026-11-09同日三輪後續session的實際執行（EXECUTED）；不表示連續演練或完整執行窗口",
   "report_author_role": "工作區使用者授權之報告整理；Codex協助",
   "endorsement": null,
@@ -2505,8 +2508,8 @@
    "label": "正向對照：panel_request對真實/api/cctv/sources成功端到端",
    "locator": {
     "kind": "lines",
-    "start": 81,
-    "end": 92
+    "start": 83,
+    "end": 94
    },
    "format": "text",
    "text": "test('positive control: panel_request succeeds end to end against the real cctv/sources handler', async (t) => {\n  const catalog = await startRealServer(t);\n  const { data } = await catalog.call('panel_request', {\n    key: KEY,\n    path: '/api/cctv/sources',\n  });\n  assert.equal(data.status, 200);\n  assert.equal(data.headers['content-type'], 'application/json');\n  const body = JSON.parse(new TextDecoder().decode(fromBase64(data.body)));\n  assert.ok(Array.isArray(body.sources));\n  assert.ok(body.sources.some((source) => source.id === 'fixture-cam'));\n});",
@@ -2520,8 +2523,8 @@
    "label": "sameSiteGated不擋panel_request：mapillary/status實測200",
    "locator": {
     "kind": "lines",
-    "start": 94,
-    "end": 109
+    "start": 96,
+    "end": 111
    },
    "format": "text",
    "text": "test('GEV-C-004: sameSiteGated on /api/mapillary/status does not block panel_request (loopback tool call, not a cross-site browser)', async (t) => {\n  // mapillary.js wraps its status handler in sameSiteGated, a DIFFERENT gate\n  // from isLocalBrowser/PAT: it refuses cross-site BROWSER requests (foreign\n  // Origin, Sec-Fetch-Site) but explicitly passes loopback non-browser\n  // callers through. panelRequest's own fetch to the app's server is such a\n  // caller, so this route has NO independent defense against the panel\n  // path specifically — only against a malicious webpage calling it directly.\n  const catalog = await startRealServer(t);\n  const { data } = await catalog.call('panel_request', {\n    key: KEY,\n    path: '/api/mapillary/status',\n  });\n  assert.equal(data.status, 200);\n  const body = JSON.parse(new TextDecoder().decode(fromBase64(data.body)));\n  assert.equal(body.configured, false);\n});",
@@ -2535,8 +2538,8 @@
    "label": "負向案例（已永久化）：真實taiwan-ai-status拒絕無憑證呼叫",
    "locator": {
     "kind": "lines",
-    "start": 111,
-    "end": 123
+    "start": 113,
+    "end": 125
    },
    "format": "text",
    "text": "test('negative control: the real taiwan-ai-status handler itself refuses an uncredentialed call (not panelRequest\\'s own REFUSED_PATHS)', async (t) => {\n  const catalog = await startRealServer(t);\n  // /api/taiwan-ai-status is not in panelRequest.js's REFUSED_PATHS list —\n  // the refusal below must come from the downstream handler's own gate\n  // (isLocalBrowser + PAT check), proving the tool-layer allowlist alone\n  // does not protect this route; the real handler's auth does.\n  const { data } = await catalog.call('panel_request', {\n    key: KEY,\n    path: '/api/taiwan-ai-status',\n  });\n  assert.equal(data.status, 401);\n  const body = JSON.parse(new TextDecoder().decode(fromBase64(data.body)));\n  assert.match(body.error, /Local same-origin browser or valid Bearer PAT required/);",
@@ -2569,6 +2572,21 @@
    },
    "qualification": "由qa/c004-route-contract.mjs實際呼叫真實panelRequest工具枚舉產生，不是手抄REFUSED_PATHS regex；「有獨立門控」只代表程式碼引用了isLocalBrowser/admitKeySetupRequest/sameSiteGated這些名稱，不代表該門控對panel_request這條呼叫路徑真的有效（見EV-C004-SAMESITE，sameSiteGated就是反例）；40條without own auth gate完全依賴panelRequest的黑名單加loopback-only網路曝露模型，其中只有1條（/api/cctv/sources）有實測正向對照。",
    "contains_only": "allowlisted_synthetic_test_results",
+   "render_as": "plain_text"
+  },
+  {
+   "id": "EV-C004-FULL-COVERAGE",
+   "source_ref": "SRC-058",
+   "label": "全部40條無門控路由逐一實測：皆未觸發401/403式的auth refusal",
+   "locator": {
+    "kind": "lines",
+    "start": 150,
+    "end": 169
+   },
+   "format": "text",
+   "text": "test('GEV-C-004 full coverage: every route classified as having no own auth gate reaches the real handler without an isLocalBrowser/PAT or sameSiteGated refusal', async (t) => {\n  assert.ok(\n    NO_GATE_ROUTES.length >= 39,\n    `expected around 40 no-gate routes from the live contract audit, got ${NO_GATE_ROUTES.length}`,\n  );\n  const catalog = await startRealServer(t);\n  const results = [];\n  for (const route of NO_GATE_ROUTES) {\n    try {\n      const { data } = await catalog.call('panel_request', {\n        key: KEY,\n        path: route,\n      });\n      results.push({ route, status: data.status, body: data.body });\n    } catch (error) {\n      results.push({ route, error: error.message });\n    }\n  }\n  const misclassified = results.filter(\n    (r) => r.error?.includes('is not available') || r.status === 401 || r.status === 403,",
+   "qualification": "外部上游呼叫仍由既有fetch mock擋下（這個環境沒有多數路由需要的API金鑰），所以不是「每條都拿到真實資料」的正向對照，但是「每條都逐一實測reachability」，不是只靠靜態分類推論全部40條都一樣。",
+   "contains_only": "non_secret_product_code",
    "render_as": "plain_text"
   }
  ],

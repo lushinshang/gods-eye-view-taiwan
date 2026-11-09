@@ -1,14 +1,14 @@
 {
  "metadata": {
-  "data_version": "1.4.0",
+  "data_version": "1.5.0",
   "implementation_stage": "TASK_8_DELIVERED_WITH_QA_LIMITATIONS",
   "language": "zh-Hant-TW",
   "title": "A24 戰情台安全評估報告",
   "subtitle": "紅隊導向攻擊面分析與原生 macOS 受控驗證",
-  "cutoff_label": "截至 Review 45、2026-11-09 交接文件勘誤，以及同日五輪後續session（F-001/vite/主動測試/413死碼修補、v1.1.0改版、記憶體監控與PAT畫面隱藏、C-004正向對照測試、C-002風險接受）",
+  "cutoff_label": "截至 Review 45、2026-11-09 交接文件勘誤，以及同日六輪後續session（F-001/vite/主動測試/413死碼修補、v1.1.0改版、記憶體監控與PAT畫面隱藏、C-004正向對照測試、C-002風險接受、C-003父目錄symlink檢查）",
   "prepared_date": "2026-11-09",
   "timezone": "Asia/Taipei",
-  "product_commit": "7ae38a7",
+  "product_commit": "cc53107",
   "working_tree_status": "DIRTY_HISTORICAL_TRACKED_PYC_DELETIONS",
   "overall_status": "INCOMPLETE",
   "release_authorization": false,
@@ -283,7 +283,7 @@
     "cvss": null,
     "rationale": "目前只有同UID路徑行為與指定終端防護證據，缺跨權限前提；維持待確認，不能稱已越權。"
    },
-   "remediation_status": "PENDING_VALIDATION",
+   "remediation_status": "PARTIAL_MITIGATION",
    "owner": null,
    "scenario_ids": [
     "GEV-03",
@@ -298,11 +298,12 @@
     "SRC-006",
     "SRC-041",
     "SRC-025",
-    "SRC-050"
+    "SRC-050",
+    "SRC-046"
    ],
    "content_state": "DRAFT_CONTENT_COMPLETE",
    "details": {
-    "summary": "PAT終端檔案防護已有證據，父目錄鏈安全仍依賴部署權限與使用者信任。",
+    "summary": "PAT終端檔案防護已有證據，父目錄鏈安全仍依賴部署權限與使用者信任；已新增父目錄symlink檢查作為部分緩解。",
     "affected_components": [
      "server/providers/ai/ollama-advisor.js：createTokenStore"
     ],
@@ -313,7 +314,8 @@
     "established_facts": [
      "read以O_NOFOLLOW開啟終端檔，要求一般檔案且mode為0600。",
      "rotate使用暫存檔與rename；既有測試支持0644及損毀JSON拒絕、旋轉恢復。",
-     "同UID父目錄symlink會被解析，目標0600檔案建立且canary保留。"
+     "修補前：同UID父目錄symlink會被解析，目標0600檔案建立且canary保留。",
+     "已於commit cc53107新增assertNoSymlinkAncestors：read()/rotate()都會從檔案往上逐層lstat到root，發現symlink即拒絕；新增回歸測試確認父目錄為symlink時rotate丟GEV_PARENT_SYMLINK、read回報未設定，正常父目錄行為不變。"
     ],
     "reproduction": {
      "kind": "DOCUMENTED_EXISTING_OBSERVATION",
@@ -337,13 +339,16 @@
      "未證明跨UID／多租戶利用。",
      "mkdir的0700參數不代表既有父鏈皆受同樣權限保護。",
      "0777沒有作為已測變體；本機同UID信任前提不是程式碼強制隔離。",
-     "SECURITY.md已於2026-11-09新增Deployment model段落，文件化PAT儲存假設單一OS使用者、不支援共享主機；補文件不等於新增父目錄鏈驗證，風險判斷不變。"
+     "SECURITY.md已於2026-11-09新增Deployment model段落，文件化PAT儲存假設單一OS使用者、不支援共享主機；補文件不等於新增父目錄鏈驗證，風險判斷不變。",
+     "新增的assertNoSymlinkAncestors只是單次lstat，檢查完到實際open/write之間理論上仍有極小的競態窗口（TOCTOU），不構成完整防護；報告自身acceptance_criteria已承認補強父鏈不自動關閉候選。",
+     "只覆蓋ollama-advisor.js的createTokenStore，不包含server/mcp/panelKey.js（MCP panel key）或server/standalone/key-setup.js（.env store）等其他也寫入檔案系統的程式碼路徑——那些不在C-003的finding範圍內，風險判斷各自獨立。"
     ],
     "recommendations": [
      "明定支援單使用者或共享主機的部署模型與PAT路徑擁有者。",
      "依威脅模型檢查父鏈權限、symlink與身分；若需抗競態，單次lstat不能保證消除TOCTOU。",
      "保留終端0600、O_NOFOLLOW、輪替撤銷與fail-closed行為。",
-     "參考SECURITY.md的Deployment model段落，決定支援範圍是否需要擴大到多使用者環境並補驗證。"
+     "參考SECURITY.md的Deployment model段落，決定支援範圍是否需要擴大到多使用者環境並補驗證。",
+     "若未來要擴大到panelKey.js／key-setup.js等其他檔案系統路徑，應各自補同樣的父目錄鏈檢查並補測試。"
     ],
     "acceptance_criteria": [
      "文件記錄支援部署下的父目錄擁有者與可寫權限，對不支援配置有明確拒絕或警示契約。",
@@ -352,7 +357,9 @@
     ],
     "evidence_ids": [
      "EV-C003-READ",
-     "EV-C003-OBS"
+     "EV-C003-OBS",
+     "EV-C003-FIX-CODE",
+     "EV-C003-FIX-TEST"
     ],
     "source_refs": [
      "SRC-041",
@@ -360,7 +367,8 @@
      "SRC-025",
      "SRC-011",
      "SRC-006",
-     "SRC-050"
+     "SRC-050",
+     "SRC-046"
     ],
     "owner_label": "待指定",
     "target_date": null,
@@ -1526,7 +1534,7 @@
      {
       "title": "目前判斷",
       "paragraphs": [
-       "本次評估已確認一項 Grounding 邏輯缺陷並已修補，另確認並修補兩項本次新發現的問題（vite已知CVE、API錯誤回應死碼），並取得部分本機准入、PAT 生命週期、代理隔離、取消恢復、受控建置及六面向主動動態測試的驗證證據。三項候選風險中，C-002 已由開發/維護者正式接受風險；C-003／C-004 仍需釐清部署前提與產品契約，補文件不等於風險解除。完整主 App、目前受控瀏覽器流程及 Docker 實體拓樸、真模型／真上游測試尚未完成，現有證據仍不足以支持整體安全驗收或發布放行。"
+       "本次評估已確認一項 Grounding 邏輯缺陷並已修補，另確認並修補兩項本次新發現的問題（vite已知CVE、API錯誤回應死碼），並取得部分本機准入、PAT 生命週期、代理隔離、取消恢復、受控建置及六面向主動動態測試的驗證證據。三項候選風險中，C-002 已由開發/維護者正式接受風險；C-003 已補上父目錄symlink檢查作為部分緩解（PARTIAL_MITIGATION），但只是單次lstat、不構成完整TOCTOU防護；C-004 仍需釐清部署前提與產品契約。三者confirmation_status技術上均維持NEEDS_VALIDATION，補程式碼或補文件都不等於風險解除。完整主 App、目前受控瀏覽器流程及 Docker 實體拓樸、真模型／真上游測試尚未完成，現有證據仍不足以支持整體安全驗收或發布放行。"
       ],
       "source_refs": [
        "SRC-003",
@@ -1576,7 +1584,7 @@
      {
       "title": "仍待確認的風險",
       "paragraphs": [
-       "C-002（上游回應缺少累積位元組上限）已由開發/維護者於2026-11-09正式接受風險（risk_acceptance.accepted=true）：上游為固定、受信任官方來源，且已有系統記憶體監控（OBS-003）作為可觀察/預警手段，單人自架部署情境下不再要求額外byte上限；若未來改為多租戶或不受信任上游，此接受失效需重新評估。技術上confirmation_status仍維持NEEDS VALIDATION（風險接受是業務決定，不等於技術上已確認無風險）。C-003 關注 PAT 父目錄鏈與本機使用者信任；C-004 關注代理敏感路由的責任及副作用邊界。SECURITY.md已新增Deployment model段落文件化C-002與C-003的既有信任假設（commit 375dfa7），但補文件不等於新增父目錄鏈驗證，兩者風險判斷不變，維持 NEEDS VALIDATION。另OBS-002（Docker閘道信任）機制已查明是docker-start.mjs開機時主動設定，非意外；部署拓樸層面風險判斷仍待確認。已知程式行為不足以直接證明可利用的阻斷服務、跨使用者越權或完整授權繞過。"
+       "C-002（上游回應缺少累積位元組上限）已由開發/維護者於2026-11-09正式接受風險（risk_acceptance.accepted=true）：上游為固定、受信任官方來源，且已有系統記憶體監控（OBS-003）作為可觀察/預警手段，單人自架部署情境下不再要求額外byte上限；若未來改為多租戶或不受信任上游，此接受失效需重新評估。技術上confirmation_status仍維持NEEDS VALIDATION（風險接受是業務決定，不等於技術上已確認無風險）。C-003（PAT父目錄鏈）已於commit cc53107新增assertNoSymlinkAncestors，read()/rotate()都會檢查父目錄鏈是否含symlink並拒絕；remediation_status更新為PARTIAL_MITIGATION，但這只是單次lstat，不是完整TOCTOU防護，也只覆蓋ollama-advisor.js一處，confirmation_status仍維持NEEDS VALIDATION。C-004 關注代理敏感路由的責任及副作用邊界，維持NEEDS VALIDATION。SECURITY.md已新增Deployment model段落文件化C-002與C-003的既有信任假設（commit 375dfa7）。另OBS-002（Docker閘道信任）機制已查明是docker-start.mjs開機時主動設定，非意外；部署拓樸層面風險判斷仍待確認。已知程式行為不足以直接證明可利用的阻斷服務、跨使用者越權或完整授權繞過。"
       ],
       "source_refs": [
        "SRC-007",
@@ -1584,7 +1592,9 @@
        "SRC-012",
        "SRC-006",
        "SRC-050",
-       "SRC-052"
+       "SRC-052",
+       "SRC-041",
+       "SRC-046"
       ]
      },
      {
@@ -1970,9 +1980,9 @@
   }
  ],
  "document_control": {
-  "report_version": "1.4.0",
+  "report_version": "1.5.0",
   "document_status": "DELIVERABLE_WITH_QA_LIMITATIONS",
-  "data_cutoff": "2026-11-09 Asia/Taipei；至Review45、交接文件勘誤，以及同日後續五輪session",
+  "data_cutoff": "2026-11-09 Asia/Taipei；至Review45、交接文件勘誤，以及同日後續六輪session",
   "assessment_execution_dates": "2026-11-07至2026-11-09既有證據，以及2026-11-09同日三輪後續session的實際執行（EXECUTED）；不表示連續演練或完整執行窗口",
   "report_author_role": "工作區使用者授權之報告整理；Codex協助",
   "endorsement": null,
@@ -2164,15 +2174,15 @@
   {
    "id": "EV-C003-READ",
    "source_ref": "SRC-041",
-   "label": "終端O_NOFOLLOW與0600檢查",
+   "label": "終端O_NOFOLLOW與0600檢查（2026-11-09新增父目錄symlink檢查呼叫）",
    "locator": {
     "kind": "lines",
-    "start": 17,
-    "end": 23
+    "start": 52,
+    "end": 59
    },
    "format": "text",
-   "text": "    let fd;\n    try {\n      fd = fs.openSync(file, fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW);\n      const stat = fs.fstatSync(fd);\n      if (!stat.isFile() || (stat.mode & 0o777) !== 0o600) return null;\n      const value = JSON.parse(fs.readFileSync(fd, 'utf8'));\n      return /^[a-f0-9]{64}$/.test(value.sha256) ? value : null;",
-   "qualification": "只作用於終端元件；不證明父目錄鏈或跨UID隔離。",
+   "text": "    let fd;\n    try {\n      assertNoSymlinkAncestors(file, root);\n      fd = fs.openSync(file, fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW);\n      const stat = fs.fstatSync(fd);\n      if (!stat.isFile() || (stat.mode & 0o777) !== 0o600) return null;\n      const value = JSON.parse(fs.readFileSync(fd, 'utf8'));\n      return /^[a-f0-9]{64}$/.test(value.sha256) ? value : null;",
+   "qualification": "只作用於終端元件＋父目錄鏈（單次lstat）；不是完整TOCTOU防護，不證明跨UID隔離。",
    "contains_only": "non_secret_product_code",
    "render_as": "plain_text"
   },
@@ -2318,12 +2328,42 @@
    "label": "回歸測試：總數2時5與3被拒、2通過",
    "locator": {
     "kind": "lines",
-    "start": 835,
-    "end": 844
+    "start": 867,
+    "end": 876
    },
    "format": "text",
    "text": "test('vessel count 5 is rejected when the context holds only 2 vessels (GEV-F-001)', () => {\n  const q = '基隆港 貨輪 >15kt';\n  const fx = fixtures();\n  fx.vessels.rows = [vessel(), vessel(1)];\n  const p = buildPrompt(retrieve({ ...fx, query: q }), q);\n  assert.equal(p.context.vessels.length, 2);\n  assert.equal(p.context.summary.total_vessels, 2);\n  assert.equal(validateGrounding('目前共有 2 艘。', p), true);\n  assert.equal(validateGrounding('目前共有 3 艘。', p), false);\n  assert.equal(validateGrounding('目前共有 5 艘。', p), false);",
    "qualification": "本次新增的既有repo測試；還原修補前的程式碼重跑會轉紅，證明有鑑別力。",
+   "contains_only": "non_secret_product_code",
+   "render_as": "plain_text"
+  },
+  {
+   "id": "EV-C003-FIX-CODE",
+   "source_ref": "SRC-041",
+   "label": "新增父目錄symlink檢查函式（2026-11-09部分緩解）",
+   "locator": {
+    "kind": "lines",
+    "start": 23,
+    "end": 45
+   },
+   "format": "text",
+   "text": "function assertNoSymlinkAncestors(file, root) {\n  let dir = path.dirname(file);\n  while (dir !== root && dir !== path.dirname(dir)) {\n    let entry;\n    try {\n      entry = fs.lstatSync(dir);\n    } catch (error) {\n      if (error.code === 'ENOENT') {\n        dir = path.dirname(dir);\n        continue;\n      }\n      throw error;\n    }\n    if (entry.isSymbolicLink()) {\n      const error = new Error(\n        'refusing to use a PAT store whose parent directory is a symlink',\n      );\n      error.code = 'GEV_PARENT_SYMLINK';\n      throw error;\n    }\n    dir = path.dirname(dir);\n  }\n}",
+   "qualification": "靜態程式碼；已於commit cc53107新增；只是單次lstat，不是完整TOCTOU防護，不能據此宣稱C-003已解決。",
+   "contains_only": "non_secret_product_code",
+   "render_as": "plain_text"
+  },
+  {
+   "id": "EV-C003-FIX-TEST",
+   "source_ref": "SRC-046",
+   "label": "回歸測試：父目錄為symlink時rotate/read皆拒絕",
+   "locator": {
+    "kind": "lines",
+    "start": 458,
+    "end": 468
+   },
+   "format": "text",
+   "text": "test('PAT store refuses a symlinked parent directory (GEV-C-003)', () => {\n  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'advisor-root-'));\n  const real = path.join(root, 'real-elsewhere');\n  fs.mkdirSync(real, { recursive: true });\n  try {\n    const linked = path.join(root, 'ai-advisor');\n    fs.symlinkSync(real, linked);\n    const file = path.join(linked, 'token.json');\n    const store = createTokenStore(file, { root });\n    assert.throws(() => store.rotate(), { code: 'GEV_PARENT_SYMLINK' });\n    assert.equal(fs.existsSync(file), false);",
+   "qualification": "本次新增的既有repo測試；同UID symlink情境下rotate與read皆驗證拒絕。",
    "contains_only": "non_secret_product_code",
    "render_as": "plain_text"
   },

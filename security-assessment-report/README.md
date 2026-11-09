@@ -1,6 +1,15 @@
 # A24 戰情台安全評估 HTML 報告
 
-版本：1.4.0（2026-11-09 同日第五輪後續session更新；v1.0.0/v1.1.0/v1.2.0/v1.3.0原文見下方「版本歷史」）。**產品安全評估仍為 INCOMPLETE，無發布放行。** F-001／F-002／F-003已修補，C-002已由開發/維護者正式接受風險（risk_acceptance，confirmation_status技術上仍維持NEEDS_VALIDATION），C-003／C-004仍維持 NEEDS_VALIDATION（補測試不等於C-004解決）。SDD 紀錄：v1.0.0文件曾稱其記錄位於`sdd/archive/2026-11-09-a24-security-html-report/`，但核實該路徑不存在，無法追溯；v1.1.0／v1.2.0／v1.3.0改版已分別歸檔於`sdd/archive/2026-11-09-update-security-report-v1.1/`、`sdd/archive/2026-11-09-update-security-report-v1.2/`、`sdd/archive/2026-11-09-update-security-report-v1.3/`；v1.4.0改版的SDD提案目前在`sdd/accept-risk-c002/`（尚未歸檔）。
+版本：1.5.0（2026-11-09 同日第六輪後續session更新；v1.0.0/v1.1.0/v1.2.0/v1.3.0/v1.4.0原文見下方「版本歷史」）。**產品安全評估仍為 INCOMPLETE，無發布放行。** F-001／F-002／F-003已修補，C-002已由開發/維護者正式接受風險（confirmation_status技術上仍維持NEEDS_VALIDATION），C-003已補父目錄symlink檢查作為部分緩解（remediation_status=PARTIAL_MITIGATION，confirmation_status仍維持NEEDS_VALIDATION），C-004仍維持NEEDS_VALIDATION。SDD 紀錄：v1.0.0文件曾稱其記錄位於`sdd/archive/2026-11-09-a24-security-html-report/`，但核實該路徑不存在，無法追溯；v1.1.0～v1.4.0改版已分別歸檔於`sdd/archive/2026-11-09-update-security-report-v1.1/`、`sdd/archive/2026-11-09-update-security-report-v1.2/`、`sdd/archive/2026-11-09-update-security-report-v1.3/`、`sdd/archive/2026-11-09-accept-risk-c002/`；v1.5.0改版的SDD提案目前在`sdd/fix-pat-parent-symlink/`（尚未歸檔）。
+
+## v1.5.0 更新了什麼（不是只改雜湊）
+
+本報告鎖定的 commit 從 `7ae38a7` 更新到 `cc53107`。期間完成並反映進本報告：
+
+- **GEV-C-003 新增父目錄symlink檢查（部分緩解）**：`server/providers/ai/ollama-advisor.js`的`createTokenStore`新增`assertNoSymlinkAncestors`（commit `cc53107`），`read()`／`rotate()`都會從檔案往上逐層lstat到root，發現symlink即拒絕；新增2筆測試（父目錄為symlink時拒絕、正常目錄行為不變）。`remediation_status`改為`PARTIAL_MITIGATION`。
+- **C-003仍不能關閉**：這只是單次lstat，不是完整TOCTOU防護（check完到open/write之間理論上仍有競態窗口），也只覆蓋`ollama-advisor.js`一處，不包含`panelKey.js`／`key-setup.js`等其他路徑；`confirmation_status`維持`NEEDS_VALIDATION`，報告自身acceptance_criteria已明記補強父鏈不自動關閉候選。
+- **C-002／C-004 不受影響**：僅C-003的remediation_status改變，其他兩項candidate risk維持原狀。
+- **本次未做、仍是缺口**：Standalone建置、受控瀏覽器DOM、Docker實體拓樸、真模型／真上游測試；happy-dom的2筆dev相依漏洞；C-004完整路由責任契約文件，`overall_status`維持`INCOMPLETE`。
 
 ## v1.4.0 更新了什麼（不是只改雜湊）
 
@@ -45,6 +54,8 @@
 - **v1.2.0**（2026-11-09同日第三輪後續session）：見上「v1.2.0 更新了什麼」。
 - **v1.3.0**（2026-11-09同日第四輪後續session）：見上「v1.3.0 更新了什麼」。
 - **v1.4.0**（2026-11-09同日第五輪後續session）：見上「v1.4.0 更新了什麼」。
+- **v1.5.0**（2026-11-09同日第六輪後續session）：見上「v1.5.0 更新了什麼」。
+- **v1.4.0**（2026-11-09同日第五輪後續session）：見上「v1.4.0 更新了什麼」。
 
 ## 開啟報告
 
@@ -52,11 +63,11 @@
 
 內容包括管理摘要、範圍方法、攻擊面／信任邊界、F-001 與三項候選、其他觀察、原 15 情境、改善交接及證據附錄。可搜尋／篩選、展開節錄、暫停動畫及列印。JavaScript 停用時核心內容與安全節錄仍靜態存在。
 
-HTML 可單獨攜出閱讀；完整證據檔沒有嵌入。來源相對連結需要保留本工作區的資料夾結構。來源索引記錄58份選取檔案的SHA-256（v1.0.0為45份，v1.1.0新增7份，v1.2.0新增5份，v1.3.0新增1份），不是數位簽章或整個歷史執行範圍的證明。
+HTML 可單獨攜出閱讀；完整證據檔沒有嵌入。來源相對連結需要保留本工作區的資料夾結構。來源索引記錄58份選取檔案的SHA-256（v1.0.0為45份，v1.1.0新增7份，v1.2.0新增5份，v1.3.0新增1份；v1.4.0無新增；v1.5.0重新雜湊既有SRC-041/SRC-046，未新增筆數），不是數位簽章或整個歷史執行範圍的證明。
 
 ## QA 結果與限制
 
-v1.4.0 新增 `qa/check_v1.4.py`，取代`check_v1.3.py`作為目前版本的通用稽核：來源雜湊/連結、證據節錄逐字核對、15情境原名不變、v1.4.0應有事實（GEV-C-002的risk_acceptance已填且accepted=true、confirmation_status仍NEEDS_VALIDATION、C-003／C-004的risk_acceptance維持null、product_commit不變等）全部PASS，見`qa/check-v1.4-audit.json`。`qa/check_v1.3.py`／`check_v1.2.py`／`check_v1.1.py`的metadata版本斷言分別從v1.4.0／v1.3.0／v1.2.0起預期失敗（檔頭已補註記），但其餘通用檢查section仍應通過——這證明每次改版沒有意外改壞前一版已確立的事實，只是版本號本身往前移。`qa/check_task7.py`與`qa/task4-dom.mjs`／`task5-diagrams.mjs`／`task6-coverage.mjs`／`task8-final.mjs`釘死在v1.0.0的具體內容，從v1.1.0起預期會失敗，各檔頭已加註記；這些都是版本釘死的歷史稽核，不是未知迴歸。
+v1.5.0 新增 `qa/check_v1.5.py`，取代`check_v1.4.py`作為目前版本的通用稽核：來源雜湊/連結、證據節錄逐字核對、15情境原名不變、v1.5.0應有事實（GEV-C-003的remediation_status=PARTIAL_MITIGATION且引用EV-C003-FIX-CODE/TEST、C-002/C-004未被連帶誤標PARTIAL_MITIGATION、product_commit=cc53107等）全部PASS，見`qa/check-v1.5-audit.json`。`qa/check_v1.4.py`／`check_v1.3.py`／`check_v1.2.py`／`check_v1.1.py`的metadata版本斷言分別從v1.5.0／v1.4.0／v1.3.0／v1.2.0起預期失敗（檔頭已補註記），但其餘通用檢查section仍應通過——這證明每次改版沒有意外改壞前一版已確立的事實，只是版本號本身往前移。`qa/check_task7.py`與`qa/task4-dom.mjs`／`task5-diagrams.mjs`／`task6-coverage.mjs`／`task8-final.mjs`釘死在v1.0.0的具體內容，從v1.1.0起預期會失敗，各檔頭已加註記；這些都是版本釘死的歷史稽核，不是未知迴歸。
 
 v1.0.0的既有結果如下（未重新驗證視覺／瀏覽器部分，狀態不變）：
 

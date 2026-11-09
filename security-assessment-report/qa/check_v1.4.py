@@ -19,6 +19,11 @@ snapshot.json. That file is a frozen hash record of the files as they stood
 for v1.0.0; source-index.json instead reflects each file's live state as of
 whichever later commit last changed it. No source file changed for this
 update, so source-index.json is untouched from v1.3.0.
+
+UPDATE (v1.5.0, same day): section 6's exact-metadata assertions
+(data_version==1.4.0, product_commit==7ae38a7) are now PINNED TO v1.4.0 and
+EXPECTED TO FAIL from v1.5.0 onward. Sections 1-5 are still generic and
+should still pass. See qa/check_v1.5.py for the current version's audit.
 """
 from pathlib import Path
 import hashlib

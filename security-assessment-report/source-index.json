@@ -534,17 +534,17 @@
    "id": "SRC-041",
    "path": "1151104_gods-eye-view/repo/server/providers/ai/ollama-advisor.js",
    "href": "../../1151104_gods-eye-view/repo/server/providers/ai/ollama-advisor.js",
-   "sha256": "601d4508b1ef2544ac95afee89e968cab1d38f3f49621b153759a8e567f9ea18",
-   "size_bytes": 10772,
+   "sha256": "852ce4b4e547670eda1b2f0ab6eb573cb974d80bf98641834c390eef105a6562",
+   "size_bytes": 11965,
    "role": "product_source",
    "source_run": null,
    "locator": {
     "kind": "lines",
-    "start": 13,
-    "end": 13,
+    "start": 47,
+    "end": 47,
     "anchor_text": "export function createTokenStore("
    },
-   "summary": "PAT終端讀取、權限與旋轉流程；僅節錄程式碼",
+   "summary": "PAT終端讀取、權限、父目錄symlink檢查(2026-11-09新增)與旋轉流程；僅節錄程式碼",
    "embed_policy": "selected_safe_excerpt_only"
   },
   {
@@ -619,14 +619,14 @@
    "id": "SRC-046",
    "path": "1151104_gods-eye-view/repo/server/providers/ai/ollama-advisor.test.mjs",
    "href": "../../1151104_gods-eye-view/repo/server/providers/ai/ollama-advisor.test.mjs",
-   "sha256": "d9febfeb087249fa55af3f8e2f0e873296d1ab6553957a265516aa6c7e117cd3",
-   "size_bytes": 29819,
+   "sha256": "848aec4c07df4b70cf3255a253a4a515129999bee6c89b4afa6b6a907b8ef926",
+   "size_bytes": 31231,
    "role": "current_observation",
    "source_run": null,
    "locator": {
     "kind": "lines",
-    "start": 835,
-    "end": 835,
+    "start": 867,
+    "end": 867,
     "anchor_text": "test('vessel count 5 is rejected when the context holds only 2 vessels (GEV-F-001)', () => {"
    },
    "summary": "2026-11-09新增回歸測試：真實總數2時，5與3被拒、2通過；還原修補後會轉紅，證明鑑別力",

@@ -1,4 +1,12 @@
-"""Audit report data against selected retained sources; never import products."""
+"""Audit report data against selected retained sources; never import products.
+
+PINNED TO REPORT v1.0.0. This script asserts exact point-in-time facts of
+that version (GEV-F-001 still OPEN, metadata.product_commit == e50944f,
+source-index hashes matching security-assessment/execution/snapshot.json's
+frozen v1.0.0 record) — it is a historical audit, not a regression test, and
+is EXPECTED to fail from the 2026-11-09 update (report v1.1.0) onward. See
+qa/check_v1.1.py for the equivalent audit against the current version.
+"""
 from pathlib import Path
 from html.parser import HTMLParser
 from datetime import datetime

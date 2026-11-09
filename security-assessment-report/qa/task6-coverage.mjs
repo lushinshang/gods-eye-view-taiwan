@@ -1,3 +1,4 @@
+// PINNED TO REPORT v1.0.0: asserts exact v1.0.0 counts/content (4 findings, GEV-07 as KNOWN_OPEN_FINDING, 7 timeline events, 15 diagram nodes); expected to fail from the 2026-11-09 update (v1.1.0) onward. Historical audit, not a regression test. See qa/check_v1.1.py.
 import {readFile,writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';import {pathToFileURL} from 'node:url';import assert from 'node:assert/strict';
 const {Window}=await import(pathToFileURL(resolve('1151104_gods-eye-view/repo/node_modules/happy-dom/lib/index.js')).href);

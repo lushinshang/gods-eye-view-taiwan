@@ -2,9 +2,9 @@
   "task": 4,
   "status": "PASS",
   "scope": "Static single-file HTML and generator checks, not browser security or visual acceptance.",
-  "html_bytes": 316717,
-  "unique_ids": 156,
-  "source_links": 45,
+  "html_bytes": 363473,
+  "unique_ids": 172,
+  "source_links": 52,
   "checks": {
     "deterministic_output": true,
     "embedded_data_matches_json_sources": true,

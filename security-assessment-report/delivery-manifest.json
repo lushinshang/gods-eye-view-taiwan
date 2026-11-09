@@ -1,33 +1,33 @@
 {
-  "report_version": "1.0.0",
+  "report_version": "1.1.0",
   "scope": "Core report and selected QA deliverables; not original security evidence. Excludes manifest itself and optional raster QA files.",
   "signature": null,
   "assessment_status": "INCOMPLETE",
   "files": [
     {
       "path": "index.html",
-      "bytes": 316717,
-      "sha256": "92c484224de0fa98f01a58e622fda18b7feb3fbd88addf6d90a53f8890a28a9b"
+      "bytes": 363473,
+      "sha256": "80b4efa7401fd08f661ab5e44607b99e2596d63c3c3c05081d3126e6d3527230"
     },
     {
       "path": "report-data.json",
-      "bytes": 121619,
-      "sha256": "db18b7850deacc44420d842d8564380a9e4b4a444920e40106fddd206dc732ff"
+      "bytes": 125992,
+      "sha256": "e586c100203ef891b4a0ac68669fb8ad94ef56bfe94bd8d899885219e4da7885"
     },
     {
       "path": "source-index.json",
-      "bytes": 26181,
-      "sha256": "6b0422bca7ed3eeeed209a3502206ece947bef2072c23e49b1271bde19185f61"
+      "bytes": 29221,
+      "sha256": "8af523347d35cee6ee2af0b0de1e48293cd6a459a63826af55e5af934a2d82f3"
     },
     {
       "path": "build_report.py",
-      "bytes": 48462,
-      "sha256": "f6d8b5ab272c583e07c701270909a43d8a72ece0f7dae90afb41c123dfc6547b"
+      "bytes": 48581,
+      "sha256": "19b8916bcee0b2a11aa34e8486a5b983c7a068e8fb15fb89da45faaed3bc6c7c"
     },
     {
       "path": "README.md",
-      "bytes": 4487,
-      "sha256": "86ede8f2aa03cd1ca7298218d775001559e75c08152439594cfb9719ea9d4885"
+      "bytes": 8112,
+      "sha256": "f4cb929030425a365a0cab67147a2e091b4f9ecb75adb43acf6ac4efa202136c"
     },
     {
       "path": "qa/task-8-summary.json",
@@ -52,7 +52,7 @@
     {
       "path": "qa/task-4-static-verification.json",
       "bytes": 674,
-      "sha256": "f9fe9a58d72486da54574899b3c0a8d97fd75f3727903437a7e7b2d36d26b922"
+      "sha256": "445fcbb2b334a365b100ec6ed57080c2fbc1ca3f41008448c0c3336df1b8903e"
     },
     {
       "path": "qa/task-4-dom-verification.json",
@@ -73,6 +73,21 @@
       "path": "qa/report-print.pdf",
       "bytes": 753581,
       "sha256": "75db3f4c554ab0bcb93112abe7746029e9de0af9e1e226e41c25aecfae35ba54"
+    },
+    {
+      "path": "qa/check_v1.1.py",
+      "bytes": 6929,
+      "sha256": "6e3649b3218c4470645e09d7dccf3837e196f54fab6c26177b444503413a48fe"
+    },
+    {
+      "path": "qa/check-v1.1-audit.json",
+      "bytes": 225,
+      "sha256": "c9037385d0ef96ac66d97ff3fdf6cf5d2e72b60db066a36197c7a6a4b0c6ca54"
+    },
+    {
+      "path": "session-2026-11-09/summary.md",
+      "bytes": 3722,
+      "sha256": "d92d59793f35b78525f31e5447f404421aca5f05161c881e7a39e92dce72129a"
     }
   ]
 }

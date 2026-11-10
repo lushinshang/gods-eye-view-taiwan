@@ -52,31 +52,80 @@ export const HIGHLIGHT_UAV_COLOR = Cesium.Color.fromCssColorString('#B388FF');
 export const HIGHLIGHT_TANKER_COLOR = Cesium.Color.fromCssColorString('#4CD964');
 
 /**
- * Pure fleet (untracked) billboard color decision, extracted from rendering.js
- * so the precedence and the tanker type-gate are unit-testable without the
- * Cesium viewer the rest of the module needs. Precedence: emergency >
- * operator-armed klass highlight > default amber. Tanker matches on `type`
+ * Which klass-highlight group this aircraft belongs to, independent of
+ * whether its operator-facing toggle is armed. Tanker matches on `type`
  * (ICAO code), NOT `klass === 'widebody'` — that klass also covers ordinary
  * civilian wide-bodies (A332, B777, ...); only C17/K35R are tankers (see
  * aircraftClass.js WIDE set, and its own test confirming C17 classifies as
- * 'widebody').
- * @param {{emergency: boolean, klass?: string, type?: string, highlightFastjet?: boolean, highlightUav?: boolean, highlightTanker?: boolean}} info
- * @returns {Cesium.Color}
+ * 'widebody'). Shared by the color decision (gated on the toggle) and the
+ * count/label features (fastjet and uav counts/labels gate on the toggle too;
+ * only the color's emergency precedence and the label's detection-overlay
+ * scoping differ per caller).
+ * @param {{klass?: string, type?: string}} info
+ * @returns {'fastjet'|'uav'|'tanker'|null}
  */
-export function fleetHighlightColor({
-  emergency,
+export function matchedHighlightKlass({ klass, type } = {}) {
+  if (klass === 'fastjet') return 'fastjet';
+  if (klass === 'uav') return 'uav';
+  if (type === 'C17' || type === 'K35R') return 'tanker';
+  return null;
+}
+
+/**
+ * Tally of how many aircraft currently match each highlight group,
+ * independent of any toggle — getStats() exposes this so an operator can see
+ * whether flipping a highlight would show anything before flipping it.
+ * @param {Iterable<{klass?: string, type?: string}>} records
+ * @returns {{fastjet: number, uav: number, tanker: number}}
+ */
+export function countHighlightKlasses(records) {
+  const counts = { fastjet: 0, uav: 0, tanker: 0 };
+  for (const info of records) {
+    const matched = matchedHighlightKlass(info);
+    if (matched) counts[matched]++;
+  }
+  return counts;
+}
+
+/**
+ * Which highlight group this aircraft matches AND has its toggle armed for —
+ * shared by the color decision and the detection-overlay label prefix, so
+ * both read the exact same gate.
+ * @param {{klass?: string, type?: string, highlightFastjet?: boolean, highlightUav?: boolean, highlightTanker?: boolean}} info
+ * @returns {'fastjet'|'uav'|'tanker'|null}
+ */
+export function armedHighlightKlass({
   klass,
   type,
   highlightFastjet,
   highlightUav,
   highlightTanker,
 } = {}) {
-  if (emergency) return EMERGENCY_ICON_COLOR;
-  if (highlightFastjet && klass === 'fastjet') return HIGHLIGHT_FASTJET_COLOR;
-  if (highlightUav && klass === 'uav') return HIGHLIGHT_UAV_COLOR;
-  if (highlightTanker && (type === 'C17' || type === 'K35R'))
-    return HIGHLIGHT_TANKER_COLOR;
-  return MIL_ICON_COLOR;
+  const matched = matchedHighlightKlass({ klass, type });
+  if (matched === 'fastjet' && highlightFastjet) return 'fastjet';
+  if (matched === 'uav' && highlightUav) return 'uav';
+  if (matched === 'tanker' && highlightTanker) return 'tanker';
+  return null;
+}
+
+const HIGHLIGHT_COLOR_BY_KLASS = Object.freeze({
+  fastjet: HIGHLIGHT_FASTJET_COLOR,
+  uav: HIGHLIGHT_UAV_COLOR,
+  tanker: HIGHLIGHT_TANKER_COLOR,
+});
+
+/**
+ * Pure fleet (untracked) billboard color decision, extracted from rendering.js
+ * so the precedence and the tanker type-gate are unit-testable without the
+ * Cesium viewer the rest of the module needs. Precedence: emergency >
+ * operator-armed klass highlight > default amber.
+ * @param {{emergency: boolean, klass?: string, type?: string, highlightFastjet?: boolean, highlightUav?: boolean, highlightTanker?: boolean}} info
+ * @returns {Cesium.Color}
+ */
+export function fleetHighlightColor(info = {}) {
+  if (info.emergency) return EMERGENCY_ICON_COLOR;
+  const armed = armedHighlightKlass(info);
+  return armed ? HIGHLIGHT_COLOR_BY_KLASS[armed] : MIL_ICON_COLOR;
 }
 
 // --- Ground traffic (owner reversal 2026-07-03; mirror of flights.js) ---------------

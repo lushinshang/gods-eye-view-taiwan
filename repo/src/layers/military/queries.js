@@ -9,7 +9,18 @@ import {
   contactMatchWins,
   CONTACT_MATCH_TIER,
 } from '../../data/contactMatch.js';
-import { LANDED_ALT_MAX_FT, LANDED_SPEED_MAX_MPS } from './policy.js';
+import {
+  LANDED_ALT_MAX_FT,
+  LANDED_SPEED_MAX_MPS,
+  countHighlightKlasses,
+  armedHighlightKlass,
+} from './policy.js';
+
+const HIGHLIGHT_LABEL_TAG = Object.freeze({
+  fastjet: () => t('Fast jet'),
+  uav: () => t('Drone'),
+  tanker: () => t('Tanker'),
+});
 import { emergencyBroadcastPhrase } from '../../data/aircraftEmergency.js';
 
 export function createQueries({
@@ -510,7 +521,15 @@ export function createQueries({
         if (!pos) continue;
         object.position = pos;
         object.skipLabel = isTracked;
-        const id = callsign || registration || icao24;
+        const armed = armedHighlightKlass({
+          klass: info?.klass,
+          type: info?.type,
+          highlightFastjet: flightState._highlightFastjet,
+          highlightUav: flightState._highlightUav,
+          highlightTanker: flightState._highlightTanker,
+        });
+        const baseId = callsign || registration || icao24;
+        const id = armed ? `${HIGHLIGHT_LABEL_TAG[armed]()} ${baseId}` : baseId;
         if (object.id !== id) object.id = id;
         // Card surface: detectionDraw composes its secondary line from
         // `[src.klass, src.metric]`, so a converted contact's card must name the
@@ -828,7 +847,7 @@ export function createQueries({
 
     /**
      * Return current layer health/status for the HUD status chip.
-     * @returns {{count: number, lastUpdate: number|null, stale: boolean, error: string|null, status: number|null, retryInSec: number}}
+     * @returns {{count: number, lastUpdate: number|null, stale: boolean, error: string|null, status: number|null, retryInSec: number, highlightCounts: {fastjet: number, uav: number, tanker: number}}}
      */
     getStats() {
       const retryInSec = flightState.feed._retryAt
@@ -837,6 +856,9 @@ export function createQueries({
             Math.ceil((flightState.feed._retryAt - Date.now()) / 1000),
           )
         : 0;
+      const highlightCounts = countHighlightKlasses(
+        flightState.records.data.values(),
+      );
       return {
         count: flightState.feed._count,
         lastUpdate: flightState.feed._lastUpdate,
@@ -846,6 +868,7 @@ export function createQueries({
         retryInSec,
         source: flightState.feed._lastSource,
         fallback: false,
+        highlightCounts,
       };
     },
   };

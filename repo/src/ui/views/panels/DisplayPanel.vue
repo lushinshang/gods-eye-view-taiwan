@@ -41,6 +41,9 @@ const modelsMode = computed(() => models3d.value?.mode ?? 'proximity');
 const highlightFastjetOn = computed(() => klassHighlight.value?.fastjet ?? false);
 const highlightUavOn = computed(() => klassHighlight.value?.uav ?? false);
 const highlightTankerOn = computed(() => klassHighlight.value?.tanker ?? false);
+const highlightCounts = computed(
+  () => klassHighlight.value?.counts ?? { fastjet: 0, uav: 0, tanker: 0 },
+);
 const modelsOptions = computed(() => [
   { value: 'proximity', label: t('Proximity'), attrs: { id: 'models3d-mode-proximity', 'data-mode': 'proximity' } },
   { value: 'all', label: t('All'), attrs: { id: 'models3d-mode-all', 'data-mode': 'all' } },
@@ -165,14 +168,17 @@ const allocationOptions = computed(() => [
     <span class="pp-slider-mini-label">{{ t('Highlight') }}</span>
     <label class="pp-toggle-btn pp-highlight-toggle" :title="t('Highlight fast jets in the military layer')">
       <span class="pp-label">{{ t('Fast jets') }}</span>
+      <span class="pp-slider-value" id="highlight-fastjet-count">{{ highlightCounts.fastjet }}</span>
       <input type="checkbox" id="highlight-fastjet-toggle" @change="act('toggleHighlightFastjet')" :checked="highlightFastjetOn" />
     </label>
     <label class="pp-toggle-btn pp-highlight-toggle" :title="t('Highlight UAVs in the military layer')">
       <span class="pp-label">{{ t('UAVs') }}</span>
+      <span class="pp-slider-value" id="highlight-uav-count">{{ highlightCounts.uav }}</span>
       <input type="checkbox" id="highlight-uav-toggle" @change="act('toggleHighlightUav')" :checked="highlightUavOn" />
     </label>
     <label class="pp-toggle-btn pp-highlight-toggle" :title="t('Highlight tankers (C-17 / KC-135) in the military layer')">
       <span class="pp-label">{{ t('Tankers') }}</span>
+      <span class="pp-slider-value" id="highlight-tanker-count">{{ highlightCounts.tanker }}</span>
       <input type="checkbox" id="highlight-tanker-toggle" @change="act('toggleHighlightTanker')" :checked="highlightTankerOn" />
     </label>
   </div>

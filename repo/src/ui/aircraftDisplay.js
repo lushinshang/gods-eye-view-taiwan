@@ -27,6 +27,38 @@ export class AircraftDisplay {
     this._highlightFastjet = false;
     this._highlightUav = false;
     this._highlightTanker = false;
+    this._highlightCounts = { fastjet: 0, uav: 0, tanker: 0 };
+    // Counts are independent of the toggles (an operator checks them before
+    // flipping one), so they poll on their own cadence rather than riding a
+    // toggle/restore event. 2s: frequent enough to feel live without
+    // re-deriving them more often than the feed itself actually updates.
+    this._highlightCountsTimer = setInterval(
+      () => this._refreshHighlightCounts(),
+      2000,
+    );
+    // Node (tests, SSR) must not be held open by this; browsers have no unref.
+    this._highlightCountsTimer?.unref?.();
+  }
+
+  destroy() {
+    clearInterval(this._highlightCountsTimer);
+    this._highlightCountsTimer = null;
+  }
+
+  _refreshHighlightCounts() {
+    const stats = this._dataManager
+      ?.getAll?.()
+      ?.find((entry) => entry.id === 'military')?.stats;
+    const counts = stats?.highlightCounts;
+    if (!counts) return;
+    if (
+      counts.fastjet === this._highlightCounts.fastjet &&
+      counts.uav === this._highlightCounts.uav &&
+      counts.tanker === this._highlightCounts.tanker
+    )
+      return;
+    this._highlightCounts = counts;
+    this._publishKlassHighlight();
   }
   get _dataManager() {
     return this.readDataManager();
@@ -62,6 +94,7 @@ export class AircraftDisplay {
       fastjet: this._highlightFastjet,
       uav: this._highlightUav,
       tanker: this._highlightTanker,
+      counts: this._highlightCounts,
     });
   }
 

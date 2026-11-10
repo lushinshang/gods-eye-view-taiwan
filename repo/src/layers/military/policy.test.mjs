@@ -3,12 +3,65 @@ import assert from 'node:assert/strict';
 import * as Cesium from 'cesium';
 import {
   fleetHighlightColor,
+  matchedHighlightKlass,
+  countHighlightKlasses,
+  armedHighlightKlass,
   MIL_ICON_COLOR,
   EMERGENCY_ICON_COLOR,
   HIGHLIGHT_FASTJET_COLOR,
   HIGHLIGHT_UAV_COLOR,
   HIGHLIGHT_TANKER_COLOR,
 } from './policy.js';
+
+test('matchedHighlightKlass: fastjet/uav by klass, tanker by type, others null', () => {
+  assert.equal(matchedHighlightKlass({ klass: 'fastjet' }), 'fastjet');
+  assert.equal(matchedHighlightKlass({ klass: 'uav' }), 'uav');
+  assert.equal(matchedHighlightKlass({ klass: 'widebody', type: 'C17' }), 'tanker');
+  assert.equal(matchedHighlightKlass({ klass: 'widebody', type: 'K35R' }), 'tanker');
+  // A civilian widebody shares the klass with tankers but is not one.
+  assert.equal(matchedHighlightKlass({ klass: 'widebody', type: 'A333' }), null);
+  assert.equal(matchedHighlightKlass({ klass: 'airliner' }), null);
+  assert.equal(matchedHighlightKlass({}), null);
+});
+
+test('countHighlightKlasses: empty fleet is all zero', () => {
+  assert.deepEqual(countHighlightKlasses([]), { fastjet: 0, uav: 0, tanker: 0 });
+});
+
+test('countHighlightKlasses: tallies a mixed fleet correctly, ignoring non-matches', () => {
+  const fleet = [
+    { klass: 'fastjet' },
+    { klass: 'fastjet' },
+    { klass: 'uav' },
+    { klass: 'widebody', type: 'C17' },
+    { klass: 'widebody', type: 'K35R' },
+    { klass: 'widebody', type: 'A333' }, // civilian widebody, not a tanker
+    { klass: 'airliner' },
+    { klass: 'helicopter' },
+  ];
+  assert.deepEqual(countHighlightKlasses(fleet), { fastjet: 2, uav: 1, tanker: 2 });
+});
+
+test('armedHighlightKlass: null unless both the match AND its own toggle are true', () => {
+  assert.equal(armedHighlightKlass({ klass: 'fastjet' }), null);
+  assert.equal(
+    armedHighlightKlass({ klass: 'fastjet', highlightFastjet: true }),
+    'fastjet',
+  );
+  // Matching a different klass's armed toggle must not cross-trigger.
+  assert.equal(
+    armedHighlightKlass({ klass: 'fastjet', highlightUav: true }),
+    null,
+  );
+  assert.equal(
+    armedHighlightKlass({ klass: 'widebody', type: 'C17', highlightTanker: true }),
+    'tanker',
+  );
+  assert.equal(
+    armedHighlightKlass({ klass: 'widebody', type: 'A333', highlightTanker: true }),
+    null,
+  );
+});
 
 test('all highlights off: every klass still renders the default amber', () => {
   assert.ok(

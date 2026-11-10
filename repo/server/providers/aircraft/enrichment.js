@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { promises as fsp } from 'node:fs';
 import { readResponseJsonCapped } from '../common/http.js';
+import { makeRateLimiter, clientKey } from '../common/rate-limit.js';
 
 /** Route and aircraft lookups are a few hundred bytes; 1 MiB is a hard bound. */
 const ADSBDB_MAX_RESPONSE_BYTES = 1024 * 1024;
@@ -11,21 +12,78 @@ const ADSBDB_MAX_RESPONSE_BYTES = 1024 * 1024;
  * persisted to disk so restarts don't re-hammer it; other failures are not
  * cached. Adapted from skylight
  * (MIT) server/src/enrich/routes.ts.
+ *
+ * Bounded like terrain.js's point cache (same upstream issue shape, fixed
+ * there first): every distinct callsign or hex is its own permanent key, so
+ * routes and aircraft each carry an independent entry ceiling with
+ * oldest-first eviction.
  */
-export function adsbdbProxy() {
+export function adsbdbProxy(options = {}) {
+  // Destructured in the body, not the signature: src/proxyErrorResponses.test.mjs
+  // extracts this proxy by slicing to the first closing brace in column
+  // zero (see terrain.js for the same note). Overridable so the ceilings
+  // can be exercised as behaviour, not asserted as constants; production
+  // constructs this with no arguments.
+  const {
+    cacheMaxEntries = 50_000,
+    cacheMaxDiskBytes = 24 * 1024 * 1024,
+    cachePath,
+  } = options;
   const TTL_MS = 24 * 3600_000;
-  const CACHE_PATH = path.join(process.cwd(), '.gev-cache', 'adsbdb.json');
-  let cache = { routes: {}, aircraft: {} };
+  const CACHE_PATH =
+    cachePath || path.join(process.cwd(), '.gev-cache', 'adsbdb.json');
+  let cache = { routes: new Map(), aircraft: new Map() };
   let dirty = false;
   let loaded = false;
   const inflight = new Map();
+  /**
+   * 90/min/client — same band terrain.js uses for the same reason: adsbdb
+   * is free and keyless, so this guards the point cache and the upstream
+   * community API from enumeration (see issue #261) rather than a bill.
+   */
+  const allow = makeRateLimiter({ windowMs: 60_000, max: 90, globalMax: 270 });
+
+  /**
+   * Drop the oldest entries until a store is back inside its ceiling. Each
+   * store is kept in insertion order (Map's native guarantee), and every
+   * write re-inserts the key it just set, so the oldest-fetched entry is
+   * always first — no sort needed, unlike terrain.js's `mem` (which can be
+   * re-populated out of fetch order from disk and has to call `orderByAge`).
+   */
+  function evictOverflow(store) {
+    for (const key of store.keys()) {
+      if (store.size <= cacheMaxEntries) return;
+      store.delete(key);
+    }
+  }
 
   async function loadOnce() {
     if (loaded) return;
     loaded = true;
     try {
+      // A cache file past the ceiling is not read back into memory: loading
+      // it would reinstate exactly the unbounded growth the ceiling exists
+      // to stop. The next flush rewrites a bounded one. "Cannot measure it"
+      // is not "too large": if stat is unavailable, fall through and let
+      // readFile decide, so an absent file behaves exactly as it did before
+      // this guard existed.
+      let sizeBytes = null;
+      try {
+        sizeBytes = (await fsp.stat(CACHE_PATH)).size;
+      } catch {
+        sizeBytes = null;
+      }
+      if (sizeBytes !== null && sizeBytes > cacheMaxDiskBytes)
+        throw new Error('cache file too large');
       const parsed = JSON.parse(await fsp.readFile(CACHE_PATH, 'utf8'));
-      cache = { routes: parsed.routes ?? {}, aircraft: parsed.aircraft ?? {} };
+      cache = {
+        routes: new Map(Object.entries(parsed.routes ?? {})),
+        aircraft: new Map(Object.entries(parsed.aircraft ?? {})),
+      };
+      // A ceiling lowered since the file was written, or a file from before
+      // this ceiling existed, could hold more than the current cap.
+      evictOverflow(cache.routes);
+      evictOverflow(cache.aircraft);
     } catch {
       /* first run */
     }
@@ -34,7 +92,11 @@ export function adsbdbProxy() {
       dirty = false;
       try {
         await fsp.mkdir(path.dirname(CACHE_PATH), { recursive: true });
-        await fsp.writeFile(CACHE_PATH, JSON.stringify(cache), 'utf8');
+        const obj = {
+          routes: Object.fromEntries(cache.routes),
+          aircraft: Object.fromEntries(cache.aircraft),
+        };
+        await fsp.writeFile(CACHE_PATH, JSON.stringify(obj), 'utf8');
       } catch {
         dirty = true;
       } // retry next tick
@@ -74,7 +136,7 @@ export function adsbdbProxy() {
 
   function lookup(kind, key) {
     const store = kind === 'route' ? cache.routes : cache.aircraft;
-    if (fresh(store[key])) return Promise.resolve(store[key].data);
+    if (fresh(store.get(key))) return Promise.resolve(store.get(key).data);
     const ik = `${kind}:${key}`;
     if (!inflight.has(ik)) {
       inflight.set(
@@ -95,18 +157,20 @@ export function adsbdbProxy() {
               );
               const data =
                 kind === 'route' ? parseRoute(payload) : parseAircraft(payload);
-              store[key] = { at: Date.now(), data }; // data may be null — negative cache
+              store.set(key, { at: Date.now(), data }); // data may be null — negative cache
+              evictOverflow(store);
               dirty = true;
               return data;
             }
             if (res.status === 404) {
-              store[key] = { at: Date.now(), data: null }; // known-missing — cache the miss
+              store.set(key, { at: Date.now(), data: null }); // known-missing — cache the miss
+              evictOverflow(store);
               dirty = true;
             }
             // other statuses: leave uncached so we retry later
-            return fresh(store[key]) ? store[key].data : null;
+            return fresh(store.get(key)) ? store.get(key).data : null;
           } catch {
-            return fresh(store[key]) ? store[key].data : null; // network error → stale if any
+            return fresh(store.get(key)) ? store.get(key).data : null; // network error → stale if any
           } finally {
             inflight.delete(ik);
           }
@@ -124,6 +188,14 @@ export function adsbdbProxy() {
         res.end(JSON.stringify(obj));
       };
       try {
+        if (!allow(clientKey(req))) {
+          res.writeHead(429, {
+            'Content-Type': 'application/json',
+            'Retry-After': '10',
+          });
+          res.end(JSON.stringify({ error: 'Rate limit exceeded' }));
+          return;
+        }
         const [, kind, rawKey] = String(req.url || '')
           .split('?')[0]
           .split('/');

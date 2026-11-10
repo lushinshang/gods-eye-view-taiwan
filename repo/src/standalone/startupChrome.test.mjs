@@ -27,7 +27,7 @@ function fixture() {
     clearTimeout(id) {
       timers.delete(id);
     },
-    initFirstRunExperience() {
+    applyFirstRunDefaultLayers() {
       events.push('welcome');
       return { destroy: () => events.push('welcome:destroy') };
     },

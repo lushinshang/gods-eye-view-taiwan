@@ -1,4 +1,4 @@
-import { initFirstRunExperience } from '../firstRunExperience.js';
+import { applyFirstRunDefaultLayers } from '../firstRunDefaultLayers.js';
 
 /** Reveal welcome controls only after restoration and the loading transition. */
 export function startApplicationChrome({
@@ -6,7 +6,7 @@ export function startApplicationChrome({
   styleManager,
   dataManager,
   signal,
-  initializeWelcome = initFirstRunExperience,
+  initializeWelcome = applyFirstRunDefaultLayers,
   initializeSettings,
 }) {
   let disposed = false;

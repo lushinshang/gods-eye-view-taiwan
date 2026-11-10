@@ -1,0 +1,57 @@
+name: Military archive snapshot
+
+# Polls adsb.lol + adsb.fi's /v2/mil directly (see
+# scripts/archive-military-snapshot.mjs — a runner here cannot reach a
+# user's local dev server), merges by hex, age-encrypts with the public key
+# committed at scripts/fixtures/military-archive-pubkey.txt, and uploads the
+# result as an asset on that day's Release. Only the matching private key —
+# which never leaves the archive owner's machine — can decrypt it.
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: military-archive-${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    name: Fetch, encrypt, upload
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Use Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24.22.2
+
+      - name: Install age
+        run: sudo apt-get update && sudo apt-get install -y age
+
+      - name: Build encrypted snapshot
+        run: node scripts/archive-military-snapshot.mjs snapshot-out
+
+      - name: Ensure today's Release exists
+        run: |
+          TAG="military-archive-$(date -u +%Y-%m-%d)"
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" \
+              --title "Military archive — $TAG" \
+              --notes "Encrypted adsb.lol+adsb.fi /v2/mil snapshots, 15-minute cadence. Decrypt locally with scripts/decrypt-military-archive.mjs and the private key (never stored in this repo)."
+          fi
+
+      - name: Upload snapshot asset
+        run: gh release upload "$TAG" snapshot-out/*.age

@@ -336,6 +336,15 @@ export function createFlightState({ source, services }) {
 
   flightState._irBoost = false;
 
+  /** Klass highlight toggles (default off, unchanged display). See
+   *  _fleetBillboardColor in rendering.js and HIGHLIGHT_*_COLOR in policy.js. */
+
+  flightState._highlightFastjet = false;
+
+  flightState._highlightUav = false;
+
+  flightState._highlightTanker = false;
+
   /** Boosted models render UNLIT — mirror of flights.js (owner cockpit-FLIR
    *  field rounds): material-stage tint still sun-shades, so side-on planes
    *  read near-black under a high sun; UNLIT emits flat white regardless.

@@ -544,6 +544,9 @@ test('unknown and forbidden option fields are ignored while missing options use 
     models3dMode: 'all',
     selectedFlightsTrackingId: null,
     selectedMilitaryTrackingId: null,
+    highlightFastjet: false,
+    highlightUav: false,
+    highlightTanker: false,
   });
   assert.deepEqual(decoded.options.radio, { filter: 'news', volume: 0.35 });
 
@@ -639,6 +642,9 @@ test('compact URL omits absent-meaning option state and still resolves to it', (
     models3dMode: 'proximity',
     selectedFlightsTrackingId: null,
     selectedMilitaryTrackingId: null,
+    highlightFastjet: false,
+    highlightUav: false,
+    highlightTanker: false,
   };
   state.options.satellites = {
     catalog: 'core',
@@ -892,10 +898,22 @@ test('a share link that carries 3D OFF still restores OFF at both aircraft layer
     shareCreatedAtMs: 1_000,
   });
   assert.deepEqual(calls.flights, [
-    { models3d: false, models3dMode: 'proximity' },
+    {
+      models3d: false,
+      models3dMode: 'proximity',
+      highlightFastjet: false,
+      highlightUav: false,
+      highlightTanker: false,
+    },
   ]);
   assert.deepEqual(calls.military, [
-    { models3d: false, models3dMode: 'proximity' },
+    {
+      models3d: false,
+      models3dMode: 'proximity',
+      highlightFastjet: false,
+      highlightUav: false,
+      highlightTanker: false,
+    },
   ]);
   assert.equal(coordinator.getDurableState().options.flights.models3d, false);
   coordinator.destroy();
@@ -1525,6 +1543,9 @@ test('later explicit params during init replace options without cancelling visib
     models3dMode: 'proximity',
     selectedFlightsTrackingId: null,
     selectedMilitaryTrackingId: null,
+    highlightFastjet: false,
+    highlightUav: false,
+    highlightTanker: false,
   });
   assert.equal(
     results.find((result) => result.layerId === 'flights').succeeded,
@@ -1579,6 +1600,9 @@ test('explicit navigation preserves unrelated visibility and option restoration'
     {
       models3d: true,
       models3dMode: 'all',
+      highlightFastjet: false,
+      highlightUav: false,
+      highlightTanker: false,
     },
   ]);
   assert.equal(
@@ -1646,6 +1670,9 @@ test('startup gesture clears passive Follow but preserves slow layer and display
     models3dMode: 'all',
     irBoost: true,
     selectedFlightsTrackingId: null,
+    highlightFastjet: false,
+    highlightUav: false,
+    highlightTanker: false,
   });
   assert.deepEqual(manager.getLayerParams('radio'), {
     filter: 'genre:r&b',
@@ -1719,7 +1746,13 @@ test('shared flight selection is deferred until destination refresh and then fol
   });
   await coordinator.start({ shareLayerState: state, shareCreatedAtMs: 1_000 });
   assert.deepEqual(paramsCalls, [
-    { models3d: true, models3dMode: 'proximity' },
+    {
+      models3d: true,
+      models3dMode: 'proximity',
+      highlightFastjet: false,
+      highlightUav: false,
+      highlightTanker: false,
+    },
   ]);
 
   const result = await coordinator.restoreShareTrackingSelection();

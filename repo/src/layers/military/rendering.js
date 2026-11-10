@@ -34,7 +34,7 @@ import {
   COCKPIT_CONTACT_SIZE_PX,
   MIL_ICON_COLOR,
   TRACKED_ICON_COLOR,
-  EMERGENCY_ICON_COLOR,
+  fleetHighlightColor,
   MODEL_ALT_CEIL_M,
   MODEL_MAX_ALL,
   MODEL_MAX,
@@ -197,14 +197,24 @@ export function createRendering({
     return _fleetBillboardColor(icao24);
   }
 
-  /** Fleet (untracked) tint: red while the latest poll broadcast an emergency,
-   *  amber otherwise. Cockpit far-contact dots use it too. */
+  /** Fleet (untracked) tint: red while the latest poll broadcast an emergency;
+   *  else the operator-armed klass highlight (fastjet/UAV/tanker) if this
+   *  contact matches one; amber otherwise. Cockpit far-contact dots use it too.
+   *  Precedence and the tanker type-gate live in the pure, unit-tested
+   *  `fleetHighlightColor` (policy.js). */
 
   function _fleetBillboardColor(
     icao24,
     info = flightState.records.data.get(icao24),
   ) {
-    return isEmergency(info?.emergency) ? EMERGENCY_ICON_COLOR : MIL_ICON_COLOR;
+    return fleetHighlightColor({
+      emergency: isEmergency(info?.emergency),
+      klass: info?.klass,
+      type: info?.type,
+      highlightFastjet: flightState._highlightFastjet,
+      highlightUav: flightState._highlightUav,
+      highlightTanker: flightState._highlightTanker,
+    });
   }
 
   /** The FLEET's 3D-model regime: models3d enabled AND the camera zoomed in past the altitude

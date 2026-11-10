@@ -17,7 +17,8 @@ import { StyleParameterRows } from '../../styleParameters.js';
 // and each publishes them; until they do, the panel shows its initial markup.
 // Draw and Import live in UTILITIES (LayerPanelsView).
 const display = useDisplayStore();
-const { view, models3d, parameters, cockpitPortal } = storeToRefs(display);
+const { view, models3d, klassHighlight, parameters, cockpitPortal } =
+  storeToRefs(display);
 // A control's change goes to its owner (DisplayBindings).
 const act = (name, ...args) => display.act(name, ...args);
 const pct = (value) => `${value}%`;
@@ -37,6 +38,9 @@ const celestialTitle = computed(() =>
 );
 const models3dOn = computed(() => models3d.value?.pressed ?? true);
 const modelsMode = computed(() => models3d.value?.mode ?? 'proximity');
+const highlightFastjetOn = computed(() => klassHighlight.value?.fastjet ?? false);
+const highlightUavOn = computed(() => klassHighlight.value?.uav ?? false);
+const highlightTankerOn = computed(() => klassHighlight.value?.tanker ?? false);
 const modelsOptions = computed(() => [
   { value: 'proximity', label: t('Proximity'), attrs: { id: 'models3d-mode-proximity', 'data-mode': 'proximity' } },
   { value: 'all', label: t('All'), attrs: { id: 'models3d-mode-all', 'data-mode': 'all' } },
@@ -157,6 +161,21 @@ const allocationOptions = computed(() => [
     </div>
   </div>
   </Teleport>
+  <div class="pp-toggle-group" id="military-highlight-group">
+    <span class="pp-slider-mini-label">{{ t('Highlight') }}</span>
+    <label class="pp-toggle-btn pp-highlight-toggle" :title="t('Highlight fast jets in the military layer')">
+      <span class="pp-label">{{ t('Fast jets') }}</span>
+      <input type="checkbox" id="highlight-fastjet-toggle" @change="act('toggleHighlightFastjet')" :checked="highlightFastjetOn" />
+    </label>
+    <label class="pp-toggle-btn pp-highlight-toggle" :title="t('Highlight UAVs in the military layer')">
+      <span class="pp-label">{{ t('UAVs') }}</span>
+      <input type="checkbox" id="highlight-uav-toggle" @change="act('toggleHighlightUav')" :checked="highlightUavOn" />
+    </label>
+    <label class="pp-toggle-btn pp-highlight-toggle" :title="t('Highlight tankers (C-17 / KC-135) in the military layer')">
+      <span class="pp-label">{{ t('Tankers') }}</span>
+      <input type="checkbox" id="highlight-tanker-toggle" @change="act('toggleHighlightTanker')" :checked="highlightTankerOn" />
+    </label>
+  </div>
   <div class="pp-toggle-group">
     <label class="pp-toggle-btn pp-scope-toggle" :title="t('Scope — the circular viewport mask')">
       <span class="pp-icon material-symbols-outlined" aria-hidden="true">adjust</span>

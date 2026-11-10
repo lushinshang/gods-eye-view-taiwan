@@ -298,6 +298,15 @@ export function createQueries({
         // cold and thermal-reactive variants directly (mirror of flights.js).
         parts.tracking._refreshTr3bForStyle();
       }
+      if (typeof params.highlightFastjet === 'boolean') {
+        flightState._highlightFastjet = params.highlightFastjet;
+      }
+      if (typeof params.highlightUav === 'boolean') {
+        flightState._highlightUav = params.highlightUav;
+      }
+      if (typeof params.highlightTanker === 'boolean') {
+        flightState._highlightTanker = params.highlightTanker;
+      }
       if (Object.hasOwn(params, 'selectedMilitaryTrackingId')) {
         const requested = _normalizeTrackedIcao(
           params.selectedMilitaryTrackingId,
@@ -329,6 +338,9 @@ export function createQueries({
         models3dMode: flightState._models3dMode,
         irBoost: flightState._irBoost,
         selectedMilitaryTrackingId: flightState._trackedIcao,
+        highlightFastjet: flightState._highlightFastjet,
+        highlightUav: flightState._highlightUav,
+        highlightTanker: flightState._highlightTanker,
       };
     },
 

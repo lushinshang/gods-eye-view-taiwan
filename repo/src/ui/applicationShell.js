@@ -558,6 +558,10 @@ export class StyleManager extends ShellFacade {
         _setModels3dEnabled: (...args) => this._setModels3dEnabled(...args),
         _syncModels3dModeRow: (...args) => this._syncModels3dModeRow(...args),
         _setModels3dMode: (...args) => this._setModels3dMode(...args),
+        _setHighlightFastjet: (...args) =>
+          this._setHighlightFastjet(...args),
+        _setHighlightUav: (...args) => this._setHighlightUav(...args),
+        _setHighlightTanker: (...args) => this._setHighlightTanker(...args),
       },
       readState: () => ({
         shareLinkManager: this.shareLinkManager,
@@ -567,6 +571,9 @@ export class StyleManager extends ShellFacade {
         celestialRing: this.celestialRing,
         celestialRingEnabled: this.celestialRingEnabled,
         _models3dEnabled: this._models3dEnabled,
+        _highlightFastjet: this._highlightFastjet,
+        _highlightUav: this._highlightUav,
+        _highlightTanker: this._highlightTanker,
       }),
       claimDetection: () => {
         this._visualSettings._detectionUserOverridden = true;

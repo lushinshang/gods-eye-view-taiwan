@@ -375,6 +375,11 @@ const OPTION_GROUPS = Object.freeze({
     }),
     trackingIdOption('selectedFlightsTrackingId', 't', null),
     trackingIdOption('selectedMilitaryTrackingId', 'u', null),
+    // Military-layer-only klass highlight toggles (default off, unchanged
+    // display). See src/layers/military/rendering.js _fleetBillboardColor.
+    booleanOption('highlightFastjet', 'j', false),
+    booleanOption('highlightUav', 'd', false),
+    booleanOption('highlightTanker', 'k', false),
   ]),
   satellites: Object.freeze([
     enumOption('catalog', 'c', 'core', ['core', 'dense'], {

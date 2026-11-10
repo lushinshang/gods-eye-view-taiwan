@@ -39,6 +39,46 @@ export const TRACKED_ICON_COLOR = Cesium.Color.fromCssColorString('#FFD166');
 export const EMERGENCY_ICON_COLOR =
   Cesium.Color.fromCssColorString(EMERGENCY_TINT_CSS);
 
+/** @constant {Cesium.Color} Highlight tint for a fast jet when `highlightFastjet` is on */
+
+export const HIGHLIGHT_FASTJET_COLOR = Cesium.Color.fromCssColorString('#00E5FF');
+
+/** @constant {Cesium.Color} Highlight tint for a UAV when `highlightUav` is on */
+
+export const HIGHLIGHT_UAV_COLOR = Cesium.Color.fromCssColorString('#B388FF');
+
+/** @constant {Cesium.Color} Highlight tint for a C17/K35R tanker when `highlightTanker` is on */
+
+export const HIGHLIGHT_TANKER_COLOR = Cesium.Color.fromCssColorString('#4CD964');
+
+/**
+ * Pure fleet (untracked) billboard color decision, extracted from rendering.js
+ * so the precedence and the tanker type-gate are unit-testable without the
+ * Cesium viewer the rest of the module needs. Precedence: emergency >
+ * operator-armed klass highlight > default amber. Tanker matches on `type`
+ * (ICAO code), NOT `klass === 'widebody'` — that klass also covers ordinary
+ * civilian wide-bodies (A332, B777, ...); only C17/K35R are tankers (see
+ * aircraftClass.js WIDE set, and its own test confirming C17 classifies as
+ * 'widebody').
+ * @param {{emergency: boolean, klass?: string, type?: string, highlightFastjet?: boolean, highlightUav?: boolean, highlightTanker?: boolean}} info
+ * @returns {Cesium.Color}
+ */
+export function fleetHighlightColor({
+  emergency,
+  klass,
+  type,
+  highlightFastjet,
+  highlightUav,
+  highlightTanker,
+} = {}) {
+  if (emergency) return EMERGENCY_ICON_COLOR;
+  if (highlightFastjet && klass === 'fastjet') return HIGHLIGHT_FASTJET_COLOR;
+  if (highlightUav && klass === 'uav') return HIGHLIGHT_UAV_COLOR;
+  if (highlightTanker && (type === 'C17' || type === 'K35R'))
+    return HIGHLIGHT_TANKER_COLOR;
+  return MIL_ICON_COLOR;
+}
+
 // --- Ground traffic (owner reversal 2026-07-03; mirror of flights.js) ---------------
 // adsb.lol/readsb flags ground traffic with alt_baro === "ground" (no separate
 // boolean). Such aircraft are RENDERED instead of floating at the 3 km altitude

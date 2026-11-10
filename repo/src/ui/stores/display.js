@@ -28,6 +28,14 @@ export const useDisplayStore = defineStore('gev-display', () => {
     models3d.value = markRaw(next);
   }
 
+  /** The military klass-highlight checkboxes; null until AircraftDisplay first renders. */
+  const klassHighlight = shallowRef(null);
+
+  /** @param {object} next A fresh presentation of the klass-highlight checkboxes. */
+  function publishKlassHighlight(next) {
+    klassHighlight.value = markRaw(next);
+  }
+
   /** The Draw controls; null until the draw tool first renders. */
   const draw = shallowRef(null);
 
@@ -108,6 +116,8 @@ export const useDisplayStore = defineStore('gev-display', () => {
     publish,
     models3d,
     publishModels3d,
+    klassHighlight,
+    publishKlassHighlight,
     draw,
     publishDraw,
     geoImport,

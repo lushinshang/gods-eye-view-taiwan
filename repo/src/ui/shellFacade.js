@@ -25,6 +25,30 @@ export class ShellFacade {
     this._aircraftDisplay._models3dMode = value;
   }
 
+  get _highlightFastjet() {
+    return this._aircraftDisplay._highlightFastjet;
+  }
+
+  set _highlightFastjet(value) {
+    this._aircraftDisplay._highlightFastjet = value;
+  }
+
+  get _highlightUav() {
+    return this._aircraftDisplay._highlightUav;
+  }
+
+  set _highlightUav(value) {
+    this._aircraftDisplay._highlightUav = value;
+  }
+
+  get _highlightTanker() {
+    return this._aircraftDisplay._highlightTanker;
+  }
+
+  set _highlightTanker(value) {
+    this._aircraftDisplay._highlightTanker = value;
+  }
+
   get _dataManager() {
     return this._layerBindings?._dataManager;
   }
@@ -1330,6 +1354,18 @@ export class ShellFacade {
 
   _setModels3dMode(...args) {
     return this._aircraftDisplay._setModels3dMode(...args);
+  }
+
+  _setHighlightFastjet(...args) {
+    return this._aircraftDisplay._setHighlightFastjet(...args);
+  }
+
+  _setHighlightUav(...args) {
+    return this._aircraftDisplay._setHighlightUav(...args);
+  }
+
+  _setHighlightTanker(...args) {
+    return this._aircraftDisplay._setHighlightTanker(...args);
   }
 
   _syncModels3dButtonState(...args) {

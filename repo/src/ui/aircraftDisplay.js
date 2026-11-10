@@ -23,6 +23,10 @@ export class AircraftDisplay {
     this._models3dPressedShown = null;
     this._models3dRowShown = null;
     this._models3dModeShown = null;
+    // Military klass-highlight checkboxes (default off, military layer only).
+    this._highlightFastjet = false;
+    this._highlightUav = false;
+    this._highlightTanker = false;
   }
   get _dataManager() {
     return this.readDataManager();
@@ -41,7 +45,42 @@ export class AircraftDisplay {
     this._models3dRowShown = this._models3dEnabled;
     this._models3dModeShown = this._models3dMode;
     this._publishModels3d();
+    this._highlightFastjet = options.highlightFastjet === true;
+    this._highlightUav = options.highlightUav === true;
+    this._highlightTanker = options.highlightTanker === true;
+    this._publishKlassHighlight();
     this._layoutRightPanels();
+  }
+
+  /** Military-only — unlike models3d this never reaches the flights layer. */
+  _setHighlightParams(params, { origin = 'user' } = {}) {
+    this._dataManager?.setLayerParams('military', params, { origin });
+  }
+
+  _publishKlassHighlight() {
+    this.store.publishKlassHighlight({
+      fastjet: this._highlightFastjet,
+      uav: this._highlightUav,
+      tanker: this._highlightTanker,
+    });
+  }
+
+  _setHighlightFastjet(enabled) {
+    this._highlightFastjet = !!enabled;
+    this._setHighlightParams({ highlightFastjet: this._highlightFastjet });
+    this._publishKlassHighlight();
+  }
+
+  _setHighlightUav(enabled) {
+    this._highlightUav = !!enabled;
+    this._setHighlightParams({ highlightUav: this._highlightUav });
+    this._publishKlassHighlight();
+  }
+
+  _setHighlightTanker(enabled) {
+    this._highlightTanker = !!enabled;
+    this._setHighlightParams({ highlightTanker: this._highlightTanker });
+    this._publishKlassHighlight();
   }
 
   _syncModels3dModeRow() {

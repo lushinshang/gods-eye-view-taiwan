@@ -42,6 +42,15 @@ export class DisplayBindings {
   get _models3dEnabled() {
     return this.readState()._models3dEnabled;
   }
+  get _highlightFastjet() {
+    return this.readState()._highlightFastjet;
+  }
+  get _highlightUav() {
+    return this.readState()._highlightUav;
+  }
+  get _highlightTanker() {
+    return this.readState()._highlightTanker;
+  }
   _initUI() {
     const { cycleDetectionMode, isScopeMaskEnabled } = this.services;
     this._applicationShortcuts?.destroy();
@@ -168,6 +177,11 @@ export class DisplayBindings {
         this._syncModels3dModeRow();
       },
       setModelsMode: (mode) => this._setModels3dMode(mode),
+      toggleHighlightFastjet: () =>
+        this._setHighlightFastjet(!this._highlightFastjet),
+      toggleHighlightUav: () => this._setHighlightUav(!this._highlightUav),
+      toggleHighlightTanker: () =>
+        this._setHighlightTanker(!this._highlightTanker),
     });
     this._detachDisplayControls = () => store.detach(token);
   }

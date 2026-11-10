@@ -259,9 +259,12 @@ export const TRACKED_BILLBOARD_SCALE_BY_DISTANCE = new Cesium.NearFarScalar(
 
 export const TRAIL_COLOR = '#FFB800';
 
+// At the 15 s military poll cadence (military/queries.js updateInterval),
+// 800 fixes ≈ 200 min — matched to the flights layer's trail duration
+// (TRAIL_MAX_POINTS=400 at its 30 s cadence), not to its point count.
 /** @constant {number} Combined cap on trail vertices (backfill + live accumulation). */
 
-export const TRAIL_MAX_POINTS = 400;
+export const TRAIL_MAX_POINTS = 800;
 
 // ---------------------------------------------------------------------------
 // Render-behind smoothing (mirrors flights.js): the fleet renders at

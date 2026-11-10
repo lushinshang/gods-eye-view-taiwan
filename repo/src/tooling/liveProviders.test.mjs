@@ -61,6 +61,24 @@ function oversizedResponse(text, init = {}) {
   return { response, state };
 }
 
+/**
+ * The military route now queries adsb.lol AND adsb.fi independently
+ * (adsb-lol.js's adsbLolProxy merges both). Every test below exercises
+ * adsb.lol-specific cache/cooldown/fallback behavior through that route, so
+ * its fetch mock must stay URL-aware: adsb.lol's URL gets the test's own
+ * mock logic verbatim, and adsb.fi's URL gets a fixed, always-unusable
+ * response that never touches the test's own call counters — the route
+ * falls back to adsb.lol alone, which is exactly the pre-merge single-source
+ * behavior these tests were written to assert.
+ */
+function militaryFetchMock(primaryImpl) {
+  return async (url, init) => {
+    if (typeof url === 'string' && url.includes('adsb.fi'))
+      return new Response('{"error":"unavailable"}', { status: 503 });
+    return primaryImpl(url, init);
+  };
+}
+
 function environment(t, values) {
   for (const [key, value] of Object.entries(values)) {
     const original = process.env[key];
@@ -326,11 +344,15 @@ test('OpenSky does not retry a snapshot body over the cap', async (t) => {
 test('military aircraft route answers 502 to an oversized body without caching it', async (t) => {
   t.mock.method(console, 'error', () => {});
   const bodies = [];
-  t.mock.method(globalThis, 'fetch', async () => {
-    const oversized = oversizedResponse('{"ac":[]}');
-    bodies.push(oversized.state);
-    return oversized.response;
-  });
+  t.mock.method(
+    globalThis,
+    'fetch',
+    militaryFetchMock(async () => {
+      const oversized = oversizedResponse('{"ac":[]}');
+      bodies.push(oversized.state);
+      return oversized.response;
+    }),
+  );
   const request = install(providers.adsbLolProxy());
   const first = await request('/api/military');
   assert.equal(first.statusCode, 502);
@@ -346,10 +368,14 @@ test('military aircraft route preserves fresh cache and stale response after ups
   let calls = 0;
   t.mock.method(Date, 'now', () => now);
   t.mock.method(console, 'error', () => {});
-  t.mock.method(globalThis, 'fetch', async () => {
-    if (++calls > 1) throw Error('offline');
-    return Response.json({ ac: [{ hex: 'abc123' }] });
-  });
+  t.mock.method(
+    globalThis,
+    'fetch',
+    militaryFetchMock(async () => {
+      if (++calls > 1) throw Error('offline');
+      return Response.json({ ac: [{ hex: 'abc123' }] });
+    }),
+  );
   const request = install(providers.adsbLolProxy());
   const first = await request('/api/military');
   assert.equal((await request('/api/military')).body, first.body);
@@ -438,14 +464,18 @@ test('military aircraft route serves stale cache on an upstream 429 and cools do
   let calls = 0;
   t.mock.method(Date, 'now', () => now);
   t.mock.method(console, 'warn', () => {});
-  t.mock.method(globalThis, 'fetch', async () => {
-    calls += 1;
-    if (calls === 1) return Response.json({ ac: [{ hex: 'abc123' }] });
-    return new Response(JSON.stringify({ error: 'rate limited' }), {
-      status: 429,
-      headers: { 'Retry-After': '20' },
-    });
-  });
+  t.mock.method(
+    globalThis,
+    'fetch',
+    militaryFetchMock(async () => {
+      calls += 1;
+      if (calls === 1) return Response.json({ ac: [{ hex: 'abc123' }] });
+      return new Response(JSON.stringify({ error: 'rate limited' }), {
+        status: 429,
+        headers: { 'Retry-After': '20' },
+      });
+    }),
+  );
   const request = install(providers.adsbLolProxy());
   const first = await request('/api/military');
   assert.equal(first.statusCode, 200);
@@ -474,10 +504,14 @@ test('military aircraft route serves stale cache on an upstream 429 and cools do
 test('military aircraft route relays an upstream 429 when nothing is cached', async (t) => {
   t.mock.method(console, 'warn', () => {});
   let calls = 0;
-  t.mock.method(globalThis, 'fetch', async () => {
-    calls += 1;
-    return new Response('{"error":"rate limited"}', { status: 429 });
-  });
+  t.mock.method(
+    globalThis,
+    'fetch',
+    militaryFetchMock(async () => {
+      calls += 1;
+      return new Response('{"error":"rate limited"}', { status: 429 });
+    }),
+  );
   const request = install(providers.adsbLolProxy());
   const limited = await request('/api/military');
   assert.equal(limited.statusCode, 429);
@@ -501,21 +535,25 @@ test('military fallback cancels a stalled 5xx body and starts cooldown at receip
   let cancelled = false;
   t.mock.method(Date, 'now', () => now);
   t.mock.method(console, 'warn', () => {});
-  t.mock.method(globalThis, 'fetch', async () => {
-    if (++calls === 1) return Response.json({ ac: [] });
-    now += 10000;
-    return new Response(
-      new ReadableStream({
-        cancel() {
-          cancelled = true;
+  t.mock.method(
+    globalThis,
+    'fetch',
+    militaryFetchMock(async () => {
+      if (++calls === 1) return Response.json({ ac: [] });
+      now += 10000;
+      return new Response(
+        new ReadableStream({
+          cancel() {
+            cancelled = true;
+          },
+        }),
+        {
+          status: 503,
+          headers: { 'Retry-After': new Date(now + 20000).toUTCString() },
         },
-      }),
-      {
-        status: 503,
-        headers: { 'Retry-After': new Date(now + 20000).toUTCString() },
-      },
-    );
-  });
+      );
+    }),
+  );
   const request = install(providers.adsbLolProxy());
   await request('/api/military');
   now += 1000;
@@ -554,6 +592,62 @@ test('military cooldown bounds untrusted Retry-After and defaults server errors'
     const result = await install(providers.adsbLolProxy())('/api/military');
     assert.equal(Number(result.headers['retry-after']), seconds);
   }
+});
+
+test('military route merges adsb.lol and adsb.fi by hex, adsb.lol winning a collision', async (t) => {
+  t.mock.method(globalThis, 'fetch', async (url) => {
+    if (typeof url === 'string' && url.includes('adsb.fi'))
+      return Response.json({
+        ac: [
+          { hex: 'aaa001', flight: 'FROM_FI_LOSES' },
+          { hex: 'bbb002', flight: 'FI_ONLY' },
+        ],
+      });
+    return Response.json({ ac: [{ hex: 'aaa001', flight: 'FROM_LOL_WINS' }] });
+  });
+  const result = await install(providers.adsbLolProxy())('/api/military');
+  assert.equal(result.statusCode, 200);
+  assert.equal(result.headers['x-feed-source'], 'adsb.lol+adsb.fi');
+  const parsed = JSON.parse(result.body);
+  assert.deepEqual(parsed.ac, [
+    { hex: 'aaa001', flight: 'FROM_LOL_WINS' },
+    { hex: 'bbb002', flight: 'FI_ONLY' },
+  ]);
+});
+
+test('military route serves adsb.fi alone when adsb.lol is down, and vice versa', async (t) => {
+  t.mock.method(console, 'warn', () => {});
+  t.mock.method(globalThis, 'fetch', async (url) => {
+    if (typeof url === 'string' && url.includes('adsb.fi'))
+      return Response.json({ ac: [{ hex: 'fi001' }] });
+    return new Response('{"error":"down"}', { status: 503 });
+  });
+  const lolDown = await install(providers.adsbLolProxy())('/api/military');
+  assert.equal(lolDown.statusCode, 200);
+  assert.equal(lolDown.headers['x-feed-source'], 'adsb.fi');
+  assert.deepEqual(JSON.parse(lolDown.body).ac, [{ hex: 'fi001' }]);
+
+  t.mock.method(globalThis, 'fetch', async (url) => {
+    if (typeof url === 'string' && url.includes('adsb.fi'))
+      return new Response('{"error":"down"}', { status: 503 });
+    return Response.json({ ac: [{ hex: 'lol001' }] });
+  });
+  const fiDown = await install(providers.adsbLolProxy())('/api/military');
+  assert.equal(fiDown.statusCode, 200);
+  assert.equal(fiDown.headers['x-feed-source'], 'adsb.lol');
+  assert.deepEqual(JSON.parse(fiDown.body).ac, [{ hex: 'lol001' }]);
+});
+
+test('military route relays the primary error when both upstreams are down with nothing cached', async (t) => {
+  t.mock.method(console, 'warn', () => {});
+  t.mock.method(
+    globalThis,
+    'fetch',
+    async () => new Response('{"error":"down"}', { status: 503 }),
+  );
+  const result = await install(providers.adsbLolProxy())('/api/military');
+  assert.equal(result.statusCode, 503);
+  assert.equal(result.headers['x-feed-source'], 'adsb.lol');
 });
 
 test('track backfill proxy returns 502 on an oversized upstream body and caches it as an error', async (t) => {
@@ -686,7 +780,7 @@ test('global aircraft snapshots coalesce cold and expired callers and clear reje
     let release;
     let blocked;
     let fail = false;
-    t.mock.method(globalThis, 'fetch', async () => {
+    const fetchImpl = async () => {
       calls++;
       await blocked;
       if (fail) throw new Error('fixture connection failed');
@@ -694,7 +788,12 @@ test('global aircraft snapshots coalesce cold and expired callers and clear reje
         { time: now / 1000, states: [], ac: [] },
         { headers: { 'x-rate-limit-remaining': '5000' } },
       );
-    });
+    };
+    t.mock.method(
+      globalThis,
+      'fetch',
+      kind === 'military' ? militaryFetchMock(fetchImpl) : fetchImpl,
+    );
     for (const phase of ['cold', 'expired', 'failed', 'recovered']) {
       now += 13000;
       fail = phase === 'failed';

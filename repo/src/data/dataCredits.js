@@ -132,6 +132,13 @@ export const DATA_CREDITS = [
       '(ODbL 1.0)',
   },
   {
+    key: 'adsbfi',
+    html:
+      'Military flights (complementary source, merged by hex with adsb.lol): ' +
+      '<a href="https://adsb.fi" target="_blank" rel="noopener">adsb.fi</a> ' +
+      '(personal/non-commercial use)',
+  },
+  {
     key: 'adsbdb',
     html:
       'Aircraft type, registration &amp; flight routes: ' +

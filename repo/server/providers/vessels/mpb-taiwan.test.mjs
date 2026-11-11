@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   categorizeShip,
   MOTC_CATEGORIES,
+  AGENCY_GUESS_CATEGORIES,
   parseRecordTime,
   normalizeCourse,
   convertTaiwanVesselRows,
@@ -101,4 +102,42 @@ test('conversion retains source type 33, true position timestamps and cleaned co
     }),
     [],
   );
+});
+
+test('a vessel name matching an agency-guess rule overrides the official MOTC category', () => {
+  const feature = (extra = {}) => ({
+    geometry: { coordinates: [119.5, 24] },
+    properties: {
+      MMSI: '412000001',
+      ShipName: 'CCG5901',
+      Ship_and_Cargo_Type: 70, // would normally categorize as cargo
+      SOG: 5,
+      COG: 90,
+      Record_Time: '2026/11/04 21:19:00',
+      ...extra,
+    },
+  });
+  const [ccg] = convertTaiwanVesselRows({ features: [feature()] });
+  assert.equal(ccg.categoryKey, AGENCY_GUESS_CATEGORIES['china-coast-guard'].id);
+  assert.equal(ccg.categoryName, AGENCY_GUESS_CATEGORIES['china-coast-guard'].name);
+  assert.equal(ccg.color, AGENCY_GUESS_CATEGORIES['china-coast-guard'].color);
+  assert.equal(ccg.iconShape, AGENCY_GUESS_CATEGORIES['china-coast-guard'].icon);
+  // original AIS type code is preserved for reference despite the override
+  assert.equal(ccg.shipTypeCode, 70);
+
+  const [research] = convertTaiwanVesselRows({
+    features: [feature({ ShipName: 'XUE LONG', Ship_and_Cargo_Type: 80 })],
+  });
+  assert.equal(research.categoryKey, AGENCY_GUESS_CATEGORIES['china-research'].id);
+
+  const [jcg] = convertTaiwanVesselRows({
+    features: [feature({ ShipName: 'MIZUHO', Ship_and_Cargo_Type: 52 })],
+  });
+  assert.equal(jcg.categoryKey, AGENCY_GUESS_CATEGORIES['japan-coast-guard'].id);
+
+  const [unmatched] = convertTaiwanVesselRows({
+    features: [feature({ ShipName: 'EVER GIVEN', Ship_and_Cargo_Type: 70 })],
+  });
+  assert.equal(unmatched.categoryKey, MOTC_CATEGORIES.cargo.id);
+  assert.equal(unmatched.categoryName, MOTC_CATEGORIES.cargo.name);
 });

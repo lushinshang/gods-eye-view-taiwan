@@ -7,6 +7,7 @@ import {
   applyVesselOverlayPolicy,
   VESSEL_CARD_FADE_DISTANCE_M,
   VESSEL_AGENCY_STYLES,
+  VESSEL_AGENCY_ICON_SHAPES,
 } from '../../data/vesselLabels.js';
 import { classifyVesselAgency } from '../../data/vesselAgencyClassification.js';
 import {
@@ -189,14 +190,6 @@ export function createRendering({
   // Billboard shape per agency-classification guess (see
   // vesselAgencyClassification.js) — the default chevron shape is used when
   // no classification matches, unchanged from before this feature existed.
-  const AGENCY_ICON_SHAPES = {
-    'china-coast-guard':
-      'M-10,-12 L10,-12 L10,2 L0,14 L-10,2 Z',
-    'china-research':
-      'M0,-12 L10.39,-6 L10.39,6 L0,12 L-10.39,6 L-10.39,-6 Z',
-    'japan-coast-guard':
-      'M0,-13 L3.06,-4.02 L12.37,-4.02 L4.9,1.54 L7.64,10.52 L0,5.02 L-7.64,10.52 L-4.9,1.54 L-12.37,-4.02 L-3.06,-4.02 Z',
-  };
   const DEFAULT_ICON_SHAPE = 'M0,-14 L11,10 L4,7 L0,14 L-4,7 L-11,10 Z';
 
   function shipIcon(record, selected) {
@@ -213,7 +206,7 @@ export function createRendering({
 
     const stroke = selected ? 'rgba(6,26,32,0.95)' : 'rgba(4,18,24,0.9)';
     const strokeWidth = selected ? 1.1 : 0.7;
-    const path = AGENCY_ICON_SHAPES[shapeKey] || DEFAULT_ICON_SHAPE;
+    const path = VESSEL_AGENCY_ICON_SHAPES[shapeKey] || DEFAULT_ICON_SHAPE;
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
     <g transform="translate(16,16)">
       <path d="${path}" fill="${cssColor}" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linejoin="round"/>

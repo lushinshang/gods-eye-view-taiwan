@@ -10,6 +10,7 @@
 import https from 'node:https';
 import { dataHealth, aisSpeed } from '../ai/data-health.js';
 import { taiwanTrackStore } from './taiwan-tracks.js';
+import { classifyVesselAgency } from '../../../src/data/vesselAgencyClassification.js';
 
 const MPB_URL = 'https://mpbais.motcmpb.gov.tw/aismpb/tools/geojsonais.ashx';
 const CACHE_TTL_MS = 40_000; // 40 seconds cache
@@ -79,6 +80,38 @@ export const MOTC_CATEGORIES = Object.freeze({
     enName: 'Unspecified',
     color: '#d9d9d9', // 灰白
     icon: 'dot-other',
+  },
+});
+
+/**
+ * Front-end guessed agency classifications layered on top of the 8 official
+ * MOTC categories above — not provided by MOTC itself. Matched by vessel
+ * name text via `classifyVesselAgency()` (see that module for the research
+ * behind the rules and its reliability limits). `name` always carries a
+ * "(推測)" suffix so it is never mistaken for one of the 8 official MOTC
+ * categories it is mixed into the same filter list with.
+ */
+export const AGENCY_GUESS_CATEGORIES = Object.freeze({
+  'china-coast-guard': {
+    id: 'china_coast_guard',
+    name: '中國海警(推測)',
+    enName: 'China Coast Guard (guess)',
+    color: '#ff3b3b',
+    icon: 'agency-shield',
+  },
+  'china-research': {
+    id: 'china_research',
+    name: '中國科考船(推測)',
+    enName: 'China Research Vessel (guess)',
+    color: '#ffd23b',
+    icon: 'agency-hexagon',
+  },
+  'japan-coast-guard': {
+    id: 'japan_coast_guard',
+    name: '日本海保(推測)',
+    enName: 'Japan Coast Guard (guess)',
+    color: '#3b7bff',
+    icon: 'agency-star',
   },
 });
 
@@ -249,7 +282,9 @@ export function convertTaiwanVesselRows(geojson, now = Date.now()) {
     const name = rawName || `MMSI ${mmsi}`;
     const sog = aisSpeed(props.SOG);
     const cog = normalizeCourse(props.COG);
-    const category = categorizeShip(props.Ship_and_Cargo_Type);
+    let category = categorizeShip(props.Ship_and_Cargo_Type);
+    const agencyGuess = classifyVesselAgency({ name });
+    if (agencyGuess) category = AGENCY_GUESS_CATEGORIES[agencyGuess.category];
     const rawType = props.Ship_and_Cargo_Type;
     const shipTypeCode =
       rawType != null &&

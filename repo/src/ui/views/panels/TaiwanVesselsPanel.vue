@@ -45,7 +45,7 @@ onUnmounted(() => {
 
 const isAllSelected = computed({
   get() {
-    return managerState.value.enabledCategories.size === 8 && managerState.value.masterEnabled;
+    return managerState.value.enabledCategories.size === 11 && managerState.value.masterEnabled;
   },
   set(val) {
     if (!managerState.value.masterEnabled) {
@@ -67,7 +67,24 @@ const isMasterEnabled = computed({
 const stats = computed(() => managerState.value.stats);
 const selectedVessel = computed(() => managerState.value.selectedVessel);
 
-// 8 大分類順序（依照官方截圖排序）
+// The 3 agency-classification guess categories (see
+// server/providers/vessels/mpb-taiwan.js's AGENCY_GUESS_CATEGORIES) — their
+// MMSI is prefixed with the guessed category name so it stands out from the
+// 8 official MOTC categories in the same detail card.
+const AGENCY_GUESS_CATEGORY_IDS = new Set([
+  'china_coast_guard',
+  'china_research',
+  'japan_coast_guard',
+]);
+function mmsiDisplay(vessel) {
+  if (!vessel) return '';
+  if (AGENCY_GUESS_CATEGORY_IDS.has(vessel.categoryKey)) {
+    return `${vessel.categoryName} ${vessel.mmsi}`;
+  }
+  return vessel.mmsi;
+}
+
+// 8 大官方分類（依照官方截圖排序）＋ 3 個前端疊加的機構推測分類（非 MOTC 官方分類）
 const categories = [
   { id: 'unspecified', name: '未具體說明的船舶', color: '#d9d9d9', shape: 'dot' },
   { id: 'pleasure_craft', name: '拖船、帆船、遊艇', color: '#13c2c2', shape: 'sail' },
@@ -77,6 +94,9 @@ const categories = [
   { id: 'passenger', name: '客輪', color: '#eb2f96', shape: 'winged' },
   { id: 'cargo', name: '貨輪', color: '#39d5ff', shape: 'carrier' },
   { id: 'tanker', name: '油輪', color: '#ff4d4f', shape: 'tanker' },
+  { id: 'china_coast_guard', name: '中國海警(推測)', color: '#ff3b3b', shape: 'shield' },
+  { id: 'china_research', name: '中國科考船(推測)', color: '#ffd23b', shape: 'hexagon' },
+  { id: 'japan_coast_guard', name: '日本海保(推測)', color: '#3b7bff', shape: 'star' },
 ];
 
 function toggleCategory(catId) {
@@ -199,7 +219,7 @@ function closeTraffic() {
           </label>
         </div>
 
-        <!-- 8 大分類勾選清單 -->
+        <!-- 11 大分類勾選清單（8 大官方 MOTC 分類 ＋ 3 個前端推測分類） -->
         <div class="tw-category-list">
           <div
             v-for="cat in categories"
@@ -273,7 +293,7 @@ function closeTraffic() {
             <button class="detail-close" @click="closeSelected">×</button>
           </div>
           <div class="detail-grid">
-            <div class="detail-item"><span class="k">MMSI:</span> <span class="v">{{ selectedVessel.mmsi }}</span></div>
+            <div class="detail-item"><span class="k">MMSI:</span> <span class="v">{{ mmsiDisplay(selectedVessel) }}</span></div>
             <div class="detail-item"><span class="k">類型:</span> <span class="v" :style="{ color: selectedVessel.color }">{{ selectedVessel.categoryName }}</span></div>
             <div class="detail-item" v-if="selectedVessel.imo"><span class="k">IMO:</span> <span class="v">{{ selectedVessel.imo }}</span></div>
             <div class="detail-item" v-if="selectedVessel.callSign"><span class="k">呼號:</span> <span class="v">{{ selectedVessel.callSign }}</span></div>

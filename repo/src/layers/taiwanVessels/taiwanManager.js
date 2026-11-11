@@ -45,6 +45,9 @@ class TaiwanVesselsManager {
       'special_ops',
       'pleasure_craft',
       'unspecified',
+      'china_coast_guard',
+      'china_research',
+      'japan_coast_guard',
     ]);
     this.showLabels = true;
     this.labelField = 'mmsi'; // 'mmsi' | 'name'
@@ -60,6 +63,9 @@ class TaiwanVesselsManager {
       special_ops: 0,
       pleasure_craft: 0,
       unspecified: 0,
+      china_coast_guard: 0,
+      china_research: 0,
+      japan_coast_guard: 0,
     };
 
     this.listeners = new Set();
@@ -408,6 +414,9 @@ class TaiwanVesselsManager {
       special_ops: 0,
       pleasure_craft: 0,
       unspecified: 0,
+      china_coast_guard: 0,
+      china_research: 0,
+      japan_coast_guard: 0,
     };
     for (const v of this.vessels) {
       if (s[v.categoryKey] !== undefined) {
@@ -518,6 +527,9 @@ class TaiwanVesselsManager {
       'special_ops',
       'pleasure_craft',
       'unspecified',
+      'china_coast_guard',
+      'china_research',
+      'japan_coast_guard',
     ];
     if (enableAll) {
       this.enabledCategories = new Set(all);

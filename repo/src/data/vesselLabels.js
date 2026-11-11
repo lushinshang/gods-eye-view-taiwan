@@ -59,6 +59,22 @@ export const VESSEL_AGENCY_STYLES = Object.freeze({
   'japan-coast-guard': { css: '#3b7bff', accent: '59, 123, 255' },
 });
 
+/**
+ * SVG path data per agency-classification category, shared across every
+ * vessel layer that renders a billboard for a classified vessel (the
+ * AISStream `ais-live-vessels` layer's chevron-replacement icons and the
+ * MOTC `taiwanVessels` layer's icon set) so the same guess always looks the
+ * same everywhere in the app. Centered at (0,0) in a 32x32 viewBox
+ * (`translate(16,16)` before use), pointing roughly "up".
+ */
+export const VESSEL_AGENCY_ICON_SHAPES = Object.freeze({
+  'china-coast-guard': 'M-10,-12 L10,-12 L10,2 L0,14 L-10,2 Z',
+  'china-research':
+    'M0,-12 L10.39,-6 L10.39,6 L0,12 L-10.39,6 L-10.39,-6 Z',
+  'japan-coast-guard':
+    'M0,-13 L3.06,-4.02 L12.37,-4.02 L4.9,1.54 L7.64,10.52 L0,5.02 L-7.64,10.52 L-4.9,1.54 L-12.37,-4.02 L-3.06,-4.02 Z',
+});
+
 // Card text for the type tokens above. The tokens stay English: TYPE_STYLES
 // and tests match on them.
 const TYPE_DISPLAY_KEYS = Object.freeze({

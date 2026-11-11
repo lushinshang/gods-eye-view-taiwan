@@ -46,6 +46,19 @@ const TYPE_STYLES = [
 ];
 const DEFAULT_STYLE = { css: '#39d5ff', accent: '57, 213, 255' };
 
+/**
+ * Agency-classification styling (see `vesselAgencyClassification.js`) — a
+ * different concept layer than AIS ship-type `TYPE_STYLES` above: it marks
+ * who the vessel is guessed to belong to, not what kind of ship it is, so
+ * it takes priority over `TYPE_STYLES` for the billboard shape/color when a
+ * classification matches. Never merged into `TYPE_STYLES`.
+ */
+export const VESSEL_AGENCY_STYLES = Object.freeze({
+  'china-coast-guard': { css: '#ff3b3b', accent: '255, 59, 59' },
+  'china-research': { css: '#ffd23b', accent: '255, 210, 59' },
+  'japan-coast-guard': { css: '#3b7bff', accent: '59, 123, 255' },
+});
+
 // Card text for the type tokens above. The tokens stay English: TYPE_STYLES
 // and tests match on them.
 const TYPE_DISPLAY_KEYS = Object.freeze({
@@ -90,6 +103,16 @@ export function vesselTypeCss(type) {
 /** AIS ship type → "r, g, b" accent string for the host card. */
 export function accentForVesselType(type) {
   return styleForType(type).accent;
+}
+
+/**
+ * Agency-classification category → "r, g, b" accent string for the host
+ * card, or null when the category is unrecognized.
+ * @param {string|null} category One of `VESSEL_AGENCY_STYLES`'s keys.
+ * @returns {string|null}
+ */
+export function accentForVesselAgency(category) {
+  return VESSEL_AGENCY_STYLES[category]?.accent ?? null;
 }
 
 function styleForType(type) {

@@ -1,10 +1,22 @@
 import {
+  accentForVesselAgency,
   accentForVesselType,
   displayVesselType,
   normalizeVesselType,
 } from '../../data/vesselLabels.js';
-import { formatNumber, t } from '../../i18n/index.js';
+import { formatNumber, msg, t } from '../../i18n/index.js';
 import { roundHeadingDegrees } from '../../data/headingDegrees.js';
+import { classifyVesselAgency } from '../../data/vesselAgencyClassification.js';
+
+// Agency-classification label text (see vesselAgencyClassification.js) —
+// always phrased as a guess, never a confirmed identity: neither the
+// name-pattern nor the curated-name match is backed by an official vessel
+// registry.
+const AGENCY_LABEL_KEYS = Object.freeze({
+  'china-coast-guard': msg('Suspected: China Coast Guard'),
+  'china-research': msg('Suspected: China research vessel'),
+  'japan-coast-guard': msg('Suspected: Japan Coast Guard'),
+});
 
 export function createCards({
   vesselState,
@@ -58,6 +70,7 @@ export function createCards({
     const direction = record.heading ?? record.course;
     if (Number.isFinite(direction))
       parts.push(`${roundHeadingDegrees(direction)}°`);
+    const agency = classifyVesselAgency(record);
     return {
       id: vesselOverlayEntryId(record),
       actionable: Boolean(record?.mmsi),
@@ -65,12 +78,22 @@ export function createCards({
         components.rendering.getVisual(record).billboard?.position ||
         components.rendering.getVisual(record).position,
       gapPx: 10,
-      accent: accentForVesselType(record.type),
-      title: trimHudValue(displayVesselName(record), 26),
+      accent: accentForVesselAgency(agency?.category) || accentForVesselType(record.type),
+      title: trimHudValue(
+        agencyLabelPrefix(agency) + displayVesselName(record),
+        26,
+      ),
       details: parts.length ? [parts.join(' · ')] : [],
       selected: false,
       priority: components.rendering.labelPriority(record, null),
     };
+  }
+
+  /** `〔推測:XX〕` prefix for a classified vessel's card title, or '' when unclassified. */
+
+  function agencyLabelPrefix(agency) {
+    if (!agency) return '';
+    return `〔${t(AGENCY_LABEL_KEYS[agency.category])}〕`;
   }
 
   /**
@@ -99,6 +122,7 @@ export function createCards({
     details.push(
       `MMSI ${record.mmsi || '--'} · ${formatPositionTime(record)}${stale ? ` · ${t('STALE')}` : ''}`,
     );
+    const agency = classifyVesselAgency(record);
     return {
       id: vesselOverlayEntryId(record),
       actionable: Boolean(record?.mmsi),
@@ -106,8 +130,11 @@ export function createCards({
         components.rendering.getVisual(record).billboard?.position ||
         components.rendering.getVisual(record).position,
       gapPx: 12,
-      accent: accentForVesselType(record.type),
-      title: trimHudValue(displayVesselName(record), 32),
+      accent: accentForVesselAgency(agency?.category) || accentForVesselType(record.type),
+      title: trimHudValue(
+        agencyLabelPrefix(agency) + displayVesselName(record),
+        32,
+      ),
       details,
       selected: true,
       priority: 100000,
@@ -196,6 +223,7 @@ export function createCards({
     trimHudValue,
     buildVesselCard,
     buildSelectedVesselCard,
+    agencyLabelPrefix,
     vesselOverlayEntryId,
     vesselTypeShort,
     cardScreenSeparated,

@@ -850,6 +850,7 @@
   "Type unknown": "類型未知",
   "Reg unknown": "註冊號未知",
   "Operator unknown": "運營方未知",
+  "Unofficial network lookup": "(網路查詢,非官方)",
   "${amount}K": "{amount}K 美元",
   "${amount}M": "{amount}M 美元",
   "${amount}B": "{amount}B 美元",

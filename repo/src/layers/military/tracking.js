@@ -206,6 +206,39 @@ export function createTracking({
   }
 
   /**
+   * Best-effort operator lookup via hexdb.io (server-proxied at /api/hexdb),
+   * used only when the upstream feed itself has no operator — true for every
+   * military contact (see sdd/archive/.../military-operator-enrichment).
+   * hexdb.io has no documented terms of use, unlike adsb.lol/adsbdb, so its
+   * result is marked in the label as unofficial, never presented as upstream
+   * fact. One fetch per icao24 for the life of this layer instance — the
+   * result (including "not found") is cached so a tracked contact refreshed
+   * every poll never re-queries hexdb.io for the same hex. The fetch is
+   * fire-and-forget: this call returns undefined immediately, so the label
+   * built right after tracking starts still reads "Operator unknown" — the
+   * resolved owner (or confirmed absence) only shows up on the next
+   * military poll (~15s, queries.js's `updateInterval`) that rebuilds the
+   * label, not the instant the fetch resolves.
+   * @param {string} icao24
+   * @returns {string|null|undefined} Owner text, null if looked up and not
+   *   found, or undefined while unresolved/not yet requested.
+   */
+  function _hexdbOwnerFor(icao24) {
+    if (!flightState._hexdbOwnerCache)
+      flightState._hexdbOwnerCache = new Map();
+    const cache = flightState._hexdbOwnerCache;
+    if (cache.has(icao24)) return cache.get(icao24);
+    if (typeof fetch !== 'function' || !/^[0-9a-f]{6}$/i.test(icao24))
+      return undefined;
+    cache.set(icao24, undefined); // mark in-flight so a same-tick re-render doesn't refetch
+    fetch(`/api/hexdb/${icao24}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => cache.set(icao24, data?.found ? data.owner : null))
+      .catch(() => cache.set(icao24, null));
+    return undefined;
+  }
+
+  /**
    * Build the multi-line presentation text for the protected tracked host card.
    * Lines: callsign, type/registration, operator/altitude.
    * While the plane is in its missed-poll grace (coasting on dead reckoning
@@ -235,8 +268,13 @@ export function createTracking({
     );
     const registration =
       parts.queries._toCleanText(info?.registration) || t('Reg unknown');
+    const ownOperator = parts.queries._toCleanText(info?.operator);
+    const hexdbOwner = ownOperator ? undefined : _hexdbOwnerFor(icao24);
     const operator =
-      parts.queries._toCleanText(info?.operator) || t('Operator unknown');
+      ownOperator ||
+      (hexdbOwner
+        ? `${hexdbOwner} ${t('Unofficial network lookup')}`
+        : t('Operator unknown'));
     const altitude = parts.queries._formatAltitude(info?.altitudeFt);
     const speedKt = info?.speedMps ? Math.round(info.speedMps * 1.944) : null;
     const tail = speedKt ? `${altitude} · ${speedKt} kt` : altitude;

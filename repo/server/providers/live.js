@@ -8,6 +8,7 @@ export { requiredFiniteQueryNumber, clampInt } from './common/query.js';
 export { adsbLolFallbackAnchor, openSkyProxy } from './aircraft/opensky.js';
 export { adsbLolProxy } from './aircraft/adsb-lol.js';
 export { adsbdbProxy } from './aircraft/enrichment.js';
+export { hexdbEnrichmentProxy } from './aircraft/hexdbEnrichment.js';
 export { trackBackfillProxies } from './aircraft/tracks.js';
 export { aisLiveProxy } from './vessels/ais-live.js';
 export { taiwanVesselsProxy } from './vessels/mpb-taiwan.js';

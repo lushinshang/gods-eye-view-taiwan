@@ -2,6 +2,25 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { classifyVesselAgency } from './vesselAgencyClassification.js';
 
+test('classifyVesselAgency matches a verified MMSI ahead of name rules', () => {
+  assert.deepEqual(classifyVesselAgency({ mmsi: '413875041', name: 'NOT A CCG NAME' }), {
+    category: 'china-coast-guard',
+    confidence: 'mmsi-confirmed',
+  });
+  assert.deepEqual(classifyVesselAgency({ mmsi: 413330890 }), {
+    category: 'china-research',
+    confidence: 'mmsi-confirmed',
+  });
+});
+
+test('classifyVesselAgency falls back to name rules when MMSI is unverified', () => {
+  assert.deepEqual(classifyVesselAgency({ mmsi: '999999999', name: 'CCG5901' }), {
+    category: 'china-coast-guard',
+    confidence: 'name-pattern',
+  });
+  assert.equal(classifyVesselAgency({ mmsi: '999999999', name: 'EVER GIVEN' }), null);
+});
+
 test('classifyVesselAgency matches China Coast Guard "CCG" + digits names', () => {
   assert.deepEqual(classifyVesselAgency({ name: 'CCG5901' }), {
     category: 'china-coast-guard',

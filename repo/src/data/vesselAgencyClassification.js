@@ -25,7 +25,19 @@
  * to find named, not an exhaustive fleet roster. Every match from this
  * module must therefore be presented to the user as a guess, never as a
  * confirmed identity.
+ *
+ * A later, separate round of research (see `vesselMmsiWatchlist.js`)
+ * independently cross-verified a small MMSI-keyed lookup against ≥2
+ * independent public AIS aggregator domains for a subset of China Coast
+ * Guard and Chinese research vessels. That table is checked first, ahead of
+ * the name-text rules below: an exact MMSI match is a stronger signal
+ * (MMSI is numeric and the match is exact) than a name-text guess. Japan
+ * Coast Guard is intentionally absent from that table — no credible MMSI
+ * pattern was found for it (see `DATA_SOURCES.md`) — so JCG classification
+ * still relies entirely on the name-text rules in this module.
  */
+
+import { lookupVerifiedMmsi } from './vesselMmsiWatchlist.js';
 
 /** @typedef {'china-coast-guard'|'china-research'|'japan-coast-guard'} VesselAgencyCategory */
 
@@ -113,10 +125,15 @@ function normalizeName(name) {
  * a Chinese government research vessel, or a Japan Coast Guard vessel,
  * based on its AIS name text alone. Returns null when nothing matches —
  * callers must leave the vessel's existing rendering untouched in that case.
- * @param {{name?: string}} record Normalized vessel record.
- * @returns {{category: VesselAgencyCategory, confidence: 'name-pattern'|'curated-name'}|null}
+ * @param {{name?: string, mmsi?: string|number}} record Normalized vessel record.
+ * @returns {{category: VesselAgencyCategory, confidence: 'mmsi-confirmed'|'name-pattern'|'curated-name'}|null}
  */
 export function classifyVesselAgency(record) {
+  const mmsiMatch = lookupVerifiedMmsi(record?.mmsi);
+  if (mmsiMatch) {
+    return { category: mmsiMatch, confidence: 'mmsi-confirmed' };
+  }
+
   const rawName = String(record?.name || '').trim();
   if (!rawName) return null;
 

@@ -141,3 +141,20 @@ test('a vessel name matching an agency-guess rule overrides the official MOTC ca
   assert.equal(unmatched.categoryKey, MOTC_CATEGORIES.cargo.id);
   assert.equal(unmatched.categoryName, MOTC_CATEGORIES.cargo.name);
 });
+
+test('a verified MMSI overrides the official MOTC category even when the name matches no rule', () => {
+  const feature = (extra = {}) => ({
+    geometry: { coordinates: [119.5, 24] },
+    properties: {
+      MMSI: '413875041', // verified CHINACOASTGUARD2901, see vesselMmsiWatchlist.js
+      ShipName: 'NOT A RECOGNIZABLE NAME',
+      Ship_and_Cargo_Type: 70, // would normally categorize as cargo
+      SOG: 5,
+      COG: 90,
+      Record_Time: '2026/11/04 21:19:00',
+      ...extra,
+    },
+  });
+  const [ccg] = convertTaiwanVesselRows({ features: [feature()] });
+  assert.equal(ccg.categoryKey, AGENCY_GUESS_CATEGORIES['china-coast-guard'].id);
+});

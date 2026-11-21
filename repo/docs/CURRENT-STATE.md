@@ -4100,9 +4100,10 @@ Historical planning documents may not match runtime behavior.
 
 ## Current Baseline
 
-- Repository metadata and public URLs use the `bilawalsidhu/gods-eye-view`
-  project identity. Runtime behavior is defined by this document and the current
-  source tree rather than historical branch notes.
+- Repository metadata originates from the upstream `bilawalsidhu/gods-eye-view`
+  project; this fork's public URLs and remote are
+  `lushinshang/gods-eye-view-taiwan`. Runtime behavior is defined by this
+  document and the current source tree rather than historical branch notes.
 
 ## Runtime Stack
 

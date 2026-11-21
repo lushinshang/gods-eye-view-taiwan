@@ -11,8 +11,6 @@
 
 # 🌐 God's Eye View
 
-[![CI](https://github.com/bilawalsidhu/gods-eye-view/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/bilawalsidhu/gods-eye-view/actions/workflows/ci.yml) [![Reached #1 on GitHub Trending](https://img.shields.io/badge/%231_GitHub_Trending-thank_you!-F0A63C?style=flat-square&logo=github)](https://x.com/bilawalsidhu/status/2093798887815348521)
-
 ### A spy-satellite simulator in your browser — then you realize the sources are public and the data is real.
 
 Photorealistic 3D globe. Live aircraft, ships, satellites, earthquakes, traffic, and public cameras. Hands-free voice control powered by a realtime AI agent.
@@ -21,19 +19,11 @@ _No place left behind._
 
 ![Orbital HUD, a tracked live globe, FLIR terrain — then OPEN SOURCED](docs/media/hero-open-source-reveal.gif)
 
-<a href="https://www.youtube.com/@bilawalsidhu">
-  <img src="docs/media/youtube-popular-videos.png" alt="The God's Eye View video series on YouTube" width="100%">
-</a>
+<img src="docs/media/youtube-popular-videos.png" alt="The God's Eye View video series on YouTube" width="100%">
 
 ▶️ **From the project behind the viral God's Eye View series** _(formerly WorldView)_ — [5M+ on YouTube](https://youtube.com/playlist?list=PL6qSg2I-7_koPbDnSMo0QeeHX_RknA2uv&si=nBGYMoHWQw41v93Q) · [25M+ across socials](https://www.google.com/search?q=god%27s+eye+view)
 
-🏆 **Reached #1 on GitHub Trending, daily and weekly · August 2026**
-
-**[#8 Product of the Day](https://www.producthunt.com/products/god-s-eye-view?launch=god-s-eye-view)** · Hunted by Chris Messina, creator of the hashtag
-
-_“pretty cool”_ — [Brendan Eich](https://x.com/BrendanEich/status/2094592096401490266), creator of JavaScript and co-founder of Mozilla and Brave · Featured on **[Pinokio](https://pinokio.co/posts/01m1m4p9xxm3qw7dnnpj2wr93g)**
-
-⚡ **Start without API keys.** Install with [Pinokio](https://pinokio.co/apps/github-com-bilawalsidhu-gods-eye-view) or run locally from the terminal. Add optional keys inside the app. **[→ Quick Start](#-quick-start)**
+⚡ **Start without API keys.** Run locally from the terminal. Add optional keys inside the app. **[→ Quick Start](#-quick-start)**
 
 </div>
 
@@ -112,39 +102,15 @@ app's **POWER UP** panel; [Keys & Costs](#-api-keys) explains the options.
 > public OpenStreetMap Overpass servers, which now refuse them, so Traffic,
 > Mapped Installations and ALPR stay empty until you update.
 
-### Path 1 — One click, no terminal
-
-1. Install or update [Pinokio](https://desktop.pinokio.co/) to **8.2 or later**.
-2. Open [God's Eye View in Pinokio](https://pinokio.co/apps/github-com-bilawalsidhu-gods-eye-view).
-3. Click **Install**, then **Start**.
-
-Available on **Windows, macOS, and Linux**. The Pinokio maintainer reports
-cross-platform testing of the fixed installer. The launcher installs the
-locked dependencies, finds a free local port, and opens the app in your system
-browser. The Server menu item keeps the launcher console available.
-
-**Tried before and installation failed?** Update Pinokio and try again.
-Version 8.2 fixes the launcher installation issue;
-[details from the Pinokio maintainer](https://pinokio.co/posts/01m1m4p9xxm3qw7dnnpj2wr93g).
-
-**Using an older launcher or opening the embedded view manually?** If the globe
-is very choppy, before treating that as a GPU
-compatibility or minimum-hardware problem, copy the local server URL shown by
-Pinokio and open the same URL in your normal hardware-accelerated browser. One
-Pinokio 8.2.0 user reported severe stutter in Pinokio's embedded view that went
-away when the same running server was opened in an external browser ([#365](https://github.com/bilawalsidhu/gods-eye-view/issues/365)).
-That points to the embedded browser rather than the app server or your
-hardware; it does not establish a minimum GPU requirement.
-
-### Path 2 — Terminal / coding agent
+### Path 1 — Terminal / coding agent
 
 Use **Node.js 24.x (24.14.0 or later) or 26.x**; 24.22.1 or later (26.12.1 or
 later on 26) includes the October 21, 2026 security fixes, among them
 CVE-2026-111497. The setup doctor warns about Node 25, which is end-of-life.
 
 ```bash
-git clone https://github.com/bilawalsidhu/gods-eye-view.git
-cd gods-eye-view
+git clone https://github.com/lushinshang/gods-eye-view-taiwan.git
+cd gods-eye-view-taiwan
 npm ci
 npm run doctor
 npm run dev
@@ -165,13 +131,13 @@ See [docs/PERFORMANCE.md](docs/PERFORMANCE.md).
 **macOS shortcut:** `./scripts/dev-fresh.sh` clears the Vite cache and pulls any
 configured keys straight from the Keychain. It starts keyless too.
 
-### Path 3 — Docker
+### Path 2 — Docker
 
 No Node install needed; the container publishes the same dev server.
 
 ```bash
-git clone https://github.com/bilawalsidhu/gods-eye-view.git
-cd gods-eye-view
+git clone https://github.com/lushinshang/gods-eye-view-taiwan.git
+cd gods-eye-view-taiwan
 docker compose up
 ```
 
@@ -212,8 +178,8 @@ On a NAS, clone onto the share you want the data on and use the share owner's id
 
 ```bash
 cd /volume1/docker
-git clone https://github.com/bilawalsidhu/gods-eye-view.git
-cd gods-eye-view
+git clone https://github.com/lushinshang/gods-eye-view-taiwan.git
+cd gods-eye-view-taiwan
 env UID=1026 GID=100 docker compose up -d
 ```
 
@@ -243,7 +209,7 @@ the container.
 
 </details>
 
-### Path 4 — GitHub Codespaces (cloud, no local install)
+### Path 3 — GitHub Codespaces (cloud, no local install)
 
 Codespaces requires a GitHub account. Overpass queries and OpenAI voice token
 requests return HTTP 403 through its forwarded HTTPS URL, even with API keys
@@ -706,6 +672,8 @@ God's Eye View runs on **public data, clear sources, and local-first execution.*
 
 **Maintainers:** [Bilawal Sidhu](https://github.com/bilawalsidhu) and [Sameh Khamis](https://github.com/samehkhamis) at [Halfpixel](https://halfpixel.ai).
 
+This Taiwan theater extension fork is maintained independently; see the 🇹🇼 header above.
+
 <sub>Media note: the capture GIFs on this page show Google Photorealistic 3D Tiles and live data layers, used promotionally with in-frame attribution; they aren't licensed for standalone reuse. See [media provenance and permissions](docs/media/README.md); full source terms in [DATA_SOURCES.md](DATA_SOURCES.md).</sub>
 
 > [!IMPORTANT]
@@ -726,8 +694,6 @@ First — thank you. To everyone who watched the God-view demos and went off to 
 So here it is. Step inside the spy-thriller cockpit — except the data is real — and let's turn this into our shared sandbox for making sense of the world, and have fun doing it. This repo is the baseline, it stays open, and the whole point is for you to break things and bolt on layers we haven't thought of yet.
 
 One heads-up from the inside: build in this space for a week and you learn that **the present is the cheap part**. The moment you try to go back in time — tiling, serving, and scrubbing _what happened_ and _what changed_ at any real resolution — the data gets expensive and the compute gets brutal. That's the long game.
-
-**Update — a hosted version is coming.** We originally planned to keep this repository as the open-source client and build a separate professional product. Then the launch happened, and the loudest request wasn't another feature — it was _"just give me a link."_ So we're building an official hosted God's Eye View at [Halfpixel](https://halfpixel.ai): no installation, just open it in your browser. The hosted version is the easiest way into this open-source project. More soon.
 
 ---
 

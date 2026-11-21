@@ -9,8 +9,8 @@ Prefer 24.22.1 or later: earlier releases lack the October 21, 2026 security
 fixes, including CVE-2026-111497 (a Brotli decoder flaw).
 
 ```bash
-git clone https://github.com/bilawalsidhu/gods-eye-view.git
-cd gods-eye-view
+git clone https://github.com/lushinshang/gods-eye-view-taiwan.git
+cd gods-eye-view-taiwan
 nvm install 24.22.2
 nvm use 24.22.2
 npm install
@@ -24,8 +24,6 @@ Google Maps provides direct photorealistic 3D and place search; Cesium ion
 provides ion-hosted Google 3D plus optional Bing/world-terrain stacks.
 On macOS the launcher pulls optional keys from
 the Keychain; on any platform you can pass them as env vars or use a `.env`.
-People who only want to run the app can instead install the repository directly
-through Pinokio; the terminal path above remains the contributor path.
 
 Open `http://localhost:4173`. Before sending a PR run `npm run build`, `npm test`, and `npm run test:track` (dev server must be up) — **all three must stay green.**
 
@@ -265,6 +263,9 @@ God's Eye View is maintained by [Bilawal Sidhu](https://github.com/bilawalsidhu)
 and [Sameh Khamis](https://github.com/samehkhamis) at
 [Halfpixel](https://halfpixel.ai). Either maintainer can review and merge
 contributions.
+
+This Taiwan theater extension fork is maintained independently of the
+upstream project.
 
 ## Ground rules
 

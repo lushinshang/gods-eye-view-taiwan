@@ -111,6 +111,7 @@ CVE-2026-111497. The setup doctor warns about Node 25, which is end-of-life.
 ```bash
 git clone https://github.com/lushinshang/gods-eye-view-taiwan.git
 cd gods-eye-view-taiwan
+cd repo
 npm ci
 npm run doctor
 npm run dev
@@ -138,6 +139,7 @@ No Node install needed; the container publishes the same dev server.
 ```bash
 git clone https://github.com/lushinshang/gods-eye-view-taiwan.git
 cd gods-eye-view-taiwan
+cd repo
 docker compose up
 ```
 
@@ -180,6 +182,7 @@ On a NAS, clone onto the share you want the data on and use the share owner's id
 cd /volume1/docker
 git clone https://github.com/lushinshang/gods-eye-view-taiwan.git
 cd gods-eye-view-taiwan
+cd repo
 env UID=1026 GID=100 docker compose up -d
 ```
 
@@ -227,6 +230,7 @@ quotas apply.
 3. In the codespace terminal:
    ```bash
    nvm install 24 && nvm use 24
+   cd repo
    npm ci
    npm run doctor
    GEV_ALLOWED_HOSTS="$CODESPACE_NAME-4173.$GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN" npm run dev

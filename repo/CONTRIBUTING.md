@@ -11,6 +11,7 @@ fixes, including CVE-2026-111497 (a Brotli decoder flaw).
 ```bash
 git clone https://github.com/lushinshang/gods-eye-view-taiwan.git
 cd gods-eye-view-taiwan
+cd repo
 nvm install 24.22.2
 nvm use 24.22.2
 npm install

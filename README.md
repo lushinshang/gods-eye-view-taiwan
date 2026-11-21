@@ -88,15 +88,15 @@ cd $env:USERPROFILE\Downloads; curl.exe -L -o gev.zip https://github.com/lushins
 ### 方法二：手動 Docker Compose 啟動
 ```bash
 # 1. 進入 repo 目錄並背景啟動容器
-cd /Users/lanss/projects/2_Practice/tools/1151104_gods-eye-view/repo
+cd repo
 docker compose up -d
 
 # 2. 開啟瀏覽器進入戰情室
 open http://localhost:4173
 
 # 3. 查閱本機圖文並茂系統文件
-open /Users/lanss/projects/2_Practice/tools/1151104_gods-eye-view/readme.html
-open /Users/lanss/projects/2_Practice/tools/1151104_gods-eye-view/system-architecture.html
+open readme.html
+open system-architecture.html
 ```
 
 ---
